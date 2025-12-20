@@ -58,6 +58,11 @@ export default {
             animation: {
                 'fade-in': 'fadeIn 0.6s ease-out forwards',
                 'fade-in-up': 'fadeInUp 0.6s ease-out forwards',
+                'wave-slow': 'waveMove 8s ease-in-out infinite',
+                'wave-medium': 'waveMove 6s ease-in-out infinite reverse',
+                'spin-slow': 'spin 8s linear infinite',
+                'sway': 'sway 3s ease-in-out infinite',
+                'float': 'float 6s ease-in-out infinite',
             },
             keyframes: {
                 fadeIn: {
@@ -67,6 +72,18 @@ export default {
                 fadeInUp: {
                     '0%': { opacity: '0', transform: 'translateY(20px)' },
                     '100%': { opacity: '1', transform: 'translateY(0)' },
+                },
+                waveMove: {
+                    '0%, 100%': { transform: 'translateX(0)' },
+                    '50%': { transform: 'translateX(-25px)' },
+                },
+                sway: {
+                    '0%, 100%': { transform: 'rotate(-1deg)' },
+                    '50%': { transform: 'rotate(1deg)' },
+                },
+                float: {
+                    '0%, 100%': { transform: 'translateY(0)' },
+                    '50%': { transform: 'translateY(-10px)' },
                 },
             },
         },

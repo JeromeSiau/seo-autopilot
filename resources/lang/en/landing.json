@@ -16,16 +16,16 @@
     "title": "Smooth sailing to",
     "titleAccent": "better rankings",
     "subtitle": "Generate SEO-optimized articles that actually rank. Our AI creates human-quality content tailored to your keywords and audience.",
-    "cta": "Start Free Trial",
+    "cta": "Cast off now",
     "ctaSecondary": "Watch demo",
     "stats": {
       "articles": "Articles generated",
-      "users": "Happy users",
+      "users": "Crews aboard",
       "ranking": "Avg. ranking boost"
     }
   },
   "socialProof": {
-    "title": "Trusted by forward-thinking teams"
+    "title": "Trusted by forward-thinking crews"
   },
   "problem": {
     "label": "The problem",
@@ -84,8 +84,8 @@
   },
   "howItWorks": {
     "label": "How it works",
-    "title": "From zero to ranking in three steps.",
-    "subtitle": "Get started in minutes and watch your traffic grow.",
+    "title": "From zero to ranking in three ports of call.",
+    "subtitle": "Set sail in minutes and watch your traffic grow.",
     "step1": {
       "number": "01",
       "title": "Connect your site",
@@ -143,7 +143,7 @@
     "yearlyDiscount": "Save 20%",
     "perMonth": "/month",
     "starter": {
-      "name": "Starter",
+      "name": "Deckhand",
       "description": "Perfect for solo creators and small blogs.",
       "price": "49",
       "features": [
@@ -153,10 +153,10 @@
         "Email support",
         "WordPress integration"
       ],
-      "cta": "Get started"
+      "cta": "Come aboard"
     },
     "pro": {
-      "name": "Pro",
+      "name": "Captain",
       "description": "For growing businesses serious about SEO.",
       "price": "99",
       "popular": "Most popular",
@@ -168,10 +168,10 @@
         "All integrations",
         "Custom brand voice"
       ],
-      "cta": "Get started"
+      "cta": "Take the helm"
     },
     "agency": {
-      "name": "Agency",
+      "name": "Shipowner",
       "description": "For agencies managing multiple clients.",
       "price": "249",
       "features": [
@@ -182,7 +182,7 @@
         "API access",
         "Dedicated account manager"
       ],
-      "cta": "Contact sales"
+      "cta": "Contact the crew"
     }
   },
   "faq": {
@@ -215,8 +215,8 @@
   },
   "cta": {
     "title": "Ready to set sail for better rankings?",
-    "subtitle": "Join 500+ businesses already growing their organic traffic with RankCruise.",
-    "button": "Start your free trial",
+    "subtitle": "Join 500+ crews already growing their organic traffic with RankCruise.",
+    "button": "Cast off now",
     "note": "No credit card required. 14-day free trial."
   },
   "footer": {

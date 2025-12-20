@@ -1,12 +1,11 @@
 import { Head, Link } from '@inertiajs/react';
 import { useState, useEffect, useRef } from 'react';
 import {
-    Zap,
-    FileText,
-    TrendingUp,
-    Calendar,
-    Globe,
-    Shield,
+    Wind,
+    Compass,
+    Anchor,
+    Map,
+    Ship,
     ArrowRight,
     Play,
     Star,
@@ -14,8 +13,82 @@ import {
     X,
     Check,
     ChevronDown,
+    Globe,
 } from 'lucide-react';
 import Logo from '@/Components/Logo';
+
+// Animated wave SVG component
+function WaveBackground({ className = '', opacity = 0.1 }: { className?: string; opacity?: number }) {
+    return (
+        <div className={`absolute inset-0 overflow-hidden pointer-events-none ${className}`}>
+            <svg
+                className="absolute bottom-0 left-0 w-full"
+                style={{ opacity }}
+                viewBox="0 0 1440 320"
+                preserveAspectRatio="none"
+            >
+                <path
+                    className="animate-wave-slow"
+                    fill="currentColor"
+                    d="M0,192L48,197.3C96,203,192,213,288,229.3C384,245,480,267,576,250.7C672,235,768,181,864,181.3C960,181,1056,235,1152,234.7C1248,235,1344,181,1392,154.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
+                />
+            </svg>
+            <svg
+                className="absolute bottom-0 left-0 w-full"
+                style={{ opacity: opacity * 0.7 }}
+                viewBox="0 0 1440 320"
+                preserveAspectRatio="none"
+            >
+                <path
+                    className="animate-wave-medium"
+                    fill="currentColor"
+                    d="M0,256L48,240C96,224,192,192,288,181.3C384,171,480,181,576,186.7C672,192,768,192,864,208C960,224,1056,256,1152,261.3C1248,267,1344,245,1392,234.7L1440,224L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
+                />
+            </svg>
+        </div>
+    );
+}
+
+// Wave separator between sections
+function WaveSeparator({ flip = false, fillColor = '#fafaf8' }: { flip?: boolean; fillColor?: string }) {
+    return (
+        <div className={`relative w-full overflow-hidden ${flip ? 'rotate-180' : ''}`} style={{ height: '50px', marginTop: '-1px', marginBottom: '-1px' }}>
+            <svg
+                className="absolute bottom-0 w-full"
+                viewBox="0 0 1440 50"
+                preserveAspectRatio="none"
+                style={{ height: '100%' }}
+            >
+                <path
+                    fill={fillColor}
+                    d="M0,25 C240,50 480,0 720,25 C960,50 1200,0 1440,25 L1440,50 L0,50 Z"
+                />
+            </svg>
+        </div>
+    );
+}
+
+// Compass loader/spinner component
+function CompassLoader({ size = 40, className = '' }: { size?: number; className?: string }) {
+    return (
+        <div className={`relative ${className}`} style={{ width: size, height: size }}>
+            <svg viewBox="0 0 100 100" className="w-full h-full animate-spin-slow">
+                {/* Outer ring */}
+                <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="2" opacity="0.3" />
+                {/* Compass points */}
+                <path d="M50 10 L53 20 L50 18 L47 20 Z" fill="currentColor" /> {/* N */}
+                <path d="M90 50 L80 53 L82 50 L80 47 Z" fill="currentColor" opacity="0.5" /> {/* E */}
+                <path d="M50 90 L47 80 L50 82 L53 80 Z" fill="currentColor" opacity="0.5" /> {/* S */}
+                <path d="M10 50 L20 47 L18 50 L20 53 Z" fill="currentColor" opacity="0.5" /> {/* W */}
+                {/* Needle */}
+                <path d="M50 20 L55 50 L50 55 L45 50 Z" fill="#22c55e" />
+                <path d="M50 80 L45 50 L50 45 L55 50 Z" fill="#ef4444" />
+                {/* Center */}
+                <circle cx="50" cy="50" r="5" fill="currentColor" />
+            </svg>
+        </div>
+    );
+}
 
 interface LandingProps {
     locale: string;
@@ -111,12 +184,12 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
     const currentLang = languages.find(l => l.code === locale) || languages[0];
 
     const features = [
-        { icon: Zap, title: t.features.feature1.title, description: t.features.feature1.description },
-        { icon: FileText, title: t.features.feature2.title, description: t.features.feature2.description },
-        { icon: TrendingUp, title: t.features.feature3.title, description: t.features.feature3.description },
-        { icon: Calendar, title: t.features.feature4.title, description: t.features.feature4.description },
+        { icon: Wind, title: t.features.feature1.title, description: t.features.feature1.description },
+        { icon: Compass, title: t.features.feature2.title, description: t.features.feature2.description },
+        { icon: Ship, title: t.features.feature3.title, description: t.features.feature3.description },
+        { icon: Map, title: t.features.feature4.title, description: t.features.feature4.description },
         { icon: Globe, title: t.features.feature5?.title || 'Multi-Language', description: t.features.feature5?.description || 'Generate content in 50+ languages.' },
-        { icon: Shield, title: t.features.feature6?.title || 'Quality Guarantee', description: t.features.feature6?.description || 'Every article passes plagiarism checks.' },
+        { icon: Anchor, title: t.features.feature6?.title || 'Quality Guarantee', description: t.features.feature6?.description || 'Every article passes plagiarism checks.' },
     ];
 
     const steps = [
@@ -322,14 +395,17 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
                 </header>
 
                 {/* Hero Section */}
-                <section className="pt-32 pb-20 lg:pt-40 lg:pb-24">
-                    <div className="max-w-[1200px] mx-auto px-8">
+                <section className="pt-32 pb-20 lg:pt-40 lg:pb-24 relative overflow-hidden">
+                    {/* Animated waves background */}
+                    <WaveBackground className="text-primary-500" opacity={0.08} />
+
+                    <div className="max-w-[1200px] mx-auto px-8 relative z-10">
                         <div className="grid lg:grid-cols-2 gap-16 items-center">
                             {/* Left: Content */}
                             <div>
                                 <AnimatedSection>
                                     <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 text-primary-600 text-[0.85rem] font-semibold rounded-full mb-6">
-                                        <Zap className="w-4 h-4" />
+                                        <Compass className="w-4 h-4" />
                                         {t.hero.badge}
                                     </div>
                                 </AnimatedSection>
@@ -387,29 +463,33 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
                             {/* Right: Bento Grid */}
                             <AnimatedSection delay={300} className="hidden lg:block">
                                 <div className="grid grid-cols-2 gap-4">
-                                    <div className="bg-white rounded-2xl p-6 shadow-md border border-black/5 hover:-translate-y-1 hover:shadow-lg transition-all">
+                                    <div className="bg-white rounded-2xl p-6 shadow-md border border-black/5 hover:-translate-y-1 hover:shadow-lg hover:animate-sway transition-all">
                                         <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center text-primary-600 mb-4">
-                                            <FileText className="w-5 h-5" />
+                                            <Ship className="w-5 h-5" />
                                         </div>
                                         <div className="text-[0.9rem] font-medium text-surface-900 mb-1">Articles Today</div>
                                         <div className="font-display text-[2rem] font-bold text-primary-500">12</div>
                                     </div>
-                                    <div className="bg-white rounded-2xl p-6 shadow-md border border-black/5 hover:-translate-y-1 hover:shadow-lg transition-all">
+                                    <div className="bg-white rounded-2xl p-6 shadow-md border border-black/5 hover:-translate-y-1 hover:shadow-lg hover:animate-sway transition-all">
                                         <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center text-primary-600 mb-4">
-                                            <TrendingUp className="w-5 h-5" />
+                                            <Anchor className="w-5 h-5" />
                                         </div>
                                         <div className="text-[0.9rem] font-medium text-surface-900 mb-1">Avg. Position</div>
                                         <div className="font-display text-[2rem] font-bold text-primary-500">#4.2</div>
                                     </div>
-                                    <div className="col-span-2 bg-gradient-to-br from-primary-50 to-primary-100/50 rounded-2xl p-6 shadow-md border border-primary-200/50 hover:-translate-y-1 hover:shadow-lg transition-all">
+                                    <div className="col-span-2 bg-gradient-to-br from-primary-50 to-primary-100/50 rounded-2xl p-6 shadow-md border border-primary-200/50 hover:-translate-y-1 hover:shadow-lg transition-all relative overflow-hidden">
                                         <div className="text-[0.9rem] font-medium text-surface-900 mb-1">Organic Traffic Growth</div>
                                         <div className="text-[0.85rem] text-surface-500 mb-4">Last 7 days • +34% from previous week</div>
                                         <div className="flex items-end gap-2 h-[60px]">
                                             {[40, 55, 45, 70, 60, 85, 95].map((height, i) => (
                                                 <div
                                                     key={i}
-                                                    className={`flex-1 rounded ${i >= 5 ? 'bg-primary-500' : 'bg-primary-200'}`}
-                                                    style={{ height: `${height}%` }}
+                                                    className={`flex-1 rounded-t transition-all duration-1000 ${i >= 5 ? 'bg-primary-500' : 'bg-primary-200'}`}
+                                                    style={{
+                                                        height: `${height}%`,
+                                                        animation: `float ${3 + i * 0.3}s ease-in-out infinite`,
+                                                        animationDelay: `${i * 0.15}s`
+                                                    }}
                                                 />
                                             ))}
                                         </div>
@@ -438,8 +518,11 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
                     </div>
                 </section>
 
+                {/* Wave separator */}
+                <WaveSeparator fillColor="#fafaf8" />
+
                 {/* Problem/Solution */}
-                <section className="py-24">
+                <section className="py-24 bg-surface-50">
                     <div className="max-w-[1200px] mx-auto px-8">
                         <AnimatedSection>
                             <div className="text-center mb-16">
@@ -500,6 +583,9 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
                     </div>
                 </section>
 
+                {/* Wave separator */}
+                <WaveSeparator fillColor="#f5f4f0" />
+
                 {/* Features */}
                 <section id="features" className="py-24 bg-surface-100">
                     <div className="max-w-[1200px] mx-auto px-8">
@@ -520,8 +606,8 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {features.map((feature, i) => (
                                 <AnimatedSection key={i} delay={i * 100}>
-                                    <div className="bg-white rounded-2xl p-8 shadow-sm border border-surface-200 hover:-translate-y-1 hover:shadow-lg hover:border-primary-200 transition-all">
-                                        <div className="w-12 h-12 bg-gradient-to-br from-primary-50 to-primary-100 rounded-xl flex items-center justify-center text-primary-600 mb-5">
+                                    <div className="bg-white rounded-2xl p-8 shadow-sm border border-surface-200 hover:-translate-y-1 hover:shadow-lg hover:border-primary-200 hover:animate-sway transition-all">
+                                        <div className="w-12 h-12 bg-gradient-to-br from-primary-50 to-primary-100 rounded-xl flex items-center justify-center text-primary-600 mb-5 animate-float" style={{ animationDelay: `${i * 0.2}s` }}>
                                             <feature.icon className="w-6 h-6" />
                                         </div>
                                         <h3 className="font-display text-lg font-semibold text-surface-900 mb-2">
@@ -536,6 +622,9 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
                         </div>
                     </div>
                 </section>
+
+                {/* Wave separator */}
+                <WaveSeparator fillColor="#fafaf8" flip />
 
                 {/* How It Works */}
                 <section id="how-it-works" className="py-24">
@@ -646,6 +735,9 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
                     </div>
                 </section>
 
+                {/* Wave separator */}
+                <WaveSeparator fillColor="#fafaf8" flip />
+
                 {/* Testimonials */}
                 <section className="py-24">
                     <div className="max-w-[1200px] mx-auto px-8">
@@ -695,6 +787,9 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
                         </div>
                     </div>
                 </section>
+
+                {/* Wave separator */}
+                <WaveSeparator fillColor="#f5f4f0" />
 
                 {/* FAQ */}
                 <section id="faq" className="py-24 bg-surface-100">

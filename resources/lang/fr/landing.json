@@ -16,16 +16,16 @@
     "title": "Cap vers de",
     "titleAccent": "meilleurs classements",
     "subtitle": "Générez des articles SEO optimisés qui se positionnent vraiment. Notre IA crée du contenu de qualité humaine adapté à vos mots-clés et votre audience.",
-    "cta": "Essai gratuit",
+    "cta": "Larguer les amarres",
     "ctaSecondary": "Voir la démo",
     "stats": {
       "articles": "Articles générés",
-      "users": "Utilisateurs satisfaits",
+      "users": "Équipages à bord",
       "ranking": "Amélioration moyenne"
     }
   },
   "socialProof": {
-    "title": "Des équipes visionnaires nous font confiance"
+    "title": "Des équipages visionnaires nous font confiance"
   },
   "problem": {
     "label": "Le problème",
@@ -84,8 +84,8 @@
   },
   "howItWorks": {
     "label": "Comment ça marche",
-    "title": "De zéro au positionnement en trois étapes.",
-    "subtitle": "Démarrez en quelques minutes et regardez votre trafic croître.",
+    "title": "De zéro au positionnement en trois escales.",
+    "subtitle": "Embarquez en quelques minutes et regardez votre trafic croître.",
     "step1": {
       "number": "01",
       "title": "Connectez votre site",
@@ -143,7 +143,7 @@
     "yearlyDiscount": "Économisez 20%",
     "perMonth": "/mois",
     "starter": {
-      "name": "Starter",
+      "name": "Mousse",
       "description": "Parfait pour les créateurs solo et petits blogs.",
       "price": "49",
       "features": [
@@ -153,10 +153,10 @@
         "Support email",
         "Intégration WordPress"
       ],
-      "cta": "Commencer"
+      "cta": "Embarquer"
     },
     "pro": {
-      "name": "Pro",
+      "name": "Capitaine",
       "description": "Pour les entreprises sérieuses sur le SEO.",
       "price": "99",
       "popular": "Le plus populaire",
@@ -168,10 +168,10 @@
         "Toutes les intégrations",
         "Voix de marque personnalisée"
       ],
-      "cta": "Commencer"
+      "cta": "Prendre la barre"
     },
     "agency": {
-      "name": "Agency",
+      "name": "Armateur",
       "description": "Pour les agences gérant plusieurs clients.",
       "price": "249",
       "features": [
@@ -182,7 +182,7 @@
         "Accès API",
         "Account manager dédié"
       ],
-      "cta": "Contacter les ventes"
+      "cta": "Contacter l'équipage"
     }
   },
   "faq": {
@@ -215,8 +215,8 @@
   },
   "cta": {
     "title": "Prêt à mettre le cap vers de meilleurs rankings ?",
-    "subtitle": "Rejoignez plus de 500 entreprises qui développent déjà leur trafic organique avec RankCruise.",
-    "button": "Démarrer l'essai gratuit",
+    "subtitle": "Rejoignez plus de 500 équipages qui développent déjà leur trafic organique avec RankCruise.",
+    "button": "Larguer les amarres",
     "note": "Pas de carte bancaire requise. Essai gratuit de 14 jours."
   },
   "footer": {

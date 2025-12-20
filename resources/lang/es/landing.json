@@ -16,16 +16,16 @@
     "title": "Navegando hacia",
     "titleAccent": "mejores rankings",
     "subtitle": "Genera artículos SEO optimizados que realmente posicionan. Nuestra IA crea contenido de calidad humana adaptado a tus palabras clave y audiencia.",
-    "cta": "Prueba gratis",
+    "cta": "Soltar amarras",
     "ctaSecondary": "Ver demo",
     "stats": {
       "articles": "Artículos generados",
-      "users": "Usuarios satisfechos",
+      "users": "Tripulaciones a bordo",
       "ranking": "Mejora promedio"
     }
   },
   "socialProof": {
-    "title": "Equipos visionarios confían en nosotros"
+    "title": "Tripulaciones visionarias confían en nosotros"
   },
   "problem": {
     "label": "El problema",
@@ -84,8 +84,8 @@
   },
   "howItWorks": {
     "label": "Cómo funciona",
-    "title": "De cero a posicionamiento en tres pasos.",
-    "subtitle": "Empieza en minutos y mira crecer tu tráfico.",
+    "title": "De cero a posicionamiento en tres escalas.",
+    "subtitle": "Zarpa en minutos y mira crecer tu tráfico.",
     "step1": {
       "number": "01",
       "title": "Conecta tu sitio",
@@ -143,7 +143,7 @@
     "yearlyDiscount": "Ahorra 20%",
     "perMonth": "/mes",
     "starter": {
-      "name": "Starter",
+      "name": "Grumete",
       "description": "Perfecto para creadores independientes y blogs pequeños.",
       "price": "49",
       "features": [
@@ -153,10 +153,10 @@
         "Soporte por email",
         "Integración WordPress"
       ],
-      "cta": "Empezar"
+      "cta": "Embarcar"
     },
     "pro": {
-      "name": "Pro",
+      "name": "Capitán",
       "description": "Para negocios serios sobre SEO.",
       "price": "99",
       "popular": "Más popular",
@@ -168,10 +168,10 @@
         "Todas las integraciones",
         "Voz de marca personalizada"
       ],
-      "cta": "Empezar"
+      "cta": "Tomar el timón"
     },
     "agency": {
-      "name": "Agency",
+      "name": "Armador",
       "description": "Para agencias gestionando múltiples clientes.",
       "price": "249",
       "features": [
@@ -182,7 +182,7 @@
         "Acceso API",
         "Account manager dedicado"
       ],
-      "cta": "Contactar ventas"
+      "cta": "Contactar la tripulación"
     }
   },
   "faq": {
@@ -215,8 +215,8 @@
   },
   "cta": {
     "title": "¿Listo para navegar hacia mejores rankings?",
-    "subtitle": "Únete a más de 500 empresas que ya están creciendo su tráfico orgánico con RankCruise.",
-    "button": "Empieza tu prueba gratis",
+    "subtitle": "Únete a más de 500 tripulaciones que ya están creciendo su tráfico orgánico con RankCruise.",
+    "button": "Soltar amarras",
     "note": "Sin tarjeta de crédito. Prueba gratis de 14 días."
   },
   "footer": {
