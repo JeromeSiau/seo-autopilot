@@ -7,6 +7,7 @@ use App\Http\Controllers\Web\AnalyticsController;
 use App\Http\Controllers\Web\ArticleController;
 use App\Http\Controllers\Web\IntegrationController;
 use App\Http\Controllers\Web\KeywordController;
+use App\Http\Controllers\Web\NotificationController;
 use App\Http\Controllers\Web\SettingsController;
 use App\Http\Controllers\Web\SiteController;
 use Illuminate\Foundation\Application;
@@ -73,6 +74,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/settings/api-keys', [SettingsController::class, 'apiKeys'])->name('settings.api-keys');
     Route::get('/settings/brand-voices', [SettingsController::class, 'brandVoices'])->name('settings.brand-voices');
     Route::get('/settings/notifications', [SettingsController::class, 'notifications'])->name('settings.notifications');
+
+    // Notifications
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.readAll');
 });
 
 Route::middleware('auth')->group(function () {
