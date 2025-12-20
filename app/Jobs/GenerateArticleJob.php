@@ -6,6 +6,7 @@ use App\Models\Article;
 use App\Models\BrandVoice;
 use App\Models\Keyword;
 use App\Services\Content\ArticleGenerator;
+use App\Services\Image\ImageGenerator;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -25,7 +26,7 @@ class GenerateArticleJob implements ShouldQueue
     /**
      * The number of seconds the job can run before timing out.
      */
-    public int $timeout = 300; // 5 minutes
+    public int $timeout = 420; // 7 minutes (more time for images)
 
     /**
      * The number of seconds to wait before retrying the job.
@@ -35,9 +36,11 @@ class GenerateArticleJob implements ShouldQueue
     public function __construct(
         public readonly Keyword $keyword,
         public readonly ?int $brandVoiceId = null,
+        public readonly bool $generateImages = true,
+        public readonly int $sectionImageCount = 2,
     ) {}
 
-    public function handle(ArticleGenerator $generator): void
+    public function handle(ArticleGenerator $generator, ImageGenerator $imageGenerator): void
     {
         Log::info("GenerateArticleJob: Starting for keyword '{$this->keyword->keyword}'");
 
@@ -58,6 +61,11 @@ class GenerateArticleJob implements ShouldQueue
 
         try {
             $article = $generator->generateAndSave($this->keyword, $brandVoice);
+
+            // Generate images if enabled
+            if ($this->generateImages) {
+                $this->generateArticleImages($article, $imageGenerator);
+            }
 
             Log::info("GenerateArticleJob: Completed successfully", [
                 'article_id' => $article->id,
@@ -84,6 +92,42 @@ class GenerateArticleJob implements ShouldQueue
             }
 
             throw $e;
+        }
+    }
+
+    private function generateArticleImages(Article $article, ImageGenerator $imageGenerator): void
+    {
+        try {
+            Log::info("GenerateArticleJob: Generating images for article", [
+                'article_id' => $article->id,
+            ]);
+
+            $images = $imageGenerator->generateAllImages(
+                $article,
+                $this->sectionImageCount
+            );
+
+            // Store image paths in article
+            $imageData = [
+                'featured' => $images['featured']->toArray(),
+                'sections' => array_map(fn($img) => $img->toArray(), $images['sections']),
+            ];
+
+            $article->update([
+                'images' => $imageData,
+                'generation_cost' => $article->generation_cost + $imageGenerator->getTotalCost(),
+            ]);
+
+            Log::info("GenerateArticleJob: Images generated successfully", [
+                'article_id' => $article->id,
+                'image_cost' => $imageGenerator->getTotalCost(),
+            ]);
+        } catch (\Exception $e) {
+            // Image generation failure shouldn't fail the whole job
+            Log::warning("GenerateArticleJob: Image generation failed", [
+                'article_id' => $article->id,
+                'error' => $e->getMessage(),
+            ]);
         }
     }
 

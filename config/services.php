@@ -58,12 +58,12 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Image Generation
+    | Image Generation (Replicate - FLUX models)
     |--------------------------------------------------------------------------
     */
 
-    'flux' => [
-        'api_key' => env('FLUX_API_KEY'),
+    'replicate' => [
+        'api_key' => env('REPLICATE_API_KEY'),
     ],
 
     /*
