@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Site extends Model
 {
@@ -21,6 +22,11 @@ class Site extends Model
         'ga4_refresh_token',
         'ga4_token_expires_at',
         'ga4_property_id',
+        'business_description',
+        'target_audience',
+        'topics',
+        'last_crawled_at',
+        'onboarding_completed_at',
     ];
 
     protected $hidden = [
@@ -37,6 +43,9 @@ class Site extends Model
         'ga4_token' => 'encrypted',
         'ga4_refresh_token' => 'encrypted',
         'ga4_token_expires_at' => 'datetime',
+        'topics' => 'array',
+        'last_crawled_at' => 'datetime',
+        'onboarding_completed_at' => 'datetime',
     ];
 
     public function team(): BelongsTo
@@ -64,6 +73,16 @@ class Site extends Model
         return $this->hasManyThrough(ArticleAnalytic::class, Article::class);
     }
 
+    public function settings(): HasOne
+    {
+        return $this->hasOne(SiteSetting::class);
+    }
+
+    public function autopilotLogs(): HasMany
+    {
+        return $this->hasMany(AutopilotLog::class);
+    }
+
     public function isGscConnected(): bool
     {
         return !empty($this->gsc_token);
@@ -82,5 +101,27 @@ class Site extends Model
     public function getPendingKeywordsCountAttribute(): int
     {
         return $this->keywords()->where('status', 'pending')->count();
+    }
+
+    public function getOrCreateSettings(): SiteSetting
+    {
+        if ($this->settings) {
+            return $this->settings;
+        }
+
+        return SiteSetting::create([
+            'site_id' => $this->id,
+            'articles_per_week' => 5,
+        ]);
+    }
+
+    public function isAutopilotActive(): bool
+    {
+        return $this->settings?->autopilot_enabled ?? false;
+    }
+
+    public function isOnboardingComplete(): bool
+    {
+        return $this->onboarding_completed_at !== null;
     }
 }
