@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import clsx from 'clsx';
 import { User as UserType } from '@/types';
+import NotificationDropdown from '@/Components/Notifications/NotificationDropdown';
 
 interface NavItem {
     name: string;
@@ -181,6 +182,9 @@ export default function AppLayout({
                                 </span>
                             </div>
                         )}
+
+                        {/* Notification dropdown */}
+                        <NotificationDropdown initialCount={0} />
 
                         {/* User menu */}
                         <div className="relative">
