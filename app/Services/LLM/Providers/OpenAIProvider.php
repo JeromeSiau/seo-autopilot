@@ -1,0 +1,135 @@
+<?php
+
+namespace App\Services\LLM\Providers;
+
+use App\Services\LLM\Contracts\LLMProviderInterface;
+use App\Services\LLM\DTOs\LLMResponse;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+
+class OpenAIProvider implements LLMProviderInterface
+{
+    private const API_URL = 'https://api.openai.com/v1/chat/completions';
+
+    // Pricing per 1M tokens (December 2025)
+    private const PRICING = [
+        'gpt-5' => ['input' => 1.25, 'output' => 10.00],
+        'gpt-5-nano' => ['input' => 0.05, 'output' => 0.40],
+        'gpt-4o' => ['input' => 5.00, 'output' => 15.00],
+        'gpt-4o-mini' => ['input' => 0.15, 'output' => 0.60],
+    ];
+
+    public function __construct(
+        private readonly string $apiKey,
+        private readonly string $defaultModel = 'gpt-5',
+    ) {}
+
+    public function complete(string $prompt, array $options = []): LLMResponse
+    {
+        $model = $options['model'] ?? $this->defaultModel;
+        $startTime = microtime(true);
+
+        $response = Http::withHeaders([
+            'Authorization' => "Bearer {$this->apiKey}",
+            'Content-Type' => 'application/json',
+        ])->timeout(120)->post(self::API_URL, [
+            'model' => $model,
+            'messages' => [
+                ['role' => 'user', 'content' => $prompt],
+            ],
+            'temperature' => $options['temperature'] ?? 0.7,
+            'max_tokens' => $options['max_tokens'] ?? 4096,
+        ]);
+
+        $latencyMs = (microtime(true) - $startTime) * 1000;
+
+        if (!$response->successful()) {
+            Log::error('OpenAI API error', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+            throw new \RuntimeException('OpenAI API error: ' . $response->body());
+        }
+
+        $data = $response->json();
+        $usage = $data['usage'] ?? [];
+        $inputTokens = $usage['prompt_tokens'] ?? 0;
+        $outputTokens = $usage['completion_tokens'] ?? 0;
+
+        return new LLMResponse(
+            content: $data['choices'][0]['message']['content'] ?? '',
+            model: $model,
+            inputTokens: $inputTokens,
+            outputTokens: $outputTokens,
+            cost: $this->calculateCost($model, $inputTokens, $outputTokens),
+            latencyMs: $latencyMs,
+            finishReason: $data['choices'][0]['finish_reason'] ?? null,
+        );
+    }
+
+    public function completeJson(string $prompt, array $schema = [], array $options = []): LLMResponse
+    {
+        $model = $options['model'] ?? $this->defaultModel;
+        $startTime = microtime(true);
+
+        $requestBody = [
+            'model' => $model,
+            'messages' => [
+                ['role' => 'user', 'content' => $prompt],
+            ],
+            'temperature' => $options['temperature'] ?? 0.3,
+            'max_tokens' => $options['max_tokens'] ?? 4096,
+            'response_format' => ['type' => 'json_object'],
+        ];
+
+        $response = Http::withHeaders([
+            'Authorization' => "Bearer {$this->apiKey}",
+            'Content-Type' => 'application/json',
+        ])->timeout(120)->post(self::API_URL, $requestBody);
+
+        $latencyMs = (microtime(true) - $startTime) * 1000;
+
+        if (!$response->successful()) {
+            Log::error('OpenAI API error', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+            throw new \RuntimeException('OpenAI API error: ' . $response->body());
+        }
+
+        $data = $response->json();
+        $usage = $data['usage'] ?? [];
+        $inputTokens = $usage['prompt_tokens'] ?? 0;
+        $outputTokens = $usage['completion_tokens'] ?? 0;
+
+        return new LLMResponse(
+            content: $data['choices'][0]['message']['content'] ?? '',
+            model: $model,
+            inputTokens: $inputTokens,
+            outputTokens: $outputTokens,
+            cost: $this->calculateCost($model, $inputTokens, $outputTokens),
+            latencyMs: $latencyMs,
+            finishReason: $data['choices'][0]['finish_reason'] ?? null,
+        );
+    }
+
+    public function getName(): string
+    {
+        return 'openai';
+    }
+
+    public function getAvailableModels(): array
+    {
+        return array_keys(self::PRICING);
+    }
+
+    public function calculateCost(string $model, int $inputTokens, int $outputTokens): float
+    {
+        $pricing = self::PRICING[$model] ?? self::PRICING['gpt-5'];
+
+        $inputCost = ($inputTokens / 1_000_000) * $pricing['input'];
+        $outputCost = ($outputTokens / 1_000_000) * $pricing['output'];
+
+        return round($inputCost + $outputCost, 6);
+    }
+}
