@@ -42,6 +42,9 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
+        // Create a personal team for the user
+        $user->createTeam($request->name . "'s Team");
+
         event(new Registered($user));
 
         Auth::login($user);

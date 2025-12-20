@@ -12,9 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('articles', function (Blueprint $table) {
-            $table->string('published_remote_id')->nullable()->after('published_url');
-            $table->string('published_via')->nullable()->after('published_remote_id');
-            $table->text('error_message')->nullable()->after('published_via');
+            if (!Schema::hasColumn('articles', 'published_remote_id')) {
+                $table->string('published_remote_id')->nullable()->after('published_url');
+            }
+            if (!Schema::hasColumn('articles', 'published_via')) {
+                $table->string('published_via')->nullable()->after('published_remote_id');
+            }
+            if (!Schema::hasColumn('articles', 'error_message')) {
+                $table->text('error_message')->nullable()->after('published_via');
+            }
         });
     }
 

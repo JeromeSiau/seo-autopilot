@@ -59,7 +59,10 @@ class User extends Authenticatable
         return $this->hasMany(Team::class, 'owner_id');
     }
 
-    public function currentTeam(): ?Team
+    /**
+     * Get the user's current team (accessor).
+     */
+    public function getCurrentTeamAttribute(): ?Team
     {
         return $this->team;
     }

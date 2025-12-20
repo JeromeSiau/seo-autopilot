@@ -19,6 +19,7 @@ class Keyword extends Model
         'source',
         'current_position',
         'impressions',
+        'score',
         'scheduled_for',
     ];
 
@@ -28,6 +29,7 @@ class Keyword extends Model
         'cpc' => 'decimal:2',
         'current_position' => 'integer',
         'impressions' => 'integer',
+        'score' => 'decimal:2',
         'scheduled_for' => 'date',
     ];
 
@@ -69,7 +71,7 @@ class Keyword extends Model
             && $this->difficulty <= 30;
     }
 
-    public function getScoreAttribute(): float
+    public function calculateScore(): float
     {
         $volumeScore = min(($this->volume ?? 0) / 1000, 100) * 0.3;
         $difficultyScore = (100 - ($this->difficulty ?? 50)) * 0.3;
@@ -77,6 +79,11 @@ class Keyword extends Model
         $positionBonus = $this->current_position ? (100 - min($this->current_position, 100)) * 0.15 : 0;
 
         return round($volumeScore + $difficultyScore + $quickWinBonus + $positionBonus, 2);
+    }
+
+    public function updateScore(): void
+    {
+        $this->update(['score' => $this->calculateScore()]);
     }
 
     public function markAsScheduled(?string $date = null): void
