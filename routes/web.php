@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LandingController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Web\AnalyticsController;
 use App\Http\Controllers\Web\ArticleController;
@@ -15,14 +16,13 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
+// Landing page with locale detection and redirect
+Route::get('/', [LandingController::class, 'redirect']);
+
+// Localized landing pages
+Route::get('/{locale}', [LandingController::class, 'index'])
+    ->where('locale', 'en|fr|es')
+    ->name('landing');
 
 // Google OAuth
 Route::get('/auth/google', [GoogleAuthController::class, 'redirect'])->name('auth.google');
@@ -34,6 +34,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Onboarding Wizard
     Route::get('/onboarding', [OnboardingController::class, 'create'])->name('onboarding.create');
+    Route::get('/onboarding/{site}/resume', [OnboardingController::class, 'resume'])->name('onboarding.resume');
     Route::post('/onboarding/step1', [OnboardingController::class, 'storeStep1'])->name('onboarding.step1');
     Route::post('/onboarding/{site}/step2', [OnboardingController::class, 'storeStep2'])->name('onboarding.step2');
     Route::post('/onboarding/{site}/step3', [OnboardingController::class, 'storeStep3'])->name('onboarding.step3');

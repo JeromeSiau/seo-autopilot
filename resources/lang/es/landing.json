@@ -1,0 +1,233 @@
+{
+  "meta": {
+    "title": "SEO Autopilot - Contenido IA que Posiciona",
+    "description": "Genera contenido SEO de alta calidad, natural y humano, automáticamente. Conecta tu sitio, define tus preferencias y observa cómo crece tu tráfico orgánico."
+  },
+  "nav": {
+    "features": "Funcionalidades",
+    "howItWorks": "Cómo funciona",
+    "pricing": "Precios",
+    "faq": "FAQ",
+    "login": "Iniciar sesión",
+    "getStarted": "Empezar"
+  },
+  "hero": {
+    "badge": "Más de 500 empresas confían en nosotros",
+    "title": "Contenido SEO que se lee como si fuera escrito por humanos.",
+    "titleAccent": "Porque prácticamente lo es.",
+    "subtitle": "Deja de pasar horas en contenido que no posiciona. Nuestra IA crea artículos tan naturales, tan bien documentados, que tus lectores no notarán la diferencia.",
+    "cta": "Empieza a escribir mejor",
+    "ctaSecondary": "Ver cómo funciona",
+    "stats": {
+      "articles": "Artículos generados",
+      "languages": "Idiomas soportados",
+      "satisfaction": "Satisfacción del cliente"
+    }
+  },
+  "socialProof": {
+    "title": "Equipos visionarios confían en nosotros"
+  },
+  "problem": {
+    "label": "El problema",
+    "title": "El contenido SEO está roto.",
+    "subtitle": "Ya conoces la historia. Horas de investigación. Escritura interminable. Y al final, contenido robótico, mal posicionado, o ambos.",
+    "pain1": {
+      "title": "Consume tiempo",
+      "description": "Escribir contenido SEO de calidad toma 4-8 horas por artículo. Tiempo que no tienes."
+    },
+    "pain2": {
+      "title": "Calidad inconsistente",
+      "description": "Los freelancers varían. Las herramientas IA producen genérico. Tu voz de marca se pierde."
+    },
+    "pain3": {
+      "title": "Mal posicionamiento",
+      "description": "El contenido genérico no posiciona. Google lo sabe. Tu audiencia también."
+    }
+  },
+  "solution": {
+    "label": "La solución",
+    "title": "Contenido que trabaja mientras duermes.",
+    "subtitle": "SEO Autopilot combina investigación profunda de palabras clave, análisis de competencia e IA avanzada para crear contenido que realmente posiciona.",
+    "point1": {
+      "title": "Calidad humana",
+      "description": "Nuestra IA está entrenada con el contenido de mejor rendimiento. Cada artículo se lee naturalmente, engancha lectores y satisface la intención de búsqueda."
+    },
+    "point2": {
+      "title": "Totalmente automatizado",
+      "description": "Define tu calendario. Elige tus temas. Nosotros nos encargamos de investigación, redacción, optimización y publicación."
+    },
+    "point3": {
+      "title": "Multi-idioma nativo",
+      "description": "Alcanza audiencias globales con contenido que suena nativo en cada idioma—no traducido."
+    }
+  },
+  "features": {
+    "label": "Funcionalidades",
+    "title": "Todo lo que necesitas para dominar las búsquedas.",
+    "feature1": {
+      "title": "Generación de contenido IA",
+      "description": "Artículos que coinciden con tu voz de marca, apuntan a tus palabras clave y enganchan a tus lectores. Siempre."
+    },
+    "feature2": {
+      "title": "Investigación de palabras clave inteligente",
+      "description": "Descubre oportunidades de palabras clave desde Google Search Console y análisis de competencia."
+    },
+    "feature3": {
+      "title": "Publicación en autopilot",
+      "description": "Define tu calendario. Escribimos, optimizamos y publicamos automáticamente en WordPress, Webflow y más."
+    },
+    "feature4": {
+      "title": "Soporte multi-idioma",
+      "description": "Contenido nativo en español, inglés, francés y 20+ idiomas. Sin traducciones torpes."
+    }
+  },
+  "howItWorks": {
+    "label": "Cómo funciona",
+    "title": "De cero a posicionamiento en tres pasos.",
+    "step1": {
+      "number": "01",
+      "title": "Conecta tu sitio",
+      "description": "Vincula tu sitio web y Google Search Console. Analizaremos tu rendimiento actual y oportunidades."
+    },
+    "step2": {
+      "number": "02",
+      "title": "Configura tus preferencias",
+      "description": "Define tus palabras clave objetivo, voz de marca, calendario de publicación y objetivos de contenido."
+    },
+    "step3": {
+      "number": "03",
+      "title": "Mira crecer tu tráfico",
+      "description": "El autopilot toma el control. Generamos, optimizamos y publicamos contenido mientras te enfocas en tu negocio."
+    }
+  },
+  "preview": {
+    "label": "En acción",
+    "title": "Un dashboard diseñado para la claridad.",
+    "subtitle": "Rastrea el rendimiento de tu contenido, gestiona tu cola de publicación y observa cómo sube tu tráfico orgánico—todo en un solo lugar."
+  },
+  "testimonials": {
+    "label": "Testimonios",
+    "title": "Amado por equipos de contenido en todas partes.",
+    "testimonial1": {
+      "quote": "Pasamos de 2 artículos al mes a 20. Nuestro tráfico orgánico se triplicó en 6 meses. SEO Autopilot es un cambio total.",
+      "author": "Sarah Chen",
+      "role": "Jefa de Contenido",
+      "company": "TechFlow"
+    },
+    "testimonial2": {
+      "quote": "La calidad es increíble. Nuestros lectores no distinguen entre la IA y nuestros escritores humanos. De hecho, la IA suele ser mejor.",
+      "author": "Marcus Rodriguez",
+      "role": "Director de Marketing",
+      "company": "GrowthLabs"
+    },
+    "testimonial3": {
+      "quote": "Por fin, una herramienta IA que entiende SEO. Los artículos posicionan, el contenido convierte, y recuperé mis fines de semana.",
+      "author": "Emma Larsson",
+      "role": "Fundadora",
+      "company": "Nordic Digital"
+    }
+  },
+  "pricing": {
+    "label": "Precios",
+    "title": "Precios simples. Resultados serios.",
+    "subtitle": "Elige el plan que se ajuste a tus ambiciones de contenido. Todos los planes incluyen nuestra tecnología IA central.",
+    "monthly": "Mensual",
+    "yearly": "Anual",
+    "yearlyDiscount": "Ahorra 20%",
+    "perMonth": "/mes",
+    "starter": {
+      "name": "Starter",
+      "description": "Perfecto para creadores independientes y blogs pequeños.",
+      "price": "49",
+      "features": [
+        "10 artículos IA al mes",
+        "1 sitio web",
+        "Analytics básicos",
+        "Soporte por email",
+        "Integración WordPress"
+      ],
+      "cta": "Empezar"
+    },
+    "pro": {
+      "name": "Pro",
+      "description": "Para negocios serios sobre SEO.",
+      "price": "99",
+      "popular": "Más popular",
+      "features": [
+        "30 artículos IA al mes",
+        "3 sitios web",
+        "Suite completa de analytics",
+        "Soporte prioritario",
+        "Todas las integraciones",
+        "Voz de marca personalizada"
+      ],
+      "cta": "Empezar"
+    },
+    "agency": {
+      "name": "Agency",
+      "description": "Para agencias gestionando múltiples clientes.",
+      "price": "249",
+      "features": [
+        "100 artículos IA al mes",
+        "Sitios web ilimitados",
+        "Informes marca blanca",
+        "Acceso multi-usuario",
+        "Acceso API",
+        "Account manager dedicado"
+      ],
+      "cta": "Contactar ventas"
+    }
+  },
+  "faq": {
+    "label": "FAQ",
+    "title": "¿Preguntas? Tenemos respuestas.",
+    "q1": {
+      "question": "¿En qué se diferencia SEO Autopilot de otras herramientas de escritura IA?",
+      "answer": "A diferencia de los escritores IA genéricos, SEO Autopilot está construido específicamente para SEO. Combinamos investigación de palabras clave, análisis de competencia y optimización de intención de búsqueda en cada artículo. ¿El resultado? Contenido que posiciona, no solo contenido que existe."
+    },
+    "q2": {
+      "question": "¿Penalizará Google el contenido generado por IA?",
+      "answer": "Las directrices de Google se centran en la calidad, no en la autoría. Nuestra IA crea contenido útil, preciso y humano que sigue los principios E-E-A-T. Muchos artículos de nuestros usuarios están en primera página."
+    },
+    "q3": {
+      "question": "¿Puedo editar los artículos antes de publicar?",
+      "answer": "Por supuesto. Cada artículo pasa por tu cola de revisión antes de publicarse. Edita, aprueba o regenera—siempre tienes el control."
+    },
+    "q4": {
+      "question": "¿Qué idiomas soportáis?",
+      "answer": "Soportamos creación de contenido nativo en más de 20 idiomas incluyendo español, inglés, francés, alemán, portugués, italiano, holandés y más. Esto no es traducción—es escritura nativa."
+    },
+    "q5": {
+      "question": "¿Cuánto tiempo hasta ver resultados?",
+      "answer": "La mayoría de usuarios ven mejoras de posicionamiento en 2-3 meses. El SEO es un juego largo, pero el contenido de alta calidad constante acelera los resultados significativamente."
+    },
+    "q6": {
+      "question": "¿Puedo cancelar en cualquier momento?",
+      "answer": "Sí. Sin contratos, sin compromisos. Cancela cuando quieras desde tu dashboard. Estamos seguros de que querrás quedarte."
+    }
+  },
+  "cta": {
+    "title": "¿Listo para automatizar tu contenido SEO?",
+    "subtitle": "Únete a más de 500 empresas que ya están creciendo su tráfico orgánico con SEO Autopilot.",
+    "button": "Empieza tu prueba gratis",
+    "note": "Sin tarjeta de crédito. Prueba gratis de 14 días."
+  },
+  "footer": {
+    "description": "Contenido SEO potenciado por IA que posiciona. Construido para empresas serias sobre crecimiento orgánico.",
+    "product": "Producto",
+    "features": "Funcionalidades",
+    "pricing": "Precios",
+    "integrations": "Integraciones",
+    "changelog": "Changelog",
+    "company": "Empresa",
+    "about": "Acerca de",
+    "blog": "Blog",
+    "careers": "Carreras",
+    "contact": "Contacto",
+    "legal": "Legal",
+    "privacy": "Política de Privacidad",
+    "terms": "Términos de Servicio",
+    "cookies": "Política de Cookies",
+    "copyright": "© 2024 SEO Autopilot. Todos los derechos reservados."
+  }
+}
