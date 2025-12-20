@@ -70,13 +70,28 @@ class GoogleAuthController extends Controller
             // Exchange code for tokens
             $tokens = $this->googleAuth->exchangeCode($request->code);
 
-            // Save tokens to site
+            // Save tokens to site (both GSC and GA4 use the same OAuth token)
             $this->googleAuth->saveTokensToSite($site, $tokens);
+
+            // Also save to GA4 fields (same token works for both APIs)
+            $site->update([
+                'ga4_token' => $tokens->accessToken,
+                'ga4_refresh_token' => $tokens->refreshToken ?? $site->ga4_refresh_token,
+                'ga4_token_expires_at' => $tokens->expiresAt
+                    ? now()->setTimestamp($tokens->expiresAt)
+                    : null,
+            ]);
 
             Log::info('Google connected successfully', [
                 'site_id' => $site->id,
                 'user_id' => $state['user_id'],
             ]);
+
+            // Redirect back to wizard if onboarding not completed
+            if (!$site->onboarding_completed_at) {
+                return redirect()->route('onboarding.resume', $site)
+                    ->with('success', 'Google connecté avec succès !');
+            }
 
             return redirect()->route('sites.show', $site)
                 ->with('success', 'Google Search Console connected successfully!');
@@ -84,6 +99,12 @@ class GoogleAuthController extends Controller
             Log::error('Google OAuth callback failed', [
                 'error' => $e->getMessage(),
             ]);
+
+            // Redirect back to wizard on error if onboarding not completed
+            if (isset($state) && isset($site) && !$site->onboarding_completed_at) {
+                return redirect()->route('onboarding.resume', $site)
+                    ->with('error', 'Échec de connexion Google: ' . $e->getMessage());
+            }
 
             return redirect()->route('sites.index')
                 ->with('error', 'Failed to connect Google: ' . $e->getMessage());

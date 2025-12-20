@@ -24,6 +24,16 @@ class ArticleController extends Controller
         $team = $request->user()->currentTeam;
         $siteIds = $team->sites()->pluck('id');
 
+        $baseQuery = Article::whereIn('site_id', $siteIds);
+
+        // Stats
+        $stats = [
+            'total' => (clone $baseQuery)->count(),
+            'review' => (clone $baseQuery)->where('status', 'review')->count(),
+            'approved' => (clone $baseQuery)->where('status', 'approved')->count(),
+            'published' => (clone $baseQuery)->where('status', 'published')->count(),
+        ];
+
         $query = Article::whereIn('site_id', $siteIds)
             ->with(['site', 'keyword']);
 
@@ -48,6 +58,7 @@ class ArticleController extends Controller
             'articles' => ArticleResource::collection($articles)->response()->getData(true),
             'sites' => SiteResource::collection($team->sites()->get())->resolve(),
             'filters' => $request->only(['site_id', 'status', 'search']),
+            'stats' => $stats,
         ]);
     }
 
@@ -110,7 +121,7 @@ class ArticleController extends Controller
             ->get();
 
         return Inertia::render('Articles/Show', [
-            'article' => new ArticleResource($article),
+            'article' => (new ArticleResource($article))->resolve(),
             'integrations' => IntegrationResource::collection($integrations)->resolve(),
         ]);
     }
@@ -122,7 +133,7 @@ class ArticleController extends Controller
         $article->load(['site', 'keyword']);
 
         return Inertia::render('Articles/Edit', [
-            'article' => new ArticleResource($article),
+            'article' => (new ArticleResource($article))->resolve(),
         ]);
     }
 

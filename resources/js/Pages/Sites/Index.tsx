@@ -1,21 +1,47 @@
 import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link, router } from '@inertiajs/react';
-import { Globe, Plus, ExternalLink, Settings, Trash2, CheckCircle, XCircle } from 'lucide-react';
-import { Button } from '@/Components/ui/Button';
-import { Card } from '@/Components/ui/Card';
-import { Badge } from '@/Components/ui/Badge';
-import { EmptyState } from '@/Components/ui/EmptyState';
+import {
+    Globe, Plus, ExternalLink, Settings, Trash2, CheckCircle, XCircle,
+    Search, FileText, Play, Pause, AlertCircle
+} from 'lucide-react';
+import clsx from 'clsx';
 import { Site, PaginatedData, PageProps } from '@/types';
 import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 interface SitesIndexProps extends PageProps {
     sites: PaginatedData<Site>;
 }
 
+const STATUS_CONFIG = {
+    active: {
+        label: 'Actif',
+        color: 'bg-primary-50 text-primary-700',
+        icon: Play,
+    },
+    paused: {
+        label: 'Pause',
+        color: 'bg-amber-50 text-amber-700',
+        icon: Pause,
+    },
+    not_configured: {
+        label: 'Non configuré',
+        color: 'bg-surface-100 text-surface-600',
+        icon: AlertCircle,
+    },
+    error: {
+        label: 'Erreur',
+        color: 'bg-red-50 text-red-700',
+        icon: AlertCircle,
+    },
+};
+
 export default function SitesIndex({ sites }: SitesIndexProps) {
-    const handleDelete = (site: Site) => {
-        if (confirm(`Are you sure you want to delete ${site.domain}?`)) {
-            router.delete(route('sites.destroy', site.id));
+    const handleDelete = (e: React.MouseEvent, site: Site) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (confirm(`Êtes-vous sûr de vouloir supprimer ${site.domain} ?`)) {
+            router.delete(route('sites.destroy', { site: site.id }));
         }
     };
 
@@ -23,114 +49,165 @@ export default function SitesIndex({ sites }: SitesIndexProps) {
         <AppLayout
             header={
                 <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-bold text-gray-900">Sites</h1>
-                    <Button as="link" href={route('sites.create')} icon={Plus}>
-                        Add Site
-                    </Button>
+                    <div>
+                        <h1 className="font-display text-2xl font-bold text-surface-900">Sites</h1>
+                        <p className="mt-1 text-sm text-surface-500">
+                            Gérez vos sites web connectés
+                        </p>
+                    </div>
+                    <Link
+                        href={route('onboarding.create')}
+                        className={clsx(
+                            'inline-flex items-center gap-2 rounded-xl px-4 py-2.5',
+                            'bg-gradient-to-r from-primary-500 to-primary-600 text-white text-sm font-semibold',
+                            'shadow-green hover:shadow-green-lg hover:-translate-y-0.5',
+                            'transition-all'
+                        )}
+                    >
+                        <Plus className="h-4 w-4" />
+                        Ajouter un site
+                    </Link>
                 </div>
             }
         >
             <Head title="Sites" />
 
             {sites.data.length === 0 ? (
-                <EmptyState
-                    icon={Globe}
-                    title="No sites yet"
-                    description="Add your first website to start discovering keywords and generating content."
-                    action={{
-                        label: 'Add Site',
-                        href: route('sites.create'),
-                    }}
-                />
+                <div className="bg-white rounded-2xl border border-surface-200 p-12 text-center">
+                    <div className="mx-auto w-14 h-14 rounded-2xl bg-surface-100 flex items-center justify-center mb-4">
+                        <Globe className="h-7 w-7 text-surface-400" />
+                    </div>
+                    <h3 className="font-display font-semibold text-surface-900 mb-1">
+                        Aucun site configuré
+                    </h3>
+                    <p className="text-sm text-surface-500 max-w-sm mx-auto mb-6">
+                        Ajoutez votre premier site web pour commencer à découvrir des mots-clés et générer du contenu.
+                    </p>
+                    <Link
+                        href={route('onboarding.create')}
+                        className={clsx(
+                            'inline-flex items-center gap-2 rounded-xl px-5 py-2.5',
+                            'bg-gradient-to-r from-primary-500 to-primary-600 text-white text-sm font-semibold',
+                            'shadow-green hover:shadow-green-lg',
+                            'transition-all'
+                        )}
+                    >
+                        <Plus className="h-4 w-4" />
+                        Ajouter un site
+                    </Link>
+                </div>
             ) : (
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    {sites.data.map((site) => (
-                        <Card key={site.id} className="relative">
-                            <div className="flex items-start justify-between">
-                                <div className="flex items-center gap-3">
-                                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-50">
-                                        <Globe className="h-5 w-5 text-indigo-600" />
-                                    </div>
-                                    <div>
-                                        <h3 className="font-semibold text-gray-900">{site.name}</h3>
-                                        <a
-                                            href={`https://${site.domain}`}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="flex items-center gap-1 text-sm text-gray-500 hover:text-indigo-600"
-                                        >
-                                            {site.domain}
-                                            <ExternalLink className="h-3 w-3" />
-                                        </a>
-                                    </div>
-                                </div>
-                                <div className="flex gap-1">
-                                    <Link
-                                        href={route('sites.edit', site.id)}
-                                        className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
-                                    >
-                                        <Settings className="h-4 w-4" />
-                                    </Link>
-                                    <button
-                                        onClick={() => handleDelete(site)}
-                                        className="rounded p-1 text-gray-400 hover:bg-red-50 hover:text-red-600"
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div className="mt-4 flex items-center gap-4 text-sm text-gray-500">
-                                <span>{site.keywords_count || 0} keywords</span>
-                                <span>{site.articles_count || 0} articles</span>
-                            </div>
-
-                            <div className="mt-4 flex items-center gap-2">
-                                <Badge variant={site.language === 'en' ? 'info' : 'secondary'}>
-                                    {site.language.toUpperCase()}
-                                </Badge>
-                                <div className="flex items-center gap-1">
-                                    {site.gsc_connected ? (
-                                        <span className="flex items-center gap-1 text-xs text-green-600">
-                                            <CheckCircle className="h-3 w-3" />
-                                            GSC
-                                        </span>
-                                    ) : (
-                                        <span className="flex items-center gap-1 text-xs text-gray-400">
-                                            <XCircle className="h-3 w-3" />
-                                            GSC
-                                        </span>
-                                    )}
-                                </div>
-                                <div className="flex items-center gap-1">
-                                    {site.ga4_connected ? (
-                                        <span className="flex items-center gap-1 text-xs text-green-600">
-                                            <CheckCircle className="h-3 w-3" />
-                                            GA4
-                                        </span>
-                                    ) : (
-                                        <span className="flex items-center gap-1 text-xs text-gray-400">
-                                            <XCircle className="h-3 w-3" />
-                                            GA4
-                                        </span>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="mt-4 border-t border-gray-100 pt-4">
-                                <p className="text-xs text-gray-400">
-                                    Added {format(new Date(site.created_at), 'MMM d, yyyy')}
-                                </p>
-                            </div>
-
-                            <Link
-                                href={route('sites.show', site.id)}
-                                className="absolute inset-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    {sites.data.map((site) => {
+                        const status = STATUS_CONFIG[site.autopilot_status as keyof typeof STATUS_CONFIG] || STATUS_CONFIG.not_configured;
+                        const StatusIcon = status.icon;
+                        return (
+                            <div
+                                key={site.id}
+                                onClick={() => router.visit(route('sites.show', { site: site.id }))}
+                                className="group bg-white rounded-2xl border border-surface-200 p-5 hover:shadow-lg hover:border-primary-200 transition-all cursor-pointer"
                             >
-                                <span className="sr-only">View {site.name}</span>
-                            </Link>
-                        </Card>
-                    ))}
+                                {/* Header */}
+                                <div className="flex items-start justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center">
+                                            <span className="font-display font-bold text-primary-700 text-lg uppercase">
+                                                {site.domain.charAt(0)}
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <h3 className="font-display font-semibold text-surface-900 group-hover:text-primary-600 transition-colors">
+                                                {site.name}
+                                            </h3>
+                                            <div className="flex items-center gap-1 mt-0.5 text-sm text-surface-500">
+                                                {site.domain}
+                                                <ExternalLink className="h-3 w-3" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                router.visit(route('sites.edit', { site: site.id }));
+                                            }}
+                                            className="rounded-lg p-2 text-surface-400 hover:bg-surface-100 hover:text-surface-600 transition-colors"
+                                        >
+                                            <Settings className="h-4 w-4" />
+                                        </button>
+                                        <button
+                                            onClick={(e) => handleDelete(e, site)}
+                                            className="rounded-lg p-2 text-surface-400 hover:bg-red-50 hover:text-red-600 transition-colors"
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Stats */}
+                                <div className="mt-4 flex items-center gap-4">
+                                    <div className="flex items-center gap-1.5 text-sm text-surface-600">
+                                        <Search className="h-4 w-4 text-surface-400" />
+                                        <span className="font-medium">{site.keywords_count || 0}</span>
+                                        <span className="text-surface-400">keywords</span>
+                                    </div>
+                                    <div className="flex items-center gap-1.5 text-sm text-surface-600">
+                                        <FileText className="h-4 w-4 text-surface-400" />
+                                        <span className="font-medium">{site.articles_count || 0}</span>
+                                        <span className="text-surface-400">articles</span>
+                                    </div>
+                                </div>
+
+                                {/* Tags */}
+                                <div className="mt-4 flex items-center flex-wrap gap-2">
+                                    {/* Language */}
+                                    <span className="inline-flex items-center rounded-lg bg-surface-100 px-2 py-1 text-xs font-medium text-surface-600">
+                                        {site.language.toUpperCase()}
+                                    </span>
+
+                                    {/* GSC Status */}
+                                    {site.gsc_connected ? (
+                                        <span className="inline-flex items-center gap-1 rounded-lg bg-primary-50 px-2 py-1 text-xs font-medium text-primary-700">
+                                            <CheckCircle className="h-3 w-3" />
+                                            GSC
+                                        </span>
+                                    ) : (
+                                        <span className="inline-flex items-center gap-1 rounded-lg bg-surface-100 px-2 py-1 text-xs font-medium text-surface-400">
+                                            <XCircle className="h-3 w-3" />
+                                            GSC
+                                        </span>
+                                    )}
+
+                                    {/* GA4 Status */}
+                                    {site.ga4_connected ? (
+                                        <span className="inline-flex items-center gap-1 rounded-lg bg-primary-50 px-2 py-1 text-xs font-medium text-primary-700">
+                                            <CheckCircle className="h-3 w-3" />
+                                            GA4
+                                        </span>
+                                    ) : (
+                                        <span className="inline-flex items-center gap-1 rounded-lg bg-surface-100 px-2 py-1 text-xs font-medium text-surface-400">
+                                            <XCircle className="h-3 w-3" />
+                                            GA4
+                                        </span>
+                                    )}
+                                </div>
+
+                                {/* Footer */}
+                                <div className="mt-4 pt-4 border-t border-surface-100 flex items-center justify-between">
+                                    <span className={clsx(
+                                        'inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium',
+                                        status.color
+                                    )}>
+                                        <StatusIcon className="h-3.5 w-3.5" />
+                                        {status.label}
+                                    </span>
+                                    <span className="text-xs text-surface-400">
+                                        Ajouté le {format(new Date(site.created_at), 'd MMM yyyy', { locale: fr })}
+                                    </span>
+                                </div>
+                            </div>
+                        );
+                    })}
                 </div>
             )}
         </AppLayout>

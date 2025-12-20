@@ -23,7 +23,7 @@ class DashboardController extends Controller
             'total_keywords_queued' => $sites->sum(fn($s) => $s->keywords()->where('status', 'queued')->count()),
             'articles_this_month' => $sites->sum(fn($s) => $s->articles()->where('created_at', '>=', now()->startOfMonth())->count()),
             'articles_published_this_month' => $sites->sum(fn($s) => $s->articles()->where('status', 'published')->where('published_at', '>=', now()->startOfMonth())->count()),
-            'articles_used' => $team->articlesUsedThisMonth(),
+            'articles_used' => $team->articles_used_this_month,
             'articles_limit' => $team->articles_limit,
         ];
 

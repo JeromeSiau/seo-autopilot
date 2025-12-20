@@ -109,7 +109,7 @@ class NotificationService
         try {
             Mail::raw(implode("\n", $lines), function ($message) use ($user, $subject) {
                 $message->to($user->email)
-                    ->subject("[SEO Autopilot] {$subject}");
+                    ->subject("[RankCruise] {$subject}");
             });
         } catch (\Exception $e) {
             \Log::error("Failed to send immediate email", ['error' => $e->getMessage()]);

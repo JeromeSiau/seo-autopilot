@@ -1,12 +1,19 @@
 import { useState } from 'react';
-import { Button } from '@/Components/ui/Button';
 import { router } from '@inertiajs/react';
-import { Rocket, Check } from 'lucide-react';
+import { Rocket, Check, ChevronLeft, Sparkles } from 'lucide-react';
+import clsx from 'clsx';
 
 interface Props {
     siteId: number;
     onBack: () => void;
 }
+
+const LAUNCH_ITEMS = [
+    'Analyse de votre site et Search Console',
+    'Découverte de mots-clés pertinents',
+    'Génération automatique d\'articles SEO',
+    'Publication selon votre planning',
+];
 
 export default function Step6Launch({ siteId, onBack }: Props) {
     const [loading, setLoading] = useState(false);
@@ -18,39 +25,77 @@ export default function Step6Launch({ siteId, onBack }: Props) {
 
     return (
         <div className="space-y-6">
+            {/* Header */}
             <div className="text-center">
-                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-indigo-100">
-                    <Rocket className="h-8 w-8 text-indigo-600" />
+                <div className="relative mx-auto flex h-16 w-16 items-center justify-center">
+                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary-400 to-primary-600 animate-pulse" />
+                    <div className="relative flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-primary-500 to-primary-600">
+                        <Rocket className="h-7 w-7 text-white" />
+                    </div>
                 </div>
-                <h2 className="mt-4 text-2xl font-bold text-gray-900">Prêt à lancer !</h2>
-                <p className="mt-2 text-gray-600">
-                    Votre autopilot est configuré. Cliquez pour démarrer.
+                <h2 className="mt-5 font-display text-2xl font-bold text-surface-900">
+                    Prêt à lancer !
+                </h2>
+                <p className="mt-2 text-surface-500">
+                    Votre autopilot est configuré et prêt à démarrer
                 </p>
             </div>
 
-            <div className="rounded-lg bg-green-50 p-6">
-                <h3 className="font-medium text-green-900">Ce qui va se passer :</h3>
-                <ul className="mt-3 space-y-2">
-                    {[
-                        'Analyse de votre site et Search Console',
-                        'Découverte de mots-clés pertinents',
-                        'Génération automatique d\'articles SEO',
-                        'Publication selon votre planning',
-                    ].map((item, i) => (
-                        <li key={i} className="flex items-center gap-2 text-sm text-green-700">
-                            <Check className="h-4 w-4" />
-                            {item}
+            {/* What happens next */}
+            <div className="rounded-2xl bg-gradient-to-br from-primary-50 to-primary-100/50 p-6 border border-primary-100">
+                <div className="flex items-center gap-2 mb-4">
+                    <Sparkles className="h-5 w-5 text-primary-600" />
+                    <h3 className="font-display font-semibold text-primary-900">
+                        Ce qui va se passer
+                    </h3>
+                </div>
+                <ul className="space-y-3">
+                    {LAUNCH_ITEMS.map((item, i) => (
+                        <li key={i} className="flex items-center gap-3">
+                            <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary-500">
+                                <Check className="h-3.5 w-3.5 text-white" />
+                            </div>
+                            <span className="text-sm text-primary-800">{item}</span>
                         </li>
                     ))}
                 </ul>
             </div>
 
-            <div className="flex justify-between">
-                <Button variant="secondary" onClick={onBack}>Retour</Button>
-                <Button onClick={handleLaunch} loading={loading} className="gap-2">
-                    <Rocket className="h-4 w-4" />
-                    Activer l'Autopilot
-                </Button>
+            {/* Launch Button */}
+            <button
+                onClick={handleLaunch}
+                disabled={loading}
+                className={clsx(
+                    'group relative flex w-full items-center justify-center gap-3 rounded-xl px-6 py-4',
+                    'bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold text-lg',
+                    'shadow-green hover:shadow-green-lg',
+                    'transition-all disabled:opacity-50 disabled:cursor-not-allowed',
+                    !loading && 'hover:-translate-y-0.5'
+                )}
+            >
+                {loading ? (
+                    <>
+                        <div className="h-6 w-6 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                        <span>Activation en cours...</span>
+                    </>
+                ) : (
+                    <>
+                        <Rocket className="h-5 w-5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                        <span>Activer l'Autopilot</span>
+                    </>
+                )}
+            </button>
+
+            {/* Navigation */}
+            <div className="pt-2">
+                <button
+                    onClick={onBack}
+                    disabled={loading}
+                    className="flex items-center gap-2 text-sm font-medium text-surface-600 hover:text-surface-900 transition-colors disabled:opacity-50"
+                >
+                    <ChevronLeft className="h-4 w-4" />
+                    Retour
+                </button>
             </div>
         </div>
     );

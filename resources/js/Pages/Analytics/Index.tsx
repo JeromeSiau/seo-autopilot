@@ -1,20 +1,15 @@
 import AppLayout from '@/Layouts/AppLayout';
-import { Head, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import {
     BarChart3,
     TrendingUp,
-    TrendingDown,
     MousePointer,
     Eye,
-    RefreshCw,
+    Target,
+    Info,
 } from 'lucide-react';
-import { Button } from '@/Components/ui/Button';
-import { StatCard } from '@/Components/ui/StatCard';
-import { Card, CardHeader } from '@/Components/ui/Card';
-import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@/Components/ui/Table';
+import clsx from 'clsx';
 import {
-    LineChart,
-    Line,
     AreaChart,
     Area,
     XAxis,
@@ -26,7 +21,7 @@ import {
 } from 'recharts';
 import { Site, AnalyticsData, PageProps } from '@/types';
 import { format } from 'date-fns';
-import { useState } from 'react';
+import { fr } from 'date-fns/locale';
 
 interface AnalyticsIndexProps extends PageProps {
     sites: Site[];
@@ -55,7 +50,16 @@ interface AnalyticsIndexProps extends PageProps {
         ctr: number;
     }>;
     dateRange: string;
+    connectedSitesCount: number;
+    totalSitesCount: number;
 }
+
+const STAT_CARDS = [
+    { key: 'clicks', label: 'Total Clics', icon: MousePointer, color: 'primary' },
+    { key: 'impressions', label: 'Impressions', icon: Eye, color: 'blue' },
+    { key: 'ctr', label: 'CTR Moyen', icon: TrendingUp, color: 'primary' },
+    { key: 'position', label: 'Position Moyenne', icon: Target, color: 'purple' },
+] as const;
 
 export default function AnalyticsIndex({
     sites,
@@ -65,9 +69,9 @@ export default function AnalyticsIndex({
     topPages = [],
     topQueries = [],
     dateRange,
+    connectedSitesCount,
+    totalSitesCount,
 }: AnalyticsIndexProps) {
-    const [syncing, setSyncing] = useState(false);
-
     const handleSiteChange = (siteId: string) => {
         router.get(route('analytics.index'), { site_id: siteId || undefined });
     };
@@ -79,30 +83,70 @@ export default function AnalyticsIndex({
         });
     };
 
-    const handleSync = () => {
-        if (!selectedSite) return;
-        setSyncing(true);
-        router.post(
-            route('analytics.sync', selectedSite.id),
-            {},
-            {
-                onFinish: () => setSyncing(false),
-            }
-        );
+    const isAggregatedView = !selectedSite && connectedSitesCount > 0;
+    const hasData = selectedSite?.gsc_connected || isAggregatedView;
+
+    const getColorClasses = (color: string) => {
+        const colors = {
+            primary: { text: 'text-primary-600', iconBg: 'bg-primary-100' },
+            blue: { text: 'text-blue-600', iconBg: 'bg-blue-100' },
+            purple: { text: 'text-purple-600', iconBg: 'bg-purple-100' },
+        };
+        return colors[color as keyof typeof colors] || colors.primary;
+    };
+
+    const getStatValue = (key: string) => {
+        switch (key) {
+            case 'clicks':
+                return summary.total_clicks.toLocaleString();
+            case 'impressions':
+                return summary.total_impressions.toLocaleString();
+            case 'ctr':
+                return `${summary.avg_ctr.toFixed(1)}%`;
+            case 'position':
+                return summary.avg_position.toFixed(1);
+            default:
+                return '—';
+        }
+    };
+
+    const getTrend = (key: string) => {
+        if (key === 'clicks' && summary.clicks_change !== 0) {
+            return summary.clicks_change;
+        }
+        if (key === 'impressions' && summary.impressions_change !== 0) {
+            return summary.impressions_change;
+        }
+        return null;
     };
 
     return (
         <AppLayout
             header={
-                <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-bold text-gray-900">Analytics</h1>
-                    <div className="flex items-center gap-3">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h1 className="font-display text-2xl font-bold text-surface-900">Analytics</h1>
+                        <p className="mt-1 text-sm text-surface-500">
+                            Performances de recherche depuis Google Search Console
+                        </p>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-3">
+                        {isAggregatedView && connectedSitesCount < totalSitesCount && (
+                            <div className="inline-flex items-center gap-1.5 rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700">
+                                <Info className="h-3.5 w-3.5" />
+                                {connectedSitesCount}/{totalSitesCount} sites connectés
+                            </div>
+                        )}
                         <select
                             value={selectedSite?.id || ''}
                             onChange={(e) => handleSiteChange(e.target.value)}
-                            className="rounded-lg border-gray-300 text-sm focus:border-indigo-500 focus:ring-indigo-500"
+                            className={clsx(
+                                'rounded-xl border border-surface-200 bg-white px-4 py-2.5 text-sm text-surface-700',
+                                'focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500',
+                                'transition-colors'
+                            )}
                         >
-                            <option value="">All Sites</option>
+                            <option value="">Tous les sites</option>
                             {sites.map((site) => (
                                 <option key={site.id} value={site.id}>
                                     {site.name}
@@ -112,169 +156,163 @@ export default function AnalyticsIndex({
                         <select
                             value={dateRange}
                             onChange={(e) => handleDateRangeChange(e.target.value)}
-                            className="rounded-lg border-gray-300 text-sm focus:border-indigo-500 focus:ring-indigo-500"
+                            className={clsx(
+                                'rounded-xl border border-surface-200 bg-white px-4 py-2.5 text-sm text-surface-700',
+                                'focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500',
+                                'transition-colors'
+                            )}
                         >
-                            <option value="7">Last 7 days</option>
-                            <option value="28">Last 28 days</option>
-                            <option value="90">Last 90 days</option>
+                            <option value="7">7 derniers jours</option>
+                            <option value="28">28 derniers jours</option>
+                            <option value="90">90 derniers jours</option>
                         </select>
-                        {selectedSite && (
-                            <Button
-                                onClick={handleSync}
-                                loading={syncing}
-                                variant="secondary"
-                                icon={RefreshCw}
-                            >
-                                Sync
-                            </Button>
-                        )}
                     </div>
                 </div>
             }
         >
             <Head title="Analytics" />
 
-            {!selectedSite ? (
-                <Card className="text-center">
-                    <BarChart3 className="mx-auto h-12 w-12 text-gray-400" />
-                    <h3 className="mt-4 text-lg font-semibold text-gray-900">
-                        Select a site to view analytics
-                    </h3>
-                    <p className="mt-2 text-sm text-gray-500">
-                        Choose a site from the dropdown above to see performance data.
-                    </p>
-                </Card>
-            ) : !selectedSite.gsc_connected ? (
-                <Card className="text-center">
-                    <BarChart3 className="mx-auto h-12 w-12 text-gray-400" />
-                    <h3 className="mt-4 text-lg font-semibold text-gray-900">
-                        Connect Google Search Console
-                    </h3>
-                    <p className="mt-2 text-sm text-gray-500">
-                        Connect GSC to see search performance data for {selectedSite.domain}.
-                    </p>
-                    <div className="mt-6">
-                        <Button as="link" href={route('sites.edit', selectedSite.id)}>
-                            Connect GSC
-                        </Button>
+            {!hasData ? (
+                selectedSite && !selectedSite.gsc_connected ? (
+                    <div className="bg-white rounded-2xl border border-surface-200 p-12 text-center">
+                        <div className="mx-auto w-14 h-14 rounded-2xl bg-surface-100 flex items-center justify-center mb-4">
+                            <BarChart3 className="h-7 w-7 text-surface-400" />
+                        </div>
+                        <h3 className="font-display font-semibold text-surface-900 mb-1">
+                            Connectez Google Search Console
+                        </h3>
+                        <p className="text-sm text-surface-500 max-w-sm mx-auto mb-6">
+                            Connectez GSC pour voir les données de performance de {selectedSite.domain}.
+                        </p>
+                        <Link
+                            href={route('sites.edit', { site: selectedSite.id })}
+                            className={clsx(
+                                'inline-flex items-center gap-2 rounded-xl px-5 py-2.5',
+                                'bg-gradient-to-r from-primary-500 to-primary-600 text-white text-sm font-semibold',
+                                'shadow-green hover:shadow-green-lg',
+                                'transition-all'
+                            )}
+                        >
+                            Connecter GSC
+                        </Link>
                     </div>
-                </Card>
+                ) : (
+                    <div className="bg-white rounded-2xl border border-surface-200 p-12 text-center">
+                        <div className="mx-auto w-14 h-14 rounded-2xl bg-surface-100 flex items-center justify-center mb-4">
+                            <BarChart3 className="h-7 w-7 text-surface-400" />
+                        </div>
+                        <h3 className="font-display font-semibold text-surface-900 mb-1">
+                            Aucun site connecté
+                        </h3>
+                        <p className="text-sm text-surface-500 max-w-sm mx-auto mb-6">
+                            Connectez Google Search Console sur au moins un site pour voir les analytics.
+                        </p>
+                        <Link
+                            href={route('sites.index')}
+                            className={clsx(
+                                'inline-flex items-center gap-2 rounded-xl px-5 py-2.5',
+                                'bg-gradient-to-r from-primary-500 to-primary-600 text-white text-sm font-semibold',
+                                'shadow-green hover:shadow-green-lg',
+                                'transition-all'
+                            )}
+                        >
+                            Gérer les sites
+                        </Link>
+                    </div>
+                )
             ) : (
                 <>
-                    {/* Stats */}
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                        <StatCard
-                            title="Total Clicks"
-                            value={summary.total_clicks.toLocaleString()}
-                            icon={MousePointer}
-                            color="indigo"
-                            trend={
-                                summary.clicks_change !== 0
-                                    ? {
-                                          value: summary.clicks_change,
-                                          label: 'vs previous period',
-                                      }
-                                    : undefined
-                            }
-                        />
-                        <StatCard
-                            title="Impressions"
-                            value={summary.total_impressions.toLocaleString()}
-                            icon={Eye}
-                            color="blue"
-                            trend={
-                                summary.impressions_change !== 0
-                                    ? {
-                                          value: summary.impressions_change,
-                                          label: 'vs previous period',
-                                      }
-                                    : undefined
-                            }
-                        />
-                        <StatCard
-                            title="Avg CTR"
-                            value={`${summary.avg_ctr.toFixed(1)}%`}
-                            icon={TrendingUp}
-                            color="green"
-                        />
-                        <StatCard
-                            title="Avg Position"
-                            value={summary.avg_position.toFixed(1)}
-                            icon={BarChart3}
-                            color="purple"
-                        />
+                    {/* Stats Grid */}
+                    <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+                        {STAT_CARDS.map((card) => {
+                            const colors = getColorClasses(card.color);
+                            const Icon = card.icon;
+                            const value = getStatValue(card.key);
+                            const trend = getTrend(card.key);
+                            return (
+                                <div
+                                    key={card.key}
+                                    className="bg-white rounded-2xl border border-surface-200 p-5 hover:shadow-md transition-shadow"
+                                >
+                                    <div className="flex items-start justify-between">
+                                        <div>
+                                            <p className="text-sm font-medium text-surface-500">{card.label}</p>
+                                            <p className="mt-2 font-display text-2xl font-bold text-surface-900">
+                                                {value}
+                                            </p>
+                                            {trend !== null && (
+                                                <p className={clsx(
+                                                    'mt-1 flex items-center gap-1 text-xs font-medium',
+                                                    trend >= 0 ? 'text-primary-600' : 'text-red-600'
+                                                )}>
+                                                    <TrendingUp className={clsx('h-3 w-3', trend < 0 && 'rotate-180')} />
+                                                    {trend >= 0 ? '+' : ''}{trend}% vs période précédente
+                                                </p>
+                                            )}
+                                        </div>
+                                        <div className={clsx('rounded-xl p-2.5', colors.iconBg)}>
+                                            <Icon className={clsx('h-5 w-5', colors.text)} />
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
                     </div>
 
                     {/* Chart */}
                     {analyticsData.length > 0 && (
-                        <Card className="mt-6">
-                            <CardHeader
-                                title="Performance Over Time"
-                                description="Clicks and impressions trends"
-                            />
-                            <div className="mt-6 h-80">
+                        <div className="mt-6 bg-white rounded-2xl border border-surface-200 p-6">
+                            <div className="mb-6">
+                                <h3 className="font-display font-semibold text-surface-900">Performance dans le temps</h3>
+                                <p className="text-sm text-surface-500">Clics et impressions</p>
+                            </div>
+                            <div className="h-80">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <AreaChart data={analyticsData}>
                                         <defs>
                                             <linearGradient id="colorClicks" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.1} />
-                                                <stop offset="95%" stopColor="#4f46e5" stopOpacity={0} />
-                                            </linearGradient>
-                                            <linearGradient
-                                                id="colorImpressions"
-                                                x1="0"
-                                                y1="0"
-                                                x2="0"
-                                                y2="1"
-                                            >
-                                                <stop offset="5%" stopColor="#10b981" stopOpacity={0.1} />
+                                                <stop offset="5%" stopColor="#10b981" stopOpacity={0.15} />
                                                 <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                                            </linearGradient>
+                                            <linearGradient id="colorImpressions" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.15} />
+                                                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
                                             </linearGradient>
                                         </defs>
                                         <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                                         <XAxis
                                             dataKey="date"
-                                            tickFormatter={(value) => format(new Date(value), 'MMM d')}
-                                            tick={{ fontSize: 12 }}
-                                            stroke="#9ca3af"
+                                            tickFormatter={(value) => format(new Date(value), 'd MMM', { locale: fr })}
+                                            tick={{ fontSize: 12, fill: '#78716c' }}
+                                            stroke="#e7e5e4"
                                         />
-                                        <YAxis
-                                            yAxisId="left"
-                                            tick={{ fontSize: 12 }}
-                                            stroke="#9ca3af"
-                                        />
-                                        <YAxis
-                                            yAxisId="right"
-                                            orientation="right"
-                                            tick={{ fontSize: 12 }}
-                                            stroke="#9ca3af"
-                                        />
+                                        <YAxis yAxisId="left" tick={{ fontSize: 12, fill: '#78716c' }} stroke="#e7e5e4" />
+                                        <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 12, fill: '#78716c' }} stroke="#e7e5e4" />
                                         <Tooltip
                                             contentStyle={{
                                                 backgroundColor: 'white',
-                                                border: '1px solid #e5e7eb',
-                                                borderRadius: '8px',
+                                                border: '1px solid #e7e5e4',
+                                                borderRadius: '12px',
+                                                boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
                                             }}
-                                            labelFormatter={(value) =>
-                                                format(new Date(value), 'MMM d, yyyy')
-                                            }
+                                            labelFormatter={(value) => format(new Date(value), 'd MMMM yyyy', { locale: fr })}
                                         />
                                         <Legend />
                                         <Area
                                             yAxisId="left"
                                             type="monotone"
                                             dataKey="clicks"
-                                            stroke="#4f46e5"
+                                            stroke="#10b981"
                                             fillOpacity={1}
                                             fill="url(#colorClicks)"
                                             strokeWidth={2}
-                                            name="Clicks"
+                                            name="Clics"
                                         />
                                         <Area
                                             yAxisId="right"
                                             type="monotone"
                                             dataKey="impressions"
-                                            stroke="#10b981"
+                                            stroke="#3b82f6"
                                             fillOpacity={1}
                                             fill="url(#colorImpressions)"
                                             strokeWidth={2}
@@ -283,46 +321,50 @@ export default function AnalyticsIndex({
                                     </AreaChart>
                                 </ResponsiveContainer>
                             </div>
-                        </Card>
+                        </div>
                     )}
 
                     {/* Tables */}
                     <div className="mt-6 grid gap-6 lg:grid-cols-2">
                         {/* Top Pages */}
-                        <Card padding="none">
-                            <div className="border-b border-gray-200 px-6 py-4">
-                                <h3 className="text-base font-semibold text-gray-900">Top Pages</h3>
+                        <div className="bg-white rounded-2xl border border-surface-200 overflow-hidden">
+                            <div className="border-b border-surface-100 px-6 py-4">
+                                <h3 className="font-display font-semibold text-surface-900">Top Pages</h3>
                             </div>
-                            {topPages.length === 0 ? (
-                                <div className="px-6 py-8 text-center text-sm text-gray-500">
-                                    No page data available yet.
+                            {isAggregatedView ? (
+                                <div className="px-6 py-8 text-center text-sm text-surface-500">
+                                    Sélectionnez un site pour voir les top pages.
+                                </div>
+                            ) : topPages.length === 0 ? (
+                                <div className="px-6 py-8 text-center text-sm text-surface-500">
+                                    Aucune donnée disponible.
                                 </div>
                             ) : (
                                 <div className="overflow-x-auto">
-                                    <table className="min-w-full divide-y divide-gray-200">
-                                        <thead className="bg-gray-50">
-                                            <tr>
-                                                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                                    <table className="w-full">
+                                        <thead>
+                                            <tr className="bg-surface-50/50">
+                                                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-surface-500">
                                                     Page
                                                 </th>
-                                                <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
-                                                    Clicks
+                                                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-surface-500">
+                                                    Clics
                                                 </th>
-                                                <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
+                                                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-surface-500">
                                                     Pos
                                                 </th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-gray-200 bg-white">
+                                        <tbody className="divide-y divide-surface-100">
                                             {topPages.slice(0, 10).map((page, index) => (
-                                                <tr key={index}>
-                                                    <td className="max-w-xs truncate px-4 py-3 text-sm text-gray-900">
+                                                <tr key={index} className="hover:bg-surface-50/50 transition-colors">
+                                                    <td className="max-w-xs truncate px-4 py-3 text-sm text-surface-900">
                                                         {page.page}
                                                     </td>
-                                                    <td className="whitespace-nowrap px-4 py-3 text-right text-sm text-gray-600">
+                                                    <td className="whitespace-nowrap px-4 py-3 text-right text-sm font-medium text-surface-700">
                                                         {page.clicks.toLocaleString()}
                                                     </td>
-                                                    <td className="whitespace-nowrap px-4 py-3 text-right text-sm text-gray-600">
+                                                    <td className="whitespace-nowrap px-4 py-3 text-right text-sm text-surface-500">
                                                         {page.position.toFixed(1)}
                                                     </td>
                                                 </tr>
@@ -331,43 +373,47 @@ export default function AnalyticsIndex({
                                     </table>
                                 </div>
                             )}
-                        </Card>
+                        </div>
 
                         {/* Top Queries */}
-                        <Card padding="none">
-                            <div className="border-b border-gray-200 px-6 py-4">
-                                <h3 className="text-base font-semibold text-gray-900">Top Queries</h3>
+                        <div className="bg-white rounded-2xl border border-surface-200 overflow-hidden">
+                            <div className="border-b border-surface-100 px-6 py-4">
+                                <h3 className="font-display font-semibold text-surface-900">Top Requêtes</h3>
                             </div>
-                            {topQueries.length === 0 ? (
-                                <div className="px-6 py-8 text-center text-sm text-gray-500">
-                                    No query data available yet.
+                            {isAggregatedView ? (
+                                <div className="px-6 py-8 text-center text-sm text-surface-500">
+                                    Sélectionnez un site pour voir les top requêtes.
+                                </div>
+                            ) : topQueries.length === 0 ? (
+                                <div className="px-6 py-8 text-center text-sm text-surface-500">
+                                    Aucune donnée disponible.
                                 </div>
                             ) : (
                                 <div className="overflow-x-auto">
-                                    <table className="min-w-full divide-y divide-gray-200">
-                                        <thead className="bg-gray-50">
-                                            <tr>
-                                                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                                                    Query
+                                    <table className="w-full">
+                                        <thead>
+                                            <tr className="bg-surface-50/50">
+                                                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-surface-500">
+                                                    Requête
                                                 </th>
-                                                <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
-                                                    Clicks
+                                                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-surface-500">
+                                                    Clics
                                                 </th>
-                                                <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
+                                                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-surface-500">
                                                     Pos
                                                 </th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-gray-200 bg-white">
+                                        <tbody className="divide-y divide-surface-100">
                                             {topQueries.slice(0, 10).map((query, index) => (
-                                                <tr key={index}>
-                                                    <td className="max-w-xs truncate px-4 py-3 text-sm text-gray-900">
+                                                <tr key={index} className="hover:bg-surface-50/50 transition-colors">
+                                                    <td className="max-w-xs truncate px-4 py-3 text-sm text-surface-900">
                                                         {query.query}
                                                     </td>
-                                                    <td className="whitespace-nowrap px-4 py-3 text-right text-sm text-gray-600">
+                                                    <td className="whitespace-nowrap px-4 py-3 text-right text-sm font-medium text-surface-700">
                                                         {query.clicks.toLocaleString()}
                                                     </td>
-                                                    <td className="whitespace-nowrap px-4 py-3 text-right text-sm text-gray-600">
+                                                    <td className="whitespace-nowrap px-4 py-3 text-right text-sm text-surface-500">
                                                         {query.position.toFixed(1)}
                                                     </td>
                                                 </tr>
@@ -376,7 +422,7 @@ export default function AnalyticsIndex({
                                     </table>
                                 </div>
                             )}
-                        </Card>
+                        </div>
                     </div>
                 </>
             )}

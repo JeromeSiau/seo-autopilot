@@ -20,6 +20,16 @@ class KeywordController extends Controller
         $team = $request->user()->currentTeam;
         $siteIds = $team->sites()->pluck('id');
 
+        $baseQuery = Keyword::whereIn('site_id', $siteIds);
+
+        // Stats
+        $stats = [
+            'total' => (clone $baseQuery)->count(),
+            'queued' => (clone $baseQuery)->where('status', 'queued')->count(),
+            'generating' => (clone $baseQuery)->where('status', 'generating')->count(),
+            'completed' => (clone $baseQuery)->where('status', 'completed')->count(),
+        ];
+
         $query = Keyword::whereIn('site_id', $siteIds)
             ->with(['site', 'article']);
 
@@ -36,7 +46,8 @@ class KeywordController extends Controller
             $query->where('keyword', 'like', '%' . $request->search . '%');
         }
 
-        $keywords = $query->orderByDesc('score')
+        $keywords = $query->orderByDesc('priority')
+            ->orderByDesc('score')
             ->paginate(25)
             ->withQueryString();
 
@@ -44,6 +55,7 @@ class KeywordController extends Controller
             'keywords' => KeywordResource::collection($keywords)->response()->getData(true),
             'sites' => SiteResource::collection($team->sites()->get())->resolve(),
             'filters' => $request->only(['site_id', 'status', 'search']),
+            'stats' => $stats,
         ]);
     }
 

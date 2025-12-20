@@ -1,11 +1,9 @@
 import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link } from '@inertiajs/react';
-import { Plus, AlertTriangle, ArrowRight } from 'lucide-react';
-import { Button } from '@/Components/ui/Button';
-import { Card } from '@/Components/ui/Card';
-import { StatCard } from '@/Components/ui/StatCard';
+import { Plus, AlertTriangle, ArrowRight, Globe, Search, FileText, CheckCircle, TrendingUp, Zap } from 'lucide-react';
 import SiteCard from '@/Components/Dashboard/SiteCard';
 import { PageProps } from '@/types';
+import clsx from 'clsx';
 
 interface Site {
     id: number;
@@ -44,6 +42,64 @@ interface DashboardProps extends PageProps {
     unreadNotifications: number;
 }
 
+interface StatCardProps {
+    title: string;
+    value: string | number;
+    icon: React.ElementType;
+    trend?: { value: number; positive: boolean };
+    color: 'primary' | 'blue' | 'purple' | 'amber';
+}
+
+function StatCard({ title, value, icon: Icon, trend, color }: StatCardProps) {
+    const colorStyles = {
+        primary: {
+            bg: 'bg-primary-50',
+            icon: 'text-primary-600',
+            iconBg: 'bg-primary-100',
+        },
+        blue: {
+            bg: 'bg-blue-50',
+            icon: 'text-blue-600',
+            iconBg: 'bg-blue-100',
+        },
+        purple: {
+            bg: 'bg-purple-50',
+            icon: 'text-purple-600',
+            iconBg: 'bg-purple-100',
+        },
+        amber: {
+            bg: 'bg-amber-50',
+            icon: 'text-amber-600',
+            iconBg: 'bg-amber-100',
+        },
+    };
+
+    const styles = colorStyles[color];
+
+    return (
+        <div className="bg-white rounded-2xl border border-surface-200 p-5 hover:shadow-md transition-shadow">
+            <div className="flex items-start justify-between">
+                <div>
+                    <p className="text-sm font-medium text-surface-500">{title}</p>
+                    <p className="mt-2 font-display text-2xl font-bold text-surface-900">{value}</p>
+                    {trend && (
+                        <div className={clsx(
+                            'mt-2 flex items-center gap-1 text-xs font-medium',
+                            trend.positive ? 'text-primary-600' : 'text-red-600'
+                        )}>
+                            <TrendingUp className={clsx('h-3 w-3', !trend.positive && 'rotate-180')} />
+                            {trend.positive ? '+' : ''}{trend.value}% vs last month
+                        </div>
+                    )}
+                </div>
+                <div className={clsx('rounded-xl p-2.5', styles.iconBg)}>
+                    <Icon className={clsx('h-5 w-5', styles.icon)} />
+                </div>
+            </div>
+        </div>
+    );
+}
+
 export default function Dashboard({ stats, sites, actionsRequired }: DashboardProps) {
     const usagePercentage = stats.articles_limit > 0
         ? Math.round((stats.articles_used / stats.articles_limit) * 100)
@@ -53,84 +109,139 @@ export default function Dashboard({ stats, sites, actionsRequired }: DashboardPr
         <AppLayout
             header={
                 <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-                    <Button as="link" href={route('onboarding.create')} icon={Plus}>
-                        Ajouter un site
-                    </Button>
+                    <div>
+                        <h1 className="font-display text-2xl font-bold text-surface-900">Dashboard</h1>
+                        <p className="mt-1 text-sm text-surface-500">Overview of your SEO content performance</p>
+                    </div>
+                    <Link
+                        href={route('onboarding.create')}
+                        className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 px-4 py-2.5 text-sm font-semibold text-white shadow-green hover:shadow-green-lg hover:-translate-y-0.5 transition-all"
+                    >
+                        <Plus className="h-4 w-4" />
+                        Add site
+                    </Link>
                 </div>
             }
         >
             <Head title="Dashboard" />
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                <StatCard title="Sites actifs" value={`${stats.active_sites}/${stats.total_sites}`} color="blue" />
-                <StatCard title="Keywords en queue" value={stats.total_keywords_queued} color="purple" />
-                <StatCard title="Articles ce mois" value={stats.articles_this_month} color="green" />
-                <StatCard title="Publiés ce mois" value={stats.articles_published_this_month} color="indigo" />
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+                <StatCard
+                    title="Active sites"
+                    value={`${stats.active_sites}/${stats.total_sites}`}
+                    icon={Globe}
+                    color="primary"
+                />
+                <StatCard
+                    title="Keywords queued"
+                    value={stats.total_keywords_queued}
+                    icon={Search}
+                    color="purple"
+                />
+                <StatCard
+                    title="Articles this month"
+                    value={stats.articles_this_month}
+                    icon={FileText}
+                    color="blue"
+                />
+                <StatCard
+                    title="Published"
+                    value={stats.articles_published_this_month}
+                    icon={CheckCircle}
+                    color="primary"
+                />
             </div>
 
             {/* Usage Bar */}
-            <Card className="mt-6">
+            <div className="mt-6 bg-white rounded-2xl border border-surface-200 p-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <p className="text-sm font-medium text-gray-500">Usage mensuel</p>
-                        <p className="mt-1 text-2xl font-semibold text-gray-900">
-                            {stats.articles_used} / {stats.articles_limit} articles
+                        <p className="text-sm font-medium text-surface-500">Monthly usage</p>
+                        <p className="mt-1 font-display text-2xl font-bold text-surface-900">
+                            {stats.articles_used} <span className="text-surface-400 font-normal">/ {stats.articles_limit} articles</span>
                         </p>
                     </div>
-                    <Button as="link" href={route('settings.billing')} variant="outline" size="sm">
+                    <Link
+                        href={route('settings.billing')}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-surface-200 px-3 py-2 text-sm font-medium text-surface-700 hover:bg-surface-50 hover:border-primary-300 transition-all"
+                    >
+                        <Zap className="h-4 w-4 text-primary-500" />
                         Upgrade
-                    </Button>
+                    </Link>
                 </div>
                 <div className="mt-4">
-                    <div className="h-2 w-full rounded-full bg-gray-200">
+                    <div className="h-2.5 w-full rounded-full bg-surface-100">
                         <div
-                            className={`h-2 rounded-full transition-all ${
+                            className={clsx(
+                                'h-2.5 rounded-full transition-all',
                                 usagePercentage >= 90 ? 'bg-red-500' :
-                                usagePercentage >= 70 ? 'bg-yellow-500' : 'bg-indigo-600'
-                            }`}
+                                usagePercentage >= 70 ? 'bg-amber-500' : 'bg-primary-500'
+                            )}
                             style={{ width: `${Math.min(usagePercentage, 100)}%` }}
                         />
                     </div>
+                    <div className="mt-2 flex justify-between text-xs text-surface-500">
+                        <span>{usagePercentage}% used</span>
+                        <span>{stats.articles_limit - stats.articles_used} remaining</span>
+                    </div>
                 </div>
-            </Card>
+            </div>
 
             {/* Actions Required */}
             {actionsRequired.length > 0 && (
-                <Card className="mt-6 border-yellow-200 bg-yellow-50">
-                    <h3 className="flex items-center gap-2 font-semibold text-yellow-800">
+                <div className="mt-6 bg-amber-50 rounded-2xl border border-amber-200 p-6">
+                    <h3 className="flex items-center gap-2 font-display font-semibold text-amber-800">
                         <AlertTriangle className="h-5 w-5" />
-                        Actions requises
+                        Actions required
                     </h3>
-                    <div className="mt-3 space-y-2">
+                    <div className="mt-4 space-y-2">
                         {actionsRequired.map((action, i) => (
                             <Link
                                 key={i}
                                 href={action.action_url}
-                                className="flex items-center justify-between rounded-lg bg-white p-3 hover:bg-yellow-100"
+                                className="flex items-center justify-between rounded-xl bg-white p-4 border border-amber-100 hover:border-amber-300 hover:shadow-sm transition-all"
                             >
                                 <div>
-                                    <p className="font-medium text-gray-900">{action.message}</p>
-                                    <p className="text-sm text-gray-500">{action.site_domain}</p>
+                                    <p className="font-medium text-surface-900">{action.message}</p>
+                                    <p className="text-sm text-surface-500">{action.site_domain}</p>
                                 </div>
-                                <ArrowRight className="h-4 w-4 text-gray-400" />
+                                <ArrowRight className="h-4 w-4 text-amber-600" />
                             </Link>
                         ))}
                     </div>
-                </Card>
+                </div>
             )}
 
             {/* Sites Grid */}
-            <div className="mt-6">
-                <h2 className="mb-4 text-lg font-semibold text-gray-900">Mes sites</h2>
+            <div className="mt-8">
+                <div className="flex items-center justify-between mb-4">
+                    <h2 className="font-display text-lg font-semibold text-surface-900">My sites</h2>
+                    {sites.length > 0 && (
+                        <Link
+                            href={route('sites.index')}
+                            className="text-sm font-medium text-primary-600 hover:text-primary-700 flex items-center gap-1"
+                        >
+                            View all
+                            <ArrowRight className="h-4 w-4" />
+                        </Link>
+                    )}
+                </div>
                 {sites.length === 0 ? (
-                    <Card className="text-center py-12">
-                        <p className="text-gray-500">Aucun site configuré</p>
-                        <Button as="link" href={route('onboarding.create')} className="mt-4" icon={Plus}>
-                            Ajouter votre premier site
-                        </Button>
-                    </Card>
+                    <div className="bg-white rounded-2xl border border-surface-200 p-12 text-center">
+                        <div className="mx-auto w-12 h-12 rounded-full bg-surface-100 flex items-center justify-center mb-4">
+                            <Globe className="h-6 w-6 text-surface-400" />
+                        </div>
+                        <h3 className="font-display font-semibold text-surface-900 mb-1">No sites configured</h3>
+                        <p className="text-sm text-surface-500 mb-6">Get started by adding your first website</p>
+                        <Link
+                            href={route('onboarding.create')}
+                            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 px-5 py-2.5 text-sm font-semibold text-white shadow-green hover:shadow-green-lg transition-all"
+                        >
+                            <Plus className="h-4 w-4" />
+                            Add your first site
+                        </Link>
+                    </div>
                 ) : (
                     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                         {sites.map((site) => (

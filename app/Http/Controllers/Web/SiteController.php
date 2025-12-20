@@ -64,10 +64,13 @@ class SiteController extends Controller
         $this->authorize('view', $site);
 
         $site->loadCount(['keywords', 'articles', 'integrations']);
-        $site->load(['keywords' => fn($q) => $q->orderByDesc('score')->limit(10)]);
+        $site->load([
+            'keywords' => fn($q) => $q->orderByDesc('score')->limit(10),
+            'settings',
+        ]);
 
         return Inertia::render('Sites/Show', [
-            'site' => new SiteResource($site),
+            'site' => (new SiteResource($site))->resolve(),
         ]);
     }
 
@@ -76,7 +79,7 @@ class SiteController extends Controller
         $this->authorize('update', $site);
 
         return Inertia::render('Sites/Edit', [
-            'site' => new SiteResource($site),
+            'site' => (new SiteResource($site))->resolve(),
         ]);
     }
 

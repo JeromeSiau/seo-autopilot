@@ -1,7 +1,7 @@
 import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link } from '@inertiajs/react';
-import { Settings, CreditCard, Users, Key, Bell, Palette } from 'lucide-react';
-import { Card } from '@/Components/ui/Card';
+import { CreditCard, Users, Key, Bell, Palette, ChevronRight, Zap, Sparkles } from 'lucide-react';
+import clsx from 'clsx';
 import { PageProps, Team } from '@/types';
 
 interface SettingsIndexProps extends PageProps {
@@ -10,98 +10,170 @@ interface SettingsIndexProps extends PageProps {
 
 const settingsLinks = [
     {
-        name: 'Billing',
-        description: 'Manage your subscription and payment methods',
+        name: 'Facturation',
+        description: 'Gérez votre abonnement et vos moyens de paiement',
         href: 'settings.billing',
         icon: CreditCard,
+        color: 'primary',
     },
     {
-        name: 'Team',
-        description: 'Invite team members and manage permissions',
+        name: 'Équipe',
+        description: 'Invitez des membres et gérez les permissions',
         href: 'settings.team',
         icon: Users,
+        color: 'blue',
     },
     {
-        name: 'API Keys',
-        description: 'Manage API keys for external services',
+        name: 'Clés API',
+        description: 'Gérez les clés API pour les services externes',
         href: 'settings.api-keys',
         icon: Key,
+        color: 'purple',
     },
     {
-        name: 'Brand Voices',
-        description: 'Configure your content tone and style',
+        name: 'Voix de marque',
+        description: 'Configurez le ton et le style de votre contenu',
         href: 'settings.brand-voices',
         icon: Palette,
+        color: 'amber',
     },
     {
         name: 'Notifications',
-        description: 'Configure email and webhook notifications',
+        description: 'Configurez les notifications email et webhook',
         href: 'settings.notifications',
         icon: Bell,
+        color: 'blue',
     },
 ];
 
+const PLAN_CONFIG = {
+    free: { label: 'Gratuit', color: 'bg-surface-100 text-surface-700' },
+    starter: { label: 'Starter', color: 'bg-blue-50 text-blue-700' },
+    pro: { label: 'Pro', color: 'bg-primary-50 text-primary-700' },
+    enterprise: { label: 'Enterprise', color: 'bg-purple-50 text-purple-700' },
+};
+
 export default function SettingsIndex({ team }: SettingsIndexProps) {
+    const usagePercentage = Math.round((team.articles_generated_count / team.articles_limit) * 100);
+    const planConfig = PLAN_CONFIG[team.plan] || PLAN_CONFIG.free;
+
+    const getColorClasses = (color: string) => {
+        const colors: Record<string, { iconBg: string; icon: string }> = {
+            primary: { iconBg: 'bg-primary-100', icon: 'text-primary-600' },
+            blue: { iconBg: 'bg-blue-100', icon: 'text-blue-600' },
+            purple: { iconBg: 'bg-purple-100', icon: 'text-purple-600' },
+            amber: { iconBg: 'bg-amber-100', icon: 'text-amber-600' },
+        };
+        return colors[color] || colors.primary;
+    };
+
     return (
         <AppLayout
             header={
-                <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
+                <div>
+                    <h1 className="font-display text-2xl font-bold text-surface-900">Paramètres</h1>
+                    <p className="mt-1 text-sm text-surface-500">
+                        Gérez votre compte et vos préférences
+                    </p>
+                </div>
             }
         >
-            <Head title="Settings" />
+            <Head title="Paramètres" />
 
-            {/* Current Plan */}
-            <Card className="mb-8">
-                <div className="flex items-center justify-between">
+            {/* Current Plan Card */}
+            <div className="bg-white rounded-2xl border border-surface-200 p-6 mb-8">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                     <div>
-                        <h2 className="text-lg font-semibold text-gray-900">Current Plan</h2>
-                        <p className="mt-1 text-sm text-gray-500">
-                            You're currently on the{' '}
-                            <span className="font-medium capitalize text-indigo-600">{team.plan}</span>{' '}
-                            plan.
+                        <div className="flex items-center gap-3">
+                            <h2 className="font-display text-lg font-semibold text-surface-900">
+                                Plan actuel
+                            </h2>
+                            <span className={clsx(
+                                'inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold',
+                                planConfig.color
+                            )}>
+                                <Sparkles className="h-3 w-3" />
+                                {planConfig.label}
+                            </span>
+                        </div>
+                        <p className="mt-1 text-sm text-surface-500">
+                            {team.articles_limit - team.articles_generated_count} articles restants ce mois-ci
                         </p>
                     </div>
-                    <div className="text-right">
-                        <p className="text-2xl font-bold text-gray-900">
-                            {team.articles_generated_count} / {team.articles_limit}
-                        </p>
-                        <p className="text-sm text-gray-500">articles this month</p>
+                    <div className="flex flex-col items-start sm:items-end gap-3">
+                        <div className="text-right">
+                            <p className="font-display text-2xl font-bold text-surface-900">
+                                {team.articles_generated_count}
+                                <span className="text-lg font-normal text-surface-400"> / {team.articles_limit}</span>
+                            </p>
+                            <p className="text-xs text-surface-500">articles ce mois</p>
+                        </div>
+                        <Link
+                            href={route('settings.billing')}
+                            className={clsx(
+                                'inline-flex items-center gap-1.5 rounded-lg px-4 py-2',
+                                'text-sm font-semibold',
+                                'bg-gradient-to-r from-primary-500 to-primary-600 text-white',
+                                'shadow-green hover:shadow-green-lg hover:-translate-y-0.5',
+                                'transition-all'
+                            )}
+                        >
+                            <Zap className="h-4 w-4" />
+                            Upgrader
+                        </Link>
                     </div>
                 </div>
-                <div className="mt-4">
-                    <div className="h-2 w-full rounded-full bg-gray-200">
+                <div className="mt-5">
+                    <div className="flex justify-between text-xs text-surface-500 mb-2">
+                        <span>{usagePercentage}% utilisé</span>
+                        <span>{team.articles_limit - team.articles_generated_count} restants</span>
+                    </div>
+                    <div className="h-2.5 w-full rounded-full bg-surface-100">
                         <div
-                            className="h-2 rounded-full bg-indigo-600 transition-all"
-                            style={{
-                                width: `${Math.min(
-                                    (team.articles_generated_count / team.articles_limit) * 100,
-                                    100
-                                )}%`,
-                            }}
+                            className={clsx(
+                                'h-2.5 rounded-full transition-all',
+                                usagePercentage >= 90 ? 'bg-red-500' :
+                                usagePercentage >= 70 ? 'bg-amber-500' : 'bg-primary-500'
+                            )}
+                            style={{ width: `${Math.min(usagePercentage, 100)}%` }}
                         />
                     </div>
                 </div>
-            </Card>
+            </div>
 
             {/* Settings Links */}
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {settingsLinks.map((item) => (
-                    <Link
-                        key={item.name}
-                        href={route(item.href)}
-                        className="group relative block rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-900/5 transition hover:shadow-md"
-                    >
-                        <div className="flex items-center gap-4">
-                            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-indigo-50 transition group-hover:bg-indigo-100">
-                                <item.icon className="h-6 w-6 text-indigo-600" />
+                {settingsLinks.map((item) => {
+                    const colors = getColorClasses(item.color);
+                    return (
+                        <Link
+                            key={item.name}
+                            href={route(item.href)}
+                            className="group bg-white rounded-2xl border border-surface-200 p-5 hover:shadow-lg hover:border-primary-200 transition-all"
+                        >
+                            <div className="flex items-start gap-4">
+                                <div className={clsx(
+                                    'flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl transition-colors',
+                                    colors.iconBg,
+                                    'group-hover:scale-105'
+                                )}>
+                                    <item.icon className={clsx('h-6 w-6', colors.icon)} />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-center justify-between">
+                                        <h3 className="font-display font-semibold text-surface-900 group-hover:text-primary-600 transition-colors">
+                                            {item.name}
+                                        </h3>
+                                        <ChevronRight className="h-4 w-4 text-surface-300 group-hover:text-primary-500 group-hover:translate-x-0.5 transition-all" />
+                                    </div>
+                                    <p className="mt-1 text-sm text-surface-500 line-clamp-2">
+                                        {item.description}
+                                    </p>
+                                </div>
                             </div>
-                            <div>
-                                <h3 className="font-semibold text-gray-900">{item.name}</h3>
-                                <p className="mt-1 text-sm text-gray-500">{item.description}</p>
-                            </div>
-                        </div>
-                    </Link>
-                ))}
+                        </Link>
+                    );
+                })}
             </div>
         </AppLayout>
     );

@@ -90,7 +90,7 @@ class Site extends Model
 
     public function isGa4Connected(): bool
     {
-        return !empty($this->ga4_token) && !empty($this->ga4_property_id);
+        return !empty($this->ga4_token);
     }
 
     public function getPublishedArticlesCountAttribute(): int

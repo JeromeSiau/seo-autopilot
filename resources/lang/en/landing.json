@@ -1,6 +1,6 @@
 {
   "meta": {
-    "title": "SEO Autopilot - AI-Powered Content That Ranks",
+    "title": "RankCruise - AI-Powered SEO Content That Ranks",
     "description": "Generate high-quality, human-like SEO content automatically. Connect your site, set your preferences, and watch your organic traffic grow."
   },
   "nav": {
@@ -12,16 +12,16 @@
     "getStarted": "Get Started"
   },
   "hero": {
-    "badge": "Trusted by 500+ businesses worldwide",
-    "title": "SEO content that reads like it was written by humans.",
-    "titleAccent": "Because it practically was.",
-    "subtitle": "Stop spending hours on content that doesn't rank. Our AI creates articles so natural, so well-researched, that readers can't tell the difference.",
-    "cta": "Start writing smarter",
-    "ctaSecondary": "See how it works",
+    "badge": "AI-Powered SEO Content",
+    "title": "Smooth sailing to",
+    "titleAccent": "better rankings",
+    "subtitle": "Generate SEO-optimized articles that actually rank. Our AI creates human-quality content tailored to your keywords and audience.",
+    "cta": "Start Free Trial",
+    "ctaSecondary": "Watch demo",
     "stats": {
       "articles": "Articles generated",
-      "languages": "Languages supported",
-      "satisfaction": "Customer satisfaction"
+      "users": "Happy users",
+      "ranking": "Avg. ranking boost"
     }
   },
   "socialProof": {
@@ -31,39 +31,32 @@
     "label": "The problem",
     "title": "SEO content is broken.",
     "subtitle": "You know the drill. Hours of research. Endless writing. And still, your content sounds robotic, ranks poorly, or both.",
-    "pain1": {
-      "title": "Time-consuming",
-      "description": "Writing quality SEO content takes 4-8 hours per article. Time you don't have."
-    },
-    "pain2": {
-      "title": "Inconsistent quality",
-      "description": "Freelancers vary. AI tools produce slop. Your brand voice gets lost."
-    },
-    "pain3": {
-      "title": "Poor rankings",
-      "description": "Generic content doesn't rank. Google knows. Your audience knows."
-    }
+    "cardTitle": "Without RankCruise",
+    "pains": [
+      "Hours spent researching keywords",
+      "Expensive freelance writers",
+      "Inconsistent content quality",
+      "Slow publishing schedule",
+      "No SEO optimization"
+    ]
   },
   "solution": {
     "label": "The solution",
     "title": "Content that works while you sleep.",
-    "subtitle": "SEO Autopilot combines deep keyword research, competitor analysis, and advanced AI to create content that actually ranks.",
-    "point1": {
-      "title": "Human-quality writing",
-      "description": "Our AI is trained on top-performing content. Every article reads naturally, engages readers, and satisfies search intent."
-    },
-    "point2": {
-      "title": "Fully automated",
-      "description": "Set your schedule. Define your topics. We handle research, writing, optimization, and publishing."
-    },
-    "point3": {
-      "title": "Multi-language native",
-      "description": "Reach global audiences with content that sounds native in every language—not translated."
-    }
+    "subtitle": "RankCruise combines deep keyword research, competitor analysis, and advanced AI to create content that actually ranks.",
+    "cardTitle": "With RankCruise",
+    "points": [
+      "AI finds winning keywords",
+      "Unlimited content generation",
+      "Consistent, high-quality output",
+      "Publish daily on autopilot",
+      "Built-in SEO best practices"
+    ]
   },
   "features": {
     "label": "Features",
     "title": "Everything you need to dominate search.",
+    "subtitle": "Powerful tools to automate your content strategy.",
     "feature1": {
       "title": "AI Content Generation",
       "description": "Articles that match your brand voice, target your keywords, and engage your readers. Every single time."
@@ -79,11 +72,20 @@
     "feature4": {
       "title": "Multi-Language Support",
       "description": "Native content in English, French, Spanish, and 20+ languages. No awkward translations."
+    },
+    "feature5": {
+      "title": "Multi-Language",
+      "description": "Generate content in 50+ languages."
+    },
+    "feature6": {
+      "title": "Quality Guarantee",
+      "description": "Every article passes plagiarism checks."
     }
   },
   "howItWorks": {
     "label": "How it works",
     "title": "From zero to ranking in three steps.",
+    "subtitle": "Get started in minutes and watch your traffic grow.",
     "step1": {
       "number": "01",
       "title": "Connect your site",
@@ -98,6 +100,10 @@
       "number": "03",
       "title": "Watch your traffic grow",
       "description": "Autopilot takes over. We generate, optimize, and publish content while you focus on your business."
+    },
+    "step4": {
+      "title": "Watch rankings grow",
+      "description": "Track your progress as you climb the search results."
     }
   },
   "preview": {
@@ -108,8 +114,9 @@
   "testimonials": {
     "label": "Testimonials",
     "title": "Loved by content teams everywhere.",
+    "subtitle": "See what our customers have to say.",
     "testimonial1": {
-      "quote": "We went from 2 articles a month to 20. Our organic traffic tripled in 6 months. SEO Autopilot is a game-changer.",
+      "quote": "We went from 2 articles a month to 20. Our organic traffic tripled in 6 months. RankCruise is a game-changer.",
       "author": "Sarah Chen",
       "role": "Head of Content",
       "company": "TechFlow"
@@ -182,8 +189,8 @@
     "label": "FAQ",
     "title": "Questions? We've got answers.",
     "q1": {
-      "question": "How is SEO Autopilot different from other AI writing tools?",
-      "answer": "Unlike generic AI writers, SEO Autopilot is built specifically for SEO. We combine keyword research, competitor analysis, and search intent optimization into every article. The result? Content that ranks, not just content that exists."
+      "question": "How is RankCruise different from other AI writing tools?",
+      "answer": "Unlike generic AI writers, RankCruise is built specifically for SEO. We combine keyword research, competitor analysis, and search intent optimization into every article. The result? Content that ranks, not just content that exists."
     },
     "q2": {
       "question": "Will Google penalize AI-generated content?",
@@ -207,27 +214,31 @@
     }
   },
   "cta": {
-    "title": "Ready to automate your SEO content?",
-    "subtitle": "Join 500+ businesses already growing their organic traffic with SEO Autopilot.",
+    "title": "Ready to set sail for better rankings?",
+    "subtitle": "Join 500+ businesses already growing their organic traffic with RankCruise.",
     "button": "Start your free trial",
     "note": "No credit card required. 14-day free trial."
   },
   "footer": {
-    "description": "AI-powered SEO content that ranks. Built for businesses serious about organic growth.",
+    "description": "Smooth sailing to better rankings. AI-powered SEO content built for businesses serious about organic growth.",
     "product": "Product",
     "features": "Features",
     "pricing": "Pricing",
     "integrations": "Integrations",
     "changelog": "Changelog",
+    "resources": "Resources",
+    "blog": "Blog",
+    "documentation": "Documentation",
+    "helpCenter": "Help Center",
+    "api": "API",
     "company": "Company",
     "about": "About",
-    "blog": "Blog",
     "careers": "Careers",
     "contact": "Contact",
     "legal": "Legal",
     "privacy": "Privacy Policy",
     "terms": "Terms of Service",
     "cookies": "Cookie Policy",
-    "copyright": "© 2024 SEO Autopilot. All rights reserved."
+    "copyright": "© 2024 RankCruise. All rights reserved."
   }
 }

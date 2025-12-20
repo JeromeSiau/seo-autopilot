@@ -40,7 +40,7 @@ export default function ArticleShow({ article, integrations }: ArticleShowProps)
         if (!selectedIntegration) return;
         setPublishing(true);
         router.post(
-            route('articles.publish', article.id),
+            route('articles.publish', { article: article.id }),
             { integration_id: selectedIntegration },
             {
                 onFinish: () => setPublishing(false),
@@ -49,7 +49,7 @@ export default function ArticleShow({ article, integrations }: ArticleShowProps)
     };
 
     const handleApprove = () => {
-        router.post(route('articles.approve', article.id));
+        router.post(route('articles.approve', { article: article.id }));
     };
 
     return (
@@ -118,7 +118,7 @@ export default function ArticleShow({ article, integrations }: ArticleShowProps)
                                 </Button>
                                 <Button
                                     as="link"
-                                    href={route('articles.edit', article.id)}
+                                    href={route('articles.edit', { article: article.id })}
                                     variant="secondary"
                                     size="sm"
                                     icon={Edit}

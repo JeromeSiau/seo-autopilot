@@ -1,6 +1,6 @@
 {
   "meta": {
-    "title": "SEO Autopilot - Contenu IA qui se positionne",
+    "title": "RankCruise - Contenu SEO par IA qui se Positionne",
     "description": "Générez du contenu SEO de haute qualité, naturel et humain, automatiquement. Connectez votre site, définissez vos préférences, et regardez votre trafic organique croître."
   },
   "nav": {
@@ -12,16 +12,16 @@
     "getStarted": "Commencer"
   },
   "hero": {
-    "badge": "Plus de 500 entreprises nous font confiance",
-    "title": "Du contenu SEO qui se lit comme s'il était écrit par des humains.",
-    "titleAccent": "Parce qu'il l'est presque.",
-    "subtitle": "Arrêtez de passer des heures sur du contenu qui ne se positionne pas. Notre IA crée des articles si naturels, si bien documentés, que vos lecteurs ne verront pas la différence.",
-    "cta": "Commencer maintenant",
-    "ctaSecondary": "Voir comment ça marche",
+    "badge": "Contenu SEO propulsé par l'IA",
+    "title": "Cap vers de",
+    "titleAccent": "meilleurs classements",
+    "subtitle": "Générez des articles SEO optimisés qui se positionnent vraiment. Notre IA crée du contenu de qualité humaine adapté à vos mots-clés et votre audience.",
+    "cta": "Essai gratuit",
+    "ctaSecondary": "Voir la démo",
     "stats": {
       "articles": "Articles générés",
-      "languages": "Langues supportées",
-      "satisfaction": "Satisfaction client"
+      "users": "Utilisateurs satisfaits",
+      "ranking": "Amélioration moyenne"
     }
   },
   "socialProof": {
@@ -31,39 +31,32 @@
     "label": "Le problème",
     "title": "Le contenu SEO est cassé.",
     "subtitle": "Vous connaissez la chanson. Des heures de recherche. Une rédaction interminable. Et au final, un contenu robotique, mal positionné, ou les deux.",
-    "pain1": {
-      "title": "Chronophage",
-      "description": "Rédiger un article SEO de qualité prend 4 à 8 heures. Du temps que vous n'avez pas."
-    },
-    "pain2": {
-      "title": "Qualité variable",
-      "description": "Les freelances varient. Les outils IA produisent du générique. Votre voix de marque se perd."
-    },
-    "pain3": {
-      "title": "Mauvais positionnement",
-      "description": "Le contenu générique ne se positionne pas. Google le sait. Votre audience aussi."
-    }
+    "cardTitle": "Sans RankCruise",
+    "pains": [
+      "Des heures à rechercher des mots-clés",
+      "Des rédacteurs freelance coûteux",
+      "Une qualité de contenu inconsistante",
+      "Un rythme de publication lent",
+      "Aucune optimisation SEO"
+    ]
   },
   "solution": {
     "label": "La solution",
     "title": "Du contenu qui travaille pendant que vous dormez.",
-    "subtitle": "SEO Autopilot combine recherche de mots-clés approfondie, analyse concurrentielle et IA avancée pour créer du contenu qui se positionne vraiment.",
-    "point1": {
-      "title": "Qualité humaine",
-      "description": "Notre IA est entraînée sur les contenus les plus performants. Chaque article se lit naturellement, engage les lecteurs et satisfait l'intention de recherche."
-    },
-    "point2": {
-      "title": "Entièrement automatisé",
-      "description": "Définissez votre planning. Choisissez vos sujets. On s'occupe de la recherche, la rédaction, l'optimisation et la publication."
-    },
-    "point3": {
-      "title": "Multi-langue natif",
-      "description": "Atteignez une audience mondiale avec du contenu qui sonne natif dans chaque langue—pas traduit."
-    }
+    "subtitle": "RankCruise combine recherche de mots-clés approfondie, analyse concurrentielle et IA avancée pour créer du contenu qui se positionne vraiment.",
+    "cardTitle": "Avec RankCruise",
+    "points": [
+      "L'IA trouve les mots-clés gagnants",
+      "Génération de contenu illimitée",
+      "Qualité constante et élevée",
+      "Publication quotidienne en autopilot",
+      "Meilleures pratiques SEO intégrées"
+    ]
   },
   "features": {
     "label": "Fonctionnalités",
     "title": "Tout ce qu'il faut pour dominer la recherche.",
+    "subtitle": "Des outils puissants pour automatiser votre stratégie de contenu.",
     "feature1": {
       "title": "Génération de contenu IA",
       "description": "Des articles qui correspondent à votre voix de marque, ciblent vos mots-clés et engagent vos lecteurs. À chaque fois."
@@ -79,11 +72,20 @@
     "feature4": {
       "title": "Support multi-langue",
       "description": "Contenu natif en français, anglais, espagnol et 20+ langues. Pas de traductions maladroites."
+    },
+    "feature5": {
+      "title": "Multi-langue",
+      "description": "Générez du contenu dans plus de 50 langues."
+    },
+    "feature6": {
+      "title": "Garantie qualité",
+      "description": "Chaque article passe les contrôles anti-plagiat."
     }
   },
   "howItWorks": {
     "label": "Comment ça marche",
     "title": "De zéro au positionnement en trois étapes.",
+    "subtitle": "Démarrez en quelques minutes et regardez votre trafic croître.",
     "step1": {
       "number": "01",
       "title": "Connectez votre site",
@@ -98,6 +100,10 @@
       "number": "03",
       "title": "Regardez votre trafic croître",
       "description": "L'autopilot prend le relais. On génère, optimise et publie le contenu pendant que vous vous concentrez sur votre business."
+    },
+    "step4": {
+      "title": "Voyez vos rankings monter",
+      "description": "Suivez votre progression dans les résultats de recherche."
     }
   },
   "preview": {
@@ -108,8 +114,9 @@
   "testimonials": {
     "label": "Témoignages",
     "title": "Adopté par les équipes contenu partout.",
+    "subtitle": "Découvrez ce que nos clients disent.",
     "testimonial1": {
-      "quote": "On est passé de 2 articles par mois à 20. Notre trafic organique a triplé en 6 mois. SEO Autopilot change la donne.",
+      "quote": "On est passé de 2 articles par mois à 20. Notre trafic organique a triplé en 6 mois. RankCruise change la donne.",
       "author": "Sarah Chen",
       "role": "Responsable Contenu",
       "company": "TechFlow"
@@ -182,8 +189,8 @@
     "label": "FAQ",
     "title": "Des questions ? On a les réponses.",
     "q1": {
-      "question": "En quoi SEO Autopilot diffère des autres outils d'écriture IA ?",
-      "answer": "Contrairement aux rédacteurs IA génériques, SEO Autopilot est conçu spécifiquement pour le SEO. On combine recherche de mots-clés, analyse concurrentielle et optimisation de l'intention de recherche dans chaque article. Résultat ? Du contenu qui se positionne, pas juste du contenu qui existe."
+      "question": "En quoi RankCruise diffère des autres outils d'écriture IA ?",
+      "answer": "Contrairement aux rédacteurs IA génériques, RankCruise est conçu spécifiquement pour le SEO. On combine recherche de mots-clés, analyse concurrentielle et optimisation de l'intention de recherche dans chaque article. Résultat ? Du contenu qui se positionne, pas juste du contenu qui existe."
     },
     "q2": {
       "question": "Google va-t-il pénaliser le contenu généré par IA ?",
@@ -207,27 +214,31 @@
     }
   },
   "cta": {
-    "title": "Prêt à automatiser votre contenu SEO ?",
-    "subtitle": "Rejoignez plus de 500 entreprises qui développent déjà leur trafic organique avec SEO Autopilot.",
+    "title": "Prêt à mettre le cap vers de meilleurs rankings ?",
+    "subtitle": "Rejoignez plus de 500 entreprises qui développent déjà leur trafic organique avec RankCruise.",
     "button": "Démarrer l'essai gratuit",
     "note": "Pas de carte bancaire requise. Essai gratuit de 14 jours."
   },
   "footer": {
-    "description": "Contenu SEO propulsé par l'IA qui se positionne. Conçu pour les entreprises sérieuses sur la croissance organique.",
+    "description": "Cap vers de meilleurs classements. Contenu SEO propulsé par l'IA pour les entreprises sérieuses sur la croissance organique.",
     "product": "Produit",
     "features": "Fonctionnalités",
     "pricing": "Tarifs",
     "integrations": "Intégrations",
     "changelog": "Changelog",
+    "resources": "Ressources",
+    "blog": "Blog",
+    "documentation": "Documentation",
+    "helpCenter": "Centre d'aide",
+    "api": "API",
     "company": "Entreprise",
     "about": "À propos",
-    "blog": "Blog",
     "careers": "Carrières",
     "contact": "Contact",
     "legal": "Légal",
     "privacy": "Politique de confidentialité",
     "terms": "Conditions d'utilisation",
     "cookies": "Politique des cookies",
-    "copyright": "© 2024 SEO Autopilot. Tous droits réservés."
+    "copyright": "© 2024 RankCruise. Tous droits réservés."
   }
 }

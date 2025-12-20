@@ -15,6 +15,44 @@ class OnboardingController extends Controller
     {
         return Inertia::render('Onboarding/Wizard', [
             'team' => auth()->user()->team,
+            'site' => null,
+        ]);
+    }
+
+    public function resume(Site $site)
+    {
+        // Ensure user owns this site
+        if ($site->team_id !== auth()->user()->team_id) {
+            abort(403);
+        }
+
+        // Determine which step to resume from
+        $step = 2; // Site already exists, skip step 1
+
+        // If GSC is connected, move to step 3
+        if ($site->isGscConnected()) {
+            $step = 3;
+        }
+
+        // If business description is filled, move to step 4
+        if ($site->business_description) {
+            $step = 4;
+        }
+
+        // If settings exist, move to step 5
+        if ($site->settings) {
+            $step = 5;
+        }
+
+        // If has integration OR step 5 was visited (settings exist), move to step 6
+        if ($site->settings && $site->integrations()->exists()) {
+            $step = 6;
+        }
+
+        return Inertia::render('Onboarding/Wizard', [
+            'team' => auth()->user()->team,
+            'site' => $site->load('settings'),
+            'resumeStep' => $step,
         ]);
     }
 

@@ -1,6 +1,8 @@
 import { useState } from 'react';
-import { Head, router } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { PageProps } from '@/types';
+import { Check, X } from 'lucide-react';
+import clsx from 'clsx';
 import Step1Site from './Steps/Step1Site';
 import Step2GSC from './Steps/Step2GSC';
 import Step3Business from './Steps/Step3Business';
@@ -14,98 +16,160 @@ interface Team {
     articles_limit: number;
 }
 
-interface WizardProps extends PageProps {
-    team: Team;
+interface Site {
+    id: number;
+    domain: string;
+    name: string;
+    language: string;
+    business_description?: string;
+    settings?: {
+        articles_per_week: number;
+        publish_days: string[];
+        auto_publish: boolean;
+    };
 }
 
-export default function Wizard({ team }: WizardProps) {
-    const [currentStep, setCurrentStep] = useState(1);
-    const [siteId, setSiteId] = useState<number | null>(null);
-    const [siteData, setSiteData] = useState({
-        domain: '',
-        name: '',
-        language: 'fr',
-    });
+interface WizardProps extends PageProps {
+    team: Team;
+    site?: Site | null;
+    resumeStep?: number;
+}
 
-    const steps = [
-        { number: 1, title: 'Site' },
-        { number: 2, title: 'Search Console' },
-        { number: 3, title: 'Business' },
-        { number: 4, title: 'Configuration' },
-        { number: 5, title: 'Publication' },
-        { number: 6, title: 'Lancement' },
-    ];
+const STEPS = [
+    { number: 1, title: 'Site', description: 'Infos de base' },
+    { number: 2, title: 'Search Console', description: 'Connexion GSC' },
+    { number: 3, title: 'Business', description: 'Votre activité' },
+    { number: 4, title: 'Configuration', description: 'Rythme de publication' },
+    { number: 5, title: 'Publication', description: 'Intégration CMS' },
+    { number: 6, title: 'Lancement', description: 'Activer l\'autopilot' },
+];
+
+export default function Wizard({ team, site, resumeStep }: WizardProps) {
+    const [currentStep, setCurrentStep] = useState(resumeStep || 1);
+    const [siteId, setSiteId] = useState<number | null>(site?.id || null);
+    const [siteData, setSiteData] = useState({
+        domain: site?.domain || '',
+        name: site?.name || '',
+        language: site?.language || 'fr',
+    });
 
     const nextStep = () => setCurrentStep((s) => Math.min(s + 1, 6));
     const prevStep = () => setCurrentStep((s) => Math.max(s - 1, 1));
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-surface-50">
             <Head title="Configuration du site" />
 
-            <div className="mx-auto max-w-3xl px-4 py-12">
-                {/* Progress bar */}
-                <div className="mb-8">
-                    <div className="flex justify-between">
-                        {steps.map((step) => (
-                            <div
-                                key={step.number}
-                                className={`flex flex-col items-center ${
-                                    step.number <= currentStep ? 'text-indigo-600' : 'text-gray-400'
-                                }`}
-                            >
-                                <div
-                                    className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-medium ${
-                                        step.number < currentStep
-                                            ? 'bg-indigo-600 text-white'
-                                            : step.number === currentStep
-                                            ? 'border-2 border-indigo-600 text-indigo-600'
-                                            : 'border-2 border-gray-300 text-gray-400'
-                                    }`}
-                                >
-                                    {step.number < currentStep ? '✓' : step.number}
+            {/* Header */}
+            <header className="border-b border-surface-200 bg-white">
+                <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4">
+                    <Link href="/" className="flex items-center">
+                        <span className="font-display text-xl font-bold text-surface-900">
+                            RankCruise
+                            <span className="inline-block w-1.5 h-1.5 bg-primary-500 rounded-full ml-0.5 align-super" />
+                        </span>
+                    </Link>
+                    <Link
+                        href={route('dashboard')}
+                        className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-surface-500 hover:text-surface-700 hover:bg-surface-100 transition-colors"
+                    >
+                        <X className="h-4 w-4" />
+                        <span className="hidden sm:inline">Quitter</span>
+                    </Link>
+                </div>
+            </header>
+
+            <div className="mx-auto max-w-5xl px-4 py-8 lg:py-12">
+                {/* Progress Steps */}
+                <div className="mb-10">
+                    {/* Desktop Progress - Compact horizontal */}
+                    <div className="hidden md:block">
+                        <div className="flex items-center justify-center gap-2">
+                            {STEPS.map((step, index) => (
+                                <div key={step.number} className="flex items-center">
+                                    <div className="flex flex-col items-center">
+                                        <div
+                                            className={clsx(
+                                                'flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold transition-all',
+                                                step.number < currentStep
+                                                    ? 'bg-primary-500 text-white'
+                                                    : step.number === currentStep
+                                                    ? 'bg-primary-100 text-primary-700 ring-2 ring-primary-500 ring-offset-2'
+                                                    : 'bg-surface-100 text-surface-400'
+                                            )}
+                                        >
+                                            {step.number < currentStep ? (
+                                                <Check className="h-4 w-4" />
+                                            ) : (
+                                                step.number
+                                            )}
+                                        </div>
+                                        <span className={clsx(
+                                            'mt-1.5 text-xs font-medium text-center whitespace-nowrap',
+                                            step.number <= currentStep ? 'text-surface-700' : 'text-surface-400'
+                                        )}>
+                                            {step.title}
+                                        </span>
+                                    </div>
+                                    {index < STEPS.length - 1 && (
+                                        <div className={clsx(
+                                            'mx-2 h-0.5 w-8 lg:w-16 mt-[-18px]',
+                                            step.number < currentStep ? 'bg-primary-500' : 'bg-surface-200'
+                                        )} />
+                                    )}
                                 </div>
-                                <span className="mt-2 text-xs font-medium hidden sm:block">
-                                    {step.title}
-                                </span>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                     </div>
-                    <div className="mt-4 h-2 rounded-full bg-gray-200">
-                        <div
-                            className="h-2 rounded-full bg-indigo-600 transition-all duration-300"
-                            style={{ width: `${((currentStep - 1) / 5) * 100}%` }}
-                        />
+
+                    {/* Mobile Progress */}
+                    <div className="md:hidden">
+                        <div className="flex items-center justify-between mb-3">
+                            <span className="text-sm font-medium text-surface-700">
+                                Étape {currentStep} sur {STEPS.length}
+                            </span>
+                            <span className="text-sm text-surface-500">
+                                {STEPS[currentStep - 1].title}
+                            </span>
+                        </div>
+                        <div className="h-2 w-full rounded-full bg-surface-200">
+                            <div
+                                className="h-2 rounded-full bg-primary-500 transition-all duration-300"
+                                style={{ width: `${(currentStep / STEPS.length) * 100}%` }}
+                            />
+                        </div>
                     </div>
                 </div>
 
-                {/* Step content */}
-                <div className="rounded-xl bg-white p-8 shadow-sm">
-                    {currentStep === 1 && (
-                        <Step1Site
-                            data={siteData}
-                            setData={setSiteData}
-                            onNext={(id) => {
-                                setSiteId(id);
-                                nextStep();
-                            }}
-                        />
-                    )}
-                    {currentStep === 2 && siteId && (
-                        <Step2GSC siteId={siteId} onNext={nextStep} onBack={prevStep} />
-                    )}
-                    {currentStep === 3 && siteId && (
-                        <Step3Business siteId={siteId} onNext={nextStep} onBack={prevStep} />
-                    )}
-                    {currentStep === 4 && siteId && (
-                        <Step4Config siteId={siteId} team={team} onNext={nextStep} onBack={prevStep} />
-                    )}
-                    {currentStep === 5 && siteId && (
-                        <Step5Integration siteId={siteId} onNext={nextStep} onBack={prevStep} />
-                    )}
-                    {currentStep === 6 && siteId && (
-                        <Step6Launch siteId={siteId} onBack={prevStep} />
-                    )}
+                {/* Step Content */}
+                <div className="mx-auto max-w-2xl">
+                    <div className="rounded-2xl bg-white p-6 sm:p-8 shadow-sm border border-surface-200">
+                        {currentStep === 1 && (
+                            <Step1Site
+                                data={siteData}
+                                setData={setSiteData}
+                                onNext={(id) => {
+                                    setSiteId(id);
+                                    nextStep();
+                                }}
+                            />
+                        )}
+                        {currentStep === 2 && siteId && (
+                            <Step2GSC siteId={siteId} onNext={nextStep} onBack={prevStep} />
+                        )}
+                        {currentStep === 3 && siteId && (
+                            <Step3Business siteId={siteId} onNext={nextStep} onBack={prevStep} />
+                        )}
+                        {currentStep === 4 && siteId && (
+                            <Step4Config siteId={siteId} team={team} onNext={nextStep} onBack={prevStep} />
+                        )}
+                        {currentStep === 5 && siteId && (
+                            <Step5Integration siteId={siteId} onNext={nextStep} onBack={prevStep} />
+                        )}
+                        {currentStep === 6 && siteId && (
+                            <Step6Launch siteId={siteId} onBack={prevStep} />
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

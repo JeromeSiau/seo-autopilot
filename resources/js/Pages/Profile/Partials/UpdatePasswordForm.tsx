@@ -1,16 +1,9 @@
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import { Transition } from '@headlessui/react';
 import { useForm } from '@inertiajs/react';
 import { FormEventHandler, useRef } from 'react';
+import { Check } from 'lucide-react';
+import clsx from 'clsx';
 
-export default function UpdatePasswordForm({
-    className = '',
-}: {
-    className?: string;
-}) {
+export default function UpdatePasswordForm() {
     const passwordInput = useRef<HTMLInputElement>(null);
     const currentPasswordInput = useRef<HTMLInputElement>(null);
 
@@ -48,99 +41,102 @@ export default function UpdatePasswordForm({
         });
     };
 
+    const inputClasses = (hasError: boolean) =>
+        clsx(
+            'block w-full rounded-xl border px-4 py-2.5 text-surface-900',
+            'placeholder:text-surface-400',
+            'focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500',
+            'transition-colors',
+            hasError ? 'border-red-300 bg-red-50' : 'border-surface-300 bg-white'
+        );
+
     return (
-        <section className={className}>
-            <header>
-                <h2 className="text-lg font-medium text-gray-900">
-                    Update Password
-                </h2>
+        <form onSubmit={updatePassword} className="space-y-5">
+            <div>
+                <label
+                    htmlFor="current_password"
+                    className="block text-sm font-medium text-surface-700 mb-1.5"
+                >
+                    Mot de passe actuel
+                </label>
+                <input
+                    id="current_password"
+                    ref={currentPasswordInput}
+                    type="password"
+                    className={inputClasses(!!errors.current_password)}
+                    value={data.current_password}
+                    onChange={(e) => setData('current_password', e.target.value)}
+                    autoComplete="current-password"
+                />
+                {errors.current_password && (
+                    <p className="mt-1.5 text-sm text-red-600">{errors.current_password}</p>
+                )}
+            </div>
 
-                <p className="mt-1 text-sm text-gray-600">
-                    Ensure your account is using a long, random password to stay
-                    secure.
-                </p>
-            </header>
+            <div>
+                <label
+                    htmlFor="password"
+                    className="block text-sm font-medium text-surface-700 mb-1.5"
+                >
+                    Nouveau mot de passe
+                </label>
+                <input
+                    id="password"
+                    ref={passwordInput}
+                    type="password"
+                    className={inputClasses(!!errors.password)}
+                    value={data.password}
+                    onChange={(e) => setData('password', e.target.value)}
+                    autoComplete="new-password"
+                />
+                {errors.password && (
+                    <p className="mt-1.5 text-sm text-red-600">{errors.password}</p>
+                )}
+            </div>
 
-            <form onSubmit={updatePassword} className="mt-6 space-y-6">
-                <div>
-                    <InputLabel
-                        htmlFor="current_password"
-                        value="Current Password"
-                    />
+            <div>
+                <label
+                    htmlFor="password_confirmation"
+                    className="block text-sm font-medium text-surface-700 mb-1.5"
+                >
+                    Confirmer le mot de passe
+                </label>
+                <input
+                    id="password_confirmation"
+                    type="password"
+                    className={inputClasses(!!errors.password_confirmation)}
+                    value={data.password_confirmation}
+                    onChange={(e) => setData('password_confirmation', e.target.value)}
+                    autoComplete="new-password"
+                />
+                {errors.password_confirmation && (
+                    <p className="mt-1.5 text-sm text-red-600">{errors.password_confirmation}</p>
+                )}
+            </div>
 
-                    <TextInput
-                        id="current_password"
-                        ref={currentPasswordInput}
-                        value={data.current_password}
-                        onChange={(e) =>
-                            setData('current_password', e.target.value)
-                        }
-                        type="password"
-                        className="mt-1 block w-full"
-                        autoComplete="current-password"
-                    />
+            <div className="flex items-center gap-4 pt-2">
+                <button
+                    type="submit"
+                    disabled={processing}
+                    className={clsx(
+                        'inline-flex items-center gap-2 rounded-xl px-5 py-2.5',
+                        'text-sm font-semibold text-white',
+                        'bg-primary-600 hover:bg-primary-700',
+                        'focus:outline-none focus:ring-2 focus:ring-primary-500/50',
+                        'disabled:opacity-50 disabled:cursor-not-allowed',
+                        'transition-all'
+                    )}
+                >
+                    Enregistrer
+                </button>
 
-                    <InputError
-                        message={errors.current_password}
-                        className="mt-2"
-                    />
-                </div>
-
-                <div>
-                    <InputLabel htmlFor="password" value="New Password" />
-
-                    <TextInput
-                        id="password"
-                        ref={passwordInput}
-                        value={data.password}
-                        onChange={(e) => setData('password', e.target.value)}
-                        type="password"
-                        className="mt-1 block w-full"
-                        autoComplete="new-password"
-                    />
-
-                    <InputError message={errors.password} className="mt-2" />
-                </div>
-
-                <div>
-                    <InputLabel
-                        htmlFor="password_confirmation"
-                        value="Confirm Password"
-                    />
-
-                    <TextInput
-                        id="password_confirmation"
-                        value={data.password_confirmation}
-                        onChange={(e) =>
-                            setData('password_confirmation', e.target.value)
-                        }
-                        type="password"
-                        className="mt-1 block w-full"
-                        autoComplete="new-password"
-                    />
-
-                    <InputError
-                        message={errors.password_confirmation}
-                        className="mt-2"
-                    />
-                </div>
-
-                <div className="flex items-center gap-4">
-                    <PrimaryButton disabled={processing}>Save</PrimaryButton>
-
-                    <Transition
-                        show={recentlySuccessful}
-                        enter="transition ease-in-out"
-                        enterFrom="opacity-0"
-                        leave="transition ease-in-out"
-                        leaveTo="opacity-0"
-                    >
-                        <p className="text-sm text-gray-600">
-                            Saved.
-                        </p>
-                    </Transition>
-                </div>
-            </form>
-        </section>
+                {recentlySuccessful && (
+                    <span className="inline-flex items-center gap-1.5 text-sm text-green-600">
+                        <Check className="h-4 w-4" />
+                        Enregistré
+                    </span>
+                )}
+            </div>
+        </form>
     );
 }

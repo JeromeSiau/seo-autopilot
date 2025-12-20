@@ -1,12 +1,21 @@
 import { FormEvent, useState } from 'react';
-import { Button } from '@/Components/ui/Button';
 import axios from 'axios';
+import { Globe, ChevronRight } from 'lucide-react';
+import clsx from 'clsx';
 
 interface Props {
     data: { domain: string; name: string; language: string };
     setData: (data: any) => void;
     onNext: (siteId: number) => void;
 }
+
+const LANGUAGES = [
+    { code: 'fr', name: 'Français', flag: '🇫🇷' },
+    { code: 'en', name: 'English', flag: '🇬🇧' },
+    { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
+    { code: 'es', name: 'Español', flag: '🇪🇸' },
+    { code: 'it', name: 'Italiano', flag: '🇮🇹' },
+];
 
 export default function Step1Site({ data, setData, onNext }: Props) {
     const [loading, setLoading] = useState(false);
@@ -35,52 +44,114 @@ export default function Step1Site({ data, setData, onNext }: Props) {
 
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Header */}
             <div className="text-center">
-                <h2 className="text-2xl font-bold text-gray-900">Ajouter votre site</h2>
-                <p className="mt-2 text-gray-600">Commençons par les informations de base</p>
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-100 to-primary-200">
+                    <Globe className="h-7 w-7 text-primary-600" />
+                </div>
+                <h2 className="mt-4 font-display text-2xl font-bold text-surface-900">
+                    Ajouter votre site
+                </h2>
+                <p className="mt-2 text-surface-500">
+                    Commençons par les informations de base
+                </p>
             </div>
 
+            {/* Domain Field */}
             <div>
-                <label className="block text-sm font-medium text-gray-700">Domaine</label>
+                <label className="block text-sm font-medium text-surface-700 mb-1.5">
+                    Domaine
+                </label>
                 <input
                     type="text"
                     value={data.domain}
                     onChange={(e) => setData({ ...data, domain: e.target.value })}
                     placeholder="monsite.com"
-                    className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    className={clsx(
+                        'block w-full rounded-xl border bg-white px-4 py-3 text-surface-900 placeholder:text-surface-400',
+                        'focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500',
+                        'transition-colors',
+                        errors.domain ? 'border-red-300' : 'border-surface-200'
+                    )}
                 />
-                {errors.domain && <p className="mt-1 text-sm text-red-600">{errors.domain}</p>}
+                {errors.domain && (
+                    <p className="mt-1.5 text-sm text-red-600">{errors.domain}</p>
+                )}
             </div>
 
+            {/* Name Field */}
             <div>
-                <label className="block text-sm font-medium text-gray-700">Nom du site</label>
+                <label className="block text-sm font-medium text-surface-700 mb-1.5">
+                    Nom du site
+                </label>
                 <input
                     type="text"
                     value={data.name}
                     onChange={(e) => setData({ ...data, name: e.target.value })}
                     placeholder="Mon Super Site"
-                    className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    className={clsx(
+                        'block w-full rounded-xl border bg-white px-4 py-3 text-surface-900 placeholder:text-surface-400',
+                        'focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500',
+                        'transition-colors',
+                        errors.name ? 'border-red-300' : 'border-surface-200'
+                    )}
                 />
-                {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
+                {errors.name && (
+                    <p className="mt-1.5 text-sm text-red-600">{errors.name}</p>
+                )}
             </div>
 
+            {/* Language Selection */}
             <div>
-                <label className="block text-sm font-medium text-gray-700">Langue du contenu</label>
-                <select
-                    value={data.language}
-                    onChange={(e) => setData({ ...data, language: e.target.value })}
-                    className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                >
-                    <option value="fr">Français</option>
-                    <option value="en">English</option>
-                    <option value="de">Deutsch</option>
-                    <option value="es">Español</option>
-                    <option value="it">Italiano</option>
-                </select>
+                <label className="block text-sm font-medium text-surface-700 mb-1.5">
+                    Langue du contenu
+                </label>
+                <div className="grid grid-cols-5 gap-2">
+                    {LANGUAGES.map((lang) => (
+                        <button
+                            key={lang.code}
+                            type="button"
+                            onClick={() => setData({ ...data, language: lang.code })}
+                            className={clsx(
+                                'flex flex-col items-center gap-1 rounded-xl border p-3 transition-all',
+                                data.language === lang.code
+                                    ? 'border-primary-500 bg-primary-50 ring-2 ring-primary-500/20'
+                                    : 'border-surface-200 hover:border-surface-300 hover:bg-surface-50'
+                            )}
+                        >
+                            <span className="text-xl">{lang.flag}</span>
+                            <span className={clsx(
+                                'text-xs font-medium',
+                                data.language === lang.code ? 'text-primary-700' : 'text-surface-600'
+                            )}>
+                                {lang.code.toUpperCase()}
+                            </span>
+                        </button>
+                    ))}
+                </div>
             </div>
 
-            <div className="flex justify-end">
-                <Button type="submit" loading={loading}>Continuer</Button>
+            {/* Submit Button */}
+            <div className="pt-2">
+                <button
+                    type="submit"
+                    disabled={loading}
+                    className={clsx(
+                        'flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3',
+                        'bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold',
+                        'shadow-green hover:shadow-green-lg hover:-translate-y-0.5',
+                        'transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none'
+                    )}
+                >
+                    {loading ? (
+                        <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                    ) : (
+                        <>
+                            Continuer
+                            <ChevronRight className="h-5 w-5" />
+                        </>
+                    )}
+                </button>
             </div>
         </form>
     );
