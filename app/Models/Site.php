@@ -16,8 +16,10 @@ class Site extends Model
         'language',
         'gsc_token',
         'gsc_refresh_token',
+        'gsc_token_expires_at',
         'ga4_token',
         'ga4_refresh_token',
+        'ga4_token_expires_at',
         'ga4_property_id',
     ];
 
@@ -31,8 +33,10 @@ class Site extends Model
     protected $casts = [
         'gsc_token' => 'encrypted',
         'gsc_refresh_token' => 'encrypted',
+        'gsc_token_expires_at' => 'datetime',
         'ga4_token' => 'encrypted',
         'ga4_refresh_token' => 'encrypted',
+        'ga4_token_expires_at' => 'datetime',
     ];
 
     public function team(): BelongsTo
