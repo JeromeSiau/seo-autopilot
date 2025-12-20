@@ -21,6 +21,9 @@ class Keyword extends Model
         'impressions',
         'score',
         'scheduled_for',
+        'queued_at',
+        'processed_at',
+        'priority',
     ];
 
     protected $casts = [
@@ -31,6 +34,9 @@ class Keyword extends Model
         'impressions' => 'integer',
         'score' => 'decimal:2',
         'scheduled_for' => 'date',
+        'queued_at' => 'datetime',
+        'processed_at' => 'datetime',
+        'priority' => 'integer',
     ];
 
     public function site(): BelongsTo
@@ -102,5 +108,21 @@ class Keyword extends Model
     public function markAsCompleted(): void
     {
         $this->update(['status' => 'completed']);
+    }
+
+    public function scopeQueued($query)
+    {
+        return $query->where('status', 'queued')
+            ->orderByDesc('priority')
+            ->orderBy('queued_at');
+    }
+
+    public function addToQueue(): void
+    {
+        $this->update([
+            'status' => 'queued',
+            'queued_at' => now(),
+            'priority' => (int) $this->calculateScore(),
+        ]);
     }
 }

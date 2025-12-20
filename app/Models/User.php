@@ -24,6 +24,9 @@ class User extends Authenticatable
         'email',
         'password',
         'team_id',
+        'notification_email_frequency',
+        'notification_immediate_failures',
+        'notification_immediate_quota',
     ];
 
     /**
@@ -46,6 +49,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'notification_immediate_failures' => 'boolean',
+            'notification_immediate_quota' => 'boolean',
         ];
     }
 
@@ -89,5 +94,15 @@ class User extends Authenticatable
         $this->update(['team_id' => $team->id]);
 
         return $team;
+    }
+
+    public function notifications(): HasMany
+    {
+        return $this->hasMany(Notification::class);
+    }
+
+    public function unreadNotificationsCount(): int
+    {
+        return $this->notifications()->whereNull('read_at')->count();
     }
 }
