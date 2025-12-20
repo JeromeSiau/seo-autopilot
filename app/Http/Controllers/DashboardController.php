@@ -2,79 +2,116 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\ArticleResource;
-use App\Http\Resources\KeywordResource;
+use App\Models\Site;
+use App\Models\Article;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Inertia\Response;
 
 class DashboardController extends Controller
 {
-    public function index(Request $request): Response
+    public function index()
     {
-        $user = $request->user();
-        $team = $user->currentTeam;
+        $user = auth()->user();
+        $team = $user->team;
 
-        // Auto-create team if user doesn't have one
-        if (!$team) {
-            $team = $user->createTeam($user->name . "'s Team");
-        }
+        $sites = $team->sites()->with(['settings', 'keywords', 'articles'])->get();
 
-        $sites = $team->sites()->get();
-        $siteIds = $sites->pluck('id');
-
-        // Get stats
+        // Aggregate stats
         $stats = [
             'total_sites' => $sites->count(),
-            'total_keywords' => \App\Models\Keyword::whereIn('site_id', $siteIds)->count(),
-            'total_articles' => \App\Models\Article::whereIn('site_id', $siteIds)->count(),
-            'articles_published' => \App\Models\Article::whereIn('site_id', $siteIds)
-                ->where('status', 'published')
-                ->count(),
-            'articles_this_month' => \App\Models\Article::whereIn('site_id', $siteIds)
-                ->whereMonth('created_at', now()->month)
-                ->whereYear('created_at', now()->year)
-                ->count(),
-            'total_clicks' => \App\Models\SiteAnalytic::whereIn('site_id', $siteIds)->sum('clicks'),
-            'total_impressions' => \App\Models\SiteAnalytic::whereIn('site_id', $siteIds)->sum('impressions'),
-            'avg_position' => \App\Models\SiteAnalytic::whereIn('site_id', $siteIds)->avg('position') ?? 0,
+            'active_sites' => $sites->filter(fn($s) => $s->isAutopilotActive())->count(),
+            'total_keywords_queued' => $sites->sum(fn($s) => $s->keywords()->where('status', 'queued')->count()),
+            'articles_this_month' => $sites->sum(fn($s) => $s->articles()->where('created_at', '>=', now()->startOfMonth())->count()),
+            'articles_published_this_month' => $sites->sum(fn($s) => $s->articles()->where('status', 'published')->where('published_at', '>=', now()->startOfMonth())->count()),
+            'articles_used' => $team->articlesUsedThisMonth(),
             'articles_limit' => $team->articles_limit,
-            'articles_used' => $team->articles_generated_count,
         ];
 
-        // Recent articles
-        $recentArticles = \App\Models\Article::whereIn('site_id', $siteIds)
-            ->with(['site', 'keyword'])
-            ->latest()
-            ->limit(5)
-            ->get();
+        // Sites with status
+        $sitesData = $sites->map(fn($site) => [
+            'id' => $site->id,
+            'domain' => $site->domain,
+            'name' => $site->name,
+            'autopilot_status' => $this->getAutopilotStatus($site),
+            'articles_per_week' => $site->settings?->articles_per_week ?? 0,
+            'articles_in_review' => $site->articles()->where('status', 'review')->count(),
+            'articles_this_week' => $site->articles()->where('created_at', '>=', now()->startOfWeek())->count(),
+            'onboarding_complete' => $site->isOnboardingComplete(),
+        ]);
 
-        // Top keywords by score
-        $topKeywords = \App\Models\Keyword::whereIn('site_id', $siteIds)
-            ->where('status', 'pending')
-            ->orderByDesc('score')
-            ->limit(5)
-            ->get();
-
-        // Analytics data for chart (last 14 days)
-        $analyticsData = \App\Models\SiteAnalytic::whereIn('site_id', $siteIds)
-            ->where('date', '>=', now()->subDays(14))
-            ->selectRaw('date, SUM(clicks) as clicks, SUM(impressions) as impressions, AVG(position) as position')
-            ->groupBy('date')
-            ->orderBy('date')
-            ->get()
-            ->map(fn ($row) => [
-                'date' => $row->date->format('Y-m-d'),
-                'clicks' => (int) $row->clicks,
-                'impressions' => (int) $row->impressions,
-                'position' => round($row->position, 1),
-            ]);
+        // Actions required
+        $actionsRequired = $this->getActionsRequired($sites);
 
         return Inertia::render('Dashboard', [
             'stats' => $stats,
-            'recentArticles' => ArticleResource::collection($recentArticles)->resolve(),
-            'topKeywords' => KeywordResource::collection($topKeywords)->resolve(),
-            'analyticsData' => $analyticsData,
+            'sites' => $sitesData,
+            'actionsRequired' => $actionsRequired,
+            'unreadNotifications' => $user->unreadNotificationsCount(),
         ]);
+    }
+
+    private function getAutopilotStatus(Site $site): string
+    {
+        if (!$site->isOnboardingComplete()) {
+            return 'not_configured';
+        }
+
+        if (!$site->isAutopilotActive()) {
+            return 'paused';
+        }
+
+        $hasErrors = $site->articles()
+            ->where('status', 'failed')
+            ->where('created_at', '>=', now()->subDay())
+            ->exists();
+
+        if ($hasErrors) {
+            return 'error';
+        }
+
+        return 'active';
+    }
+
+    private function getActionsRequired($sites): array
+    {
+        $actions = [];
+
+        foreach ($sites as $site) {
+            $reviewCount = $site->articles()->where('status', 'review')->count();
+            if ($reviewCount > 0) {
+                $actions[] = [
+                    'type' => 'review',
+                    'site_id' => $site->id,
+                    'site_domain' => $site->domain,
+                    'count' => $reviewCount,
+                    'message' => "{$reviewCount} article(s) en attente de review",
+                    'action_url' => route('sites.show', $site->id) . '?tab=review',
+                ];
+            }
+
+            $failedCount = $site->articles()->where('status', 'failed')->count();
+            if ($failedCount > 0) {
+                $actions[] = [
+                    'type' => 'failed',
+                    'site_id' => $site->id,
+                    'site_domain' => $site->domain,
+                    'count' => $failedCount,
+                    'message' => "Échec de publication ({$failedCount})",
+                    'action_url' => route('sites.show', $site->id) . '?tab=failed',
+                ];
+            }
+
+            if (!$site->isGscConnected() && $site->isOnboardingComplete()) {
+                $actions[] = [
+                    'type' => 'recommendation',
+                    'site_id' => $site->id,
+                    'site_domain' => $site->domain,
+                    'message' => "Connecter Google Search Console recommandé",
+                    'action_url' => route('auth.google', ['site_id' => $site->id]),
+                ];
+            }
+        }
+
+        return $actions;
     }
 }
