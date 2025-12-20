@@ -8,6 +8,7 @@ import clsx from 'clsx';
 import { Article, Site, PaginatedData, PageProps } from '@/types';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { useTranslations } from '@/hooks/useTranslations';
 
 interface ArticlesIndexProps extends PageProps {
     articles: PaginatedData<Article>;
@@ -25,24 +26,26 @@ interface ArticlesIndexProps extends PageProps {
     };
 }
 
-const STAT_CARDS = [
-    { key: 'total', label: 'Total', icon: Hash, color: 'primary' },
-    { key: 'review', label: 'En review', icon: Eye, color: 'amber' },
-    { key: 'approved', label: 'Approuvés', icon: CheckCircle, color: 'blue' },
-    { key: 'published', label: 'Publiés', icon: Send, color: 'primary' },
-] as const;
-
-const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof Clock; animate?: boolean }> = {
-    generating: { label: 'En génération', color: 'bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400', icon: Loader2, animate: true },
-    review: { label: 'En review', color: 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400', icon: Eye },
-    approved: { label: 'Approuvé', color: 'bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400', icon: CheckCircle },
-    published: { label: 'Publié', color: 'bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-400', icon: CheckCircle },
-    failed: { label: 'Échec', color: 'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400', icon: AlertCircle },
-};
-
 export default function ArticlesIndex({ articles, sites, filters, stats }: ArticlesIndexProps) {
+    const { t } = useTranslations();
+
+    const STAT_CARDS = [
+        { key: 'total', label: t?.articles?.total ?? 'Total', icon: Hash, color: 'primary' },
+        { key: 'review', label: t?.articles?.inReview ?? 'En review', icon: Eye, color: 'amber' },
+        { key: 'approved', label: t?.articles?.approved ?? 'Approuvés', icon: CheckCircle, color: 'blue' },
+        { key: 'published', label: t?.articles?.published ?? 'Publiés', icon: Send, color: 'primary' },
+    ] as const;
+
+    const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof Clock; animate?: boolean }> = {
+        generating: { label: t?.status?.generating ?? 'En génération', color: 'bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400', icon: Loader2, animate: true },
+        review: { label: t?.status?.review ?? 'En review', color: 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400', icon: Eye },
+        approved: { label: t?.status?.approved ?? 'Approuvé', color: 'bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400', icon: CheckCircle },
+        published: { label: t?.status?.published ?? 'Publié', color: 'bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-400', icon: CheckCircle },
+        failed: { label: t?.status?.failed ?? 'Échec', color: 'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400', icon: AlertCircle },
+    };
+
     const handleDelete = (article: Article) => {
-        if (confirm('Êtes-vous sûr de vouloir supprimer cet article ?')) {
+        if (confirm(t?.articles?.confirmDelete ?? 'Êtes-vous sûr de vouloir supprimer cet article ?')) {
             router.delete(route('articles.destroy', { article: article.id }));
         }
     };
@@ -69,15 +72,15 @@ export default function ArticlesIndex({ articles, sites, filters, stats }: Artic
             header={
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="font-display text-2xl font-bold text-surface-900 dark:text-white">Articles</h1>
+                        <h1 className="font-display text-2xl font-bold text-surface-900 dark:text-white">{t?.articles?.title ?? 'Articles'}</h1>
                         <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
-                            Générés automatiquement par l'Autopilot
+                            {t?.articles?.subtitle ?? 'Générés automatiquement par l\'Autopilot'}
                         </p>
                     </div>
                     <div className="flex items-center gap-2">
                         <BookOpen className="h-5 w-5 text-primary-500" />
                         <span className="text-sm font-medium text-surface-700 dark:text-surface-300">
-                            {stats.total} articles générés
+                            {stats.total} {t?.articles?.generated ?? 'articles générés'}
                         </span>
                     </div>
                 </div>
@@ -133,7 +136,7 @@ export default function ArticlesIndex({ articles, sites, filters, stats }: Artic
                         'transition-colors'
                     )}
                 >
-                    <option value="">Tous les sites</option>
+                    <option value="">{t?.articles?.allSites ?? 'Tous les sites'}</option>
                     {sites.map((site) => (
                         <option key={site.id} value={site.id}>
                             {site.name}
@@ -155,19 +158,19 @@ export default function ArticlesIndex({ articles, sites, filters, stats }: Artic
                         'transition-colors'
                     )}
                 >
-                    <option value="">Tous les statuts</option>
-                    <option value="generating">En génération</option>
-                    <option value="review">En review</option>
-                    <option value="approved">Approuvé</option>
-                    <option value="published">Publié</option>
-                    <option value="failed">Échec</option>
+                    <option value="">{t?.articles?.allStatuses ?? 'Tous les statuts'}</option>
+                    <option value="generating">{t?.status?.generating ?? 'En génération'}</option>
+                    <option value="review">{t?.status?.review ?? 'En review'}</option>
+                    <option value="approved">{t?.status?.approved ?? 'Approuvé'}</option>
+                    <option value="published">{t?.status?.published ?? 'Publié'}</option>
+                    <option value="failed">{t?.status?.failed ?? 'Échec'}</option>
                 </select>
 
                 <div className="relative flex-1 min-w-[200px]">
                     <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-surface-400" />
                     <input
                         type="search"
-                        placeholder="Rechercher un article..."
+                        placeholder={t?.articles?.searchPlaceholder ?? 'Rechercher un article...'}
                         value={filters.search || ''}
                         onChange={(e) =>
                             router.get(
@@ -194,10 +197,10 @@ export default function ArticlesIndex({ articles, sites, filters, stats }: Artic
                             <FileText className="h-7 w-7 text-surface-400" />
                         </div>
                         <h3 className="font-display font-semibold text-surface-900 dark:text-white mb-1">
-                            Aucun article trouvé
+                            {t?.articles?.noArticles ?? 'Aucun article trouvé'}
                         </h3>
                         <p className="text-sm text-surface-500 dark:text-surface-400 max-w-sm mx-auto">
-                            Les articles seront générés automatiquement par l'Autopilot une fois vos sites configurés.
+                            {t?.articles?.noArticlesDescription ?? 'Les articles seront générés automatiquement par l\'Autopilot une fois vos sites configurés.'}
                         </p>
                     </div>
                 ) : (
@@ -207,19 +210,19 @@ export default function ArticlesIndex({ articles, sites, filters, stats }: Artic
                                 <thead>
                                     <tr className="border-b border-surface-100 dark:border-surface-800 bg-surface-50/50 dark:bg-surface-800/50">
                                         <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-surface-500 dark:text-surface-400">
-                                            Titre
+                                            {t?.articles?.tableTitle ?? 'Titre'}
                                         </th>
                                         <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-surface-500 dark:text-surface-400">
-                                            Mots
+                                            {t?.articles?.tableWords ?? 'Mots'}
                                         </th>
                                         <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-surface-500 dark:text-surface-400">
-                                            Statut
+                                            {t?.articles?.tableStatus ?? 'Statut'}
                                         </th>
                                         <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-surface-500 dark:text-surface-400">
-                                            Créé
+                                            {t?.articles?.tableCreated ?? 'Créé'}
                                         </th>
                                         <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-surface-500 dark:text-surface-400">
-                                            Actions
+                                            {t?.articles?.tableActions ?? 'Actions'}
                                         </th>
                                     </tr>
                                 </thead>
@@ -273,7 +276,7 @@ export default function ArticlesIndex({ articles, sites, filters, stats }: Artic
                                                                 rel="noopener noreferrer"
                                                                 className="inline-flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium"
                                                             >
-                                                                Voir
+                                                                {t?.articles?.view ?? 'Voir'}
                                                                 <ExternalLink className="h-3 w-3" />
                                                             </a>
                                                         )}
@@ -297,7 +300,7 @@ export default function ArticlesIndex({ articles, sites, filters, stats }: Artic
                                                                 )}
                                                             >
                                                                 <CheckCircle className="h-3.5 w-3.5" />
-                                                                Approuver
+                                                                {t?.articles?.approve ?? 'Approuver'}
                                                             </button>
                                                         )}
                                                         {article.status === 'approved' && (
@@ -312,7 +315,7 @@ export default function ArticlesIndex({ articles, sites, filters, stats }: Artic
                                                                 )}
                                                             >
                                                                 <Send className="h-3.5 w-3.5" />
-                                                                Publier
+                                                                {t?.articles?.publish ?? 'Publier'}
                                                             </button>
                                                         )}
                                                         <Link
@@ -341,11 +344,11 @@ export default function ArticlesIndex({ articles, sites, filters, stats }: Artic
                             <div className="flex items-center justify-between border-t border-surface-100 dark:border-surface-800 px-6 py-4">
                                 <p className="text-sm text-surface-500 dark:text-surface-400">
                                     <span className="font-medium text-surface-700 dark:text-surface-300">{articles.meta.from}</span>
-                                    {' '}à{' '}
+                                    {' '}{t?.common?.to ?? 'à'}{' '}
                                     <span className="font-medium text-surface-700 dark:text-surface-300">{articles.meta.to}</span>
-                                    {' '}sur{' '}
+                                    {' '}{t?.common?.of ?? 'sur'}{' '}
                                     <span className="font-medium text-surface-700 dark:text-surface-300">{articles.meta.total}</span>
-                                    {' '}articles
+                                    {' '}{t?.common?.articles ?? 'articles'}
                                 </p>
                                 <div className="flex gap-2">
                                     {articles.links.prev ? (
@@ -354,12 +357,12 @@ export default function ArticlesIndex({ articles, sites, filters, stats }: Artic
                                             className="inline-flex items-center gap-1.5 rounded-lg border border-surface-200 dark:border-surface-700 px-3 py-2 text-sm font-medium text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-800 hover:border-surface-300 dark:hover:border-surface-600 transition-colors"
                                         >
                                             <ChevronLeft className="h-4 w-4" />
-                                            Précédent
+                                            {t?.common?.previous ?? 'Précédent'}
                                         </Link>
                                     ) : (
                                         <span className="inline-flex items-center gap-1.5 rounded-lg border border-surface-100 dark:border-surface-800 px-3 py-2 text-sm font-medium text-surface-300 dark:text-surface-600 cursor-not-allowed">
                                             <ChevronLeft className="h-4 w-4" />
-                                            Précédent
+                                            {t?.common?.previous ?? 'Précédent'}
                                         </span>
                                     )}
                                     {articles.links.next ? (
@@ -367,12 +370,12 @@ export default function ArticlesIndex({ articles, sites, filters, stats }: Artic
                                             href={articles.links.next}
                                             className="inline-flex items-center gap-1.5 rounded-lg border border-surface-200 dark:border-surface-700 px-3 py-2 text-sm font-medium text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-800 hover:border-surface-300 dark:hover:border-surface-600 transition-colors"
                                         >
-                                            Suivant
+                                            {t?.common?.next ?? 'Suivant'}
                                             <ChevronRight className="h-4 w-4" />
                                         </Link>
                                     ) : (
                                         <span className="inline-flex items-center gap-1.5 rounded-lg border border-surface-100 dark:border-surface-800 px-3 py-2 text-sm font-medium text-surface-300 dark:text-surface-600 cursor-not-allowed">
-                                            Suivant
+                                            {t?.common?.next ?? 'Suivant'}
                                             <ChevronRight className="h-4 w-4" />
                                         </span>
                                     )}

@@ -1,0 +1,195 @@
+{
+  "common": {
+    "add": "Ajouter",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "search": "Rechercher...",
+    "noResults": "Aucun résultat trouvé",
+    "loading": "Chargement...",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "article": "article",
+    "articles": "articles",
+    "site": "site",
+    "sites": "sites",
+    "keyword": "mot-clé",
+    "keywords": "mots-clés",
+    "of": "sur",
+    "to": "à",
+    "actions": "Actions",
+    "confirm": "Confirmer",
+    "close": "Fermer"
+  },
+  "nav": {
+    "main": "PRINCIPAL",
+    "analytics": "ANALYTIQUES",
+    "settings": "PARAMÈTRES",
+    "dashboard": "Tableau de bord",
+    "sites": "Sites",
+    "articles": "Articles",
+    "keywords": "Mots-clés",
+    "performance": "Performance",
+    "rankings": "Classements",
+    "integrations": "Intégrations"
+  },
+  "status": {
+    "active": "Actif",
+    "paused": "En pause",
+    "pending": "En attente",
+    "queued": "En file",
+    "generating": "En génération",
+    "review": "En révision",
+    "approved": "Approuvé",
+    "published": "Publié",
+    "failed": "Échec",
+    "completed": "Complété",
+    "notConfigured": "Non configuré",
+    "error": "Erreur"
+  },
+  "user": {
+    "profile": "Profil",
+    "settings": "Paramètres",
+    "logout": "Déconnexion"
+  },
+  "dashboard": {
+    "title": "Tableau de bord",
+    "subtitle": "Vue d'ensemble de vos performances SEO",
+    "activeSites": "Sites actifs",
+    "keywordsQueued": "Mots-clés en file",
+    "articlesThisMonth": "Articles ce mois",
+    "published": "Publiés",
+    "monthlyUsage": "Utilisation mensuelle",
+    "addSite": "Ajouter un site",
+    "mySites": "Mes sites",
+    "viewAll": "Voir tout",
+    "noSites": "Aucun site configuré",
+    "noSitesDescription": "Commencez par ajouter votre premier site web",
+    "addFirstSite": "Ajouter votre premier site",
+    "actionsRequired": "Actions requises"
+  },
+  "sites": {
+    "title": "Sites",
+    "subtitle": "Gérez vos sites web connectés",
+    "addSite": "Ajouter un site",
+    "noSites": "Aucun site configuré",
+    "noSitesDescription": "Ajoutez votre premier site web pour commencer à générer du contenu",
+    "addedOn": "Ajouté le",
+    "keywordsCount": "{count} mots-clés",
+    "articlesCount": "{count} articles",
+    "confirmDelete": "Êtes-vous sûr de vouloir supprimer ce site ?",
+    "gscConnected": "GSC connecté",
+    "gscNotConnected": "GSC non connecté"
+  },
+  "articles": {
+    "title": "Articles",
+    "subtitle": "Générés automatiquement par l'Autopilot",
+    "generated": "articles générés",
+    "total": "Total",
+    "inReview": "En révision",
+    "approved": "Approuvés",
+    "published": "Publiés",
+    "allSites": "Tous les sites",
+    "allStatuses": "Tous les statuts",
+    "searchPlaceholder": "Rechercher un article...",
+    "tableTitle": "Titre",
+    "tableWords": "Mots",
+    "tableStatus": "Statut",
+    "tableCreated": "Créé",
+    "tableActions": "Actions",
+    "approve": "Approuver",
+    "publish": "Publier",
+    "noArticles": "Aucun article trouvé",
+    "noArticlesDescription": "Les articles apparaîtront ici une fois générés"
+  },
+  "keywords": {
+    "title": "Mots-clés",
+    "subtitle": "Découverts automatiquement par l'Autopilot",
+    "tracked": "mots-clés suivis",
+    "total": "Total",
+    "queued": "En file",
+    "generating": "En génération",
+    "completed": "Complétés",
+    "allSites": "Tous les sites",
+    "allStatuses": "Tous les statuts",
+    "searchPlaceholder": "Rechercher un mot-clé...",
+    "tableKeyword": "Mot-clé",
+    "tableVolume": "Volume",
+    "tableDifficulty": "Difficulté",
+    "tableStatus": "Statut",
+    "tableArticles": "Articles",
+    "tableAdded": "Ajouté",
+    "noKeywords": "Aucun mot-clé trouvé",
+    "noKeywordsDescription": "Les mots-clés apparaîtront ici une fois découverts"
+  },
+  "analytics": {
+    "title": "Analytiques",
+    "subtitle": "Données de performance Search Console",
+    "selectSite": "Sélectionner un site",
+    "totalClicks": "Clics totaux",
+    "impressions": "Impressions",
+    "averageCtr": "CTR moyen",
+    "averagePosition": "Position moyenne",
+    "topPages": "Top pages",
+    "topQueries": "Top requêtes",
+    "noData": "Aucune donnée disponible",
+    "connectGsc": "Connectez Google Search Console pour voir les analytiques",
+    "last7days": "7 derniers jours",
+    "last28days": "28 derniers jours",
+    "last3months": "3 derniers mois"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "subtitle": "Gérez votre compte et vos préférences",
+    "currentPlan": "Plan actuel",
+    "articlesRemaining": "articles restants ce mois-ci",
+    "articlesThisMonth": "articles ce mois",
+    "upgrade": "Mettre à niveau",
+    "billing": "Facturation",
+    "billingDescription": "Gérez votre abonnement et vos factures",
+    "team": "Équipe",
+    "teamDescription": "Invitez et gérez les membres de l'équipe",
+    "apiKeys": "Clés API",
+    "apiKeysDescription": "Gérez vos clés d'accès API",
+    "brandVoices": "Voix de marque",
+    "brandVoicesDescription": "Configurez le ton et le style de votre contenu",
+    "notifications": "Notifications",
+    "notificationsDescription": "Configurez vos préférences de notification"
+  },
+  "onboarding": {
+    "welcome": {
+      "title": "Bienvenue sur SEO Autopilot",
+      "subtitle": "Configurons votre compte en quelques étapes simples"
+    },
+    "step1": {
+      "title": "Ajoutez votre premier site",
+      "description": "Entrez l'URL de votre site web pour commencer"
+    },
+    "step2": {
+      "title": "Connectez Google Search Console",
+      "description": "Liez votre compte GSC pour la découverte de mots-clés"
+    },
+    "step3": {
+      "title": "Configurez votre voix de marque",
+      "description": "Définissez le ton et le style de votre contenu"
+    },
+    "step4": {
+      "title": "Définissez vos préférences",
+      "description": "Choisissez vos paramètres de génération de contenu"
+    },
+    "step5": {
+      "title": "Vérifiez et lancez",
+      "description": "Vérifiez vos paramètres et démarrez l'autopilot"
+    },
+    "next": "Suivant",
+    "back": "Retour",
+    "skip": "Passer",
+    "finish": "Terminer la configuration"
+  },
+  "usage": {
+    "title": "Utilisation",
+    "upgradePlan": "Mettre à niveau",
+    "of": "sur"
+  }
+}

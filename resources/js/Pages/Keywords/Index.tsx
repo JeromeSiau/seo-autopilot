@@ -3,6 +3,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import { Search, TrendingUp, Eye, Clock, CheckCircle, Loader2, ChevronLeft, ChevronRight, Hash, Target, Zap, BarChart3 } from 'lucide-react';
 import clsx from 'clsx';
 import { Keyword, Site, PaginatedData, PageProps } from '@/types';
+import { useTranslations } from '@/hooks/useTranslations';
 
 interface KeywordsIndexProps extends PageProps {
     keywords: PaginatedData<Keyword>;
@@ -21,20 +22,22 @@ interface KeywordsIndexProps extends PageProps {
 }
 
 const STAT_CARDS = [
-    { key: 'total', label: 'Total', icon: Hash, color: 'primary' },
-    { key: 'queued', label: 'En queue', icon: Clock, color: 'blue' },
-    { key: 'generating', label: 'En génération', icon: Zap, color: 'amber' },
-    { key: 'completed', label: 'Complétés', icon: CheckCircle, color: 'primary' },
+    { key: 'total', labelKey: 'total', icon: Hash, color: 'primary' },
+    { key: 'queued', labelKey: 'queued', icon: Clock, color: 'blue' },
+    { key: 'generating', labelKey: 'generating', icon: Zap, color: 'amber' },
+    { key: 'completed', labelKey: 'completed', icon: CheckCircle, color: 'primary' },
 ] as const;
 
-const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof Clock; animate?: boolean }> = {
-    pending: { label: 'En attente', color: 'bg-surface-100 text-surface-600 dark:bg-surface-800 dark:text-surface-400', icon: Clock },
-    queued: { label: 'En queue', color: 'bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400', icon: Clock },
-    generating: { label: 'En génération', color: 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400', icon: Loader2, animate: true },
-    completed: { label: 'Complété', color: 'bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-400', icon: CheckCircle },
+const STATUS_CONFIG: Record<string, { labelKey: string; color: string; icon: typeof Clock; animate?: boolean }> = {
+    pending: { labelKey: 'pending', color: 'bg-surface-100 text-surface-600 dark:bg-surface-800 dark:text-surface-400', icon: Clock },
+    queued: { labelKey: 'queued', color: 'bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400', icon: Clock },
+    generating: { labelKey: 'generating', color: 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400', icon: Loader2, animate: true },
+    completed: { labelKey: 'completed', color: 'bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-400', icon: CheckCircle },
 };
 
 export default function KeywordsIndex({ keywords, sites, filters, stats }: KeywordsIndexProps) {
+    const { t } = useTranslations();
+
     const getDifficultyColor = (difficulty: number | null) => {
         if (!difficulty) return 'bg-surface-100 text-surface-500 dark:bg-surface-800 dark:text-surface-400';
         if (difficulty < 30) return 'bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-400';
@@ -56,21 +59,21 @@ export default function KeywordsIndex({ keywords, sites, filters, stats }: Keywo
             header={
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="font-display text-2xl font-bold text-surface-900 dark:text-white">Keywords</h1>
+                        <h1 className="font-display text-2xl font-bold text-surface-900 dark:text-white">{t?.keywords?.title ?? 'Keywords'}</h1>
                         <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
-                            Découverts automatiquement par l'Autopilot
+                            {t?.keywords?.subtitle ?? 'Découverts automatiquement par l\'Autopilot'}
                         </p>
                     </div>
                     <div className="flex items-center gap-2">
                         <Target className="h-5 w-5 text-primary-500 dark:text-primary-400" />
                         <span className="text-sm font-medium text-surface-700 dark:text-surface-300">
-                            {stats.total} keywords suivis
+                            {stats.total} {t?.keywords?.tracked ?? 'keywords suivis'}
                         </span>
                     </div>
                 </div>
             }
         >
-            <Head title="Keywords" />
+            <Head title={t?.keywords?.title ?? 'Keywords'} />
 
             {/* Stats Grid */}
             <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -85,7 +88,7 @@ export default function KeywordsIndex({ keywords, sites, filters, stats }: Keywo
                         >
                             <div className="flex items-start justify-between">
                                 <div>
-                                    <p className="text-sm font-medium text-surface-500 dark:text-surface-400">{card.label}</p>
+                                    <p className="text-sm font-medium text-surface-500 dark:text-surface-400">{t?.keywords?.[card.labelKey] ?? card.labelKey}</p>
                                     <p className={clsx(
                                         'mt-2 font-display text-2xl font-bold',
                                         card.key === 'generating' ? 'text-amber-600 dark:text-amber-400' :
@@ -120,7 +123,7 @@ export default function KeywordsIndex({ keywords, sites, filters, stats }: Keywo
                         'transition-colors'
                     )}
                 >
-                    <option value="">Tous les sites</option>
+                    <option value="">{t?.keywords?.allSites ?? 'Tous les sites'}</option>
                     {sites.map((site) => (
                         <option key={site.id} value={site.id}>
                             {site.name}
@@ -142,18 +145,18 @@ export default function KeywordsIndex({ keywords, sites, filters, stats }: Keywo
                         'transition-colors'
                     )}
                 >
-                    <option value="">Tous les statuts</option>
-                    <option value="pending">En attente</option>
-                    <option value="queued">En queue</option>
-                    <option value="generating">En génération</option>
-                    <option value="completed">Complété</option>
+                    <option value="">{t?.keywords?.allStatuses ?? 'Tous les statuts'}</option>
+                    <option value="pending">{t?.status?.pending ?? 'En attente'}</option>
+                    <option value="queued">{t?.status?.queued ?? 'En queue'}</option>
+                    <option value="generating">{t?.status?.generating ?? 'En génération'}</option>
+                    <option value="completed">{t?.status?.completed ?? 'Complété'}</option>
                 </select>
 
                 <div className="relative flex-1 min-w-[200px]">
                     <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-surface-400" />
                     <input
                         type="search"
-                        placeholder="Rechercher un keyword..."
+                        placeholder={t?.keywords?.searchPlaceholder ?? 'Rechercher un keyword...'}
                         value={filters.search || ''}
                         onChange={(e) =>
                             router.get(
@@ -180,10 +183,10 @@ export default function KeywordsIndex({ keywords, sites, filters, stats }: Keywo
                             <Search className="h-7 w-7 text-surface-400" />
                         </div>
                         <h3 className="font-display font-semibold text-surface-900 dark:text-white mb-1">
-                            Aucun keyword trouvé
+                            {t?.keywords?.noKeywords ?? 'Aucun keyword trouvé'}
                         </h3>
                         <p className="text-sm text-surface-500 dark:text-surface-400 max-w-sm mx-auto">
-                            Les keywords seront découverts automatiquement par l'Autopilot une fois vos sites configurés.
+                            {t?.keywords?.noKeywordsDescription ?? 'Les keywords seront découverts automatiquement par l\'Autopilot une fois vos sites configurés.'}
                         </p>
                     </div>
                 ) : (
@@ -193,22 +196,22 @@ export default function KeywordsIndex({ keywords, sites, filters, stats }: Keywo
                                 <thead>
                                     <tr className="border-b border-surface-100 dark:border-surface-800 bg-surface-50/50 dark:bg-surface-800/50">
                                         <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-surface-500 dark:text-surface-400">
-                                            Keyword
+                                            {t?.keywords?.tableKeyword ?? 'Keyword'}
                                         </th>
                                         <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-surface-500 dark:text-surface-400">
-                                            Volume
+                                            {t?.keywords?.tableVolume ?? 'Volume'}
                                         </th>
                                         <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-surface-500 dark:text-surface-400">
-                                            Difficulté
+                                            {t?.keywords?.tableDifficulty ?? 'Difficulté'}
                                         </th>
                                         <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-surface-500 dark:text-surface-400">
-                                            Position
+                                            {t?.keywords?.tablePosition ?? 'Position'}
                                         </th>
                                         <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-surface-500 dark:text-surface-400">
-                                            Priorité
+                                            {t?.keywords?.tablePriority ?? 'Priorité'}
                                         </th>
                                         <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-surface-500 dark:text-surface-400">
-                                            Statut
+                                            {t?.keywords?.tableStatus ?? 'Statut'}
                                         </th>
                                     </tr>
                                 </thead>
@@ -274,7 +277,7 @@ export default function KeywordsIndex({ keywords, sites, filters, stats }: Keywo
                                                             'h-3.5 w-3.5',
                                                             statusConfig.animate && 'animate-spin'
                                                         )} />
-                                                        {statusConfig.label}
+                                                        {t?.status?.[statusConfig.labelKey] ?? statusConfig.labelKey}
                                                     </span>
                                                 </td>
                                             </tr>
@@ -289,11 +292,11 @@ export default function KeywordsIndex({ keywords, sites, filters, stats }: Keywo
                             <div className="flex items-center justify-between border-t border-surface-100 dark:border-surface-800 px-6 py-4">
                                 <p className="text-sm text-surface-500 dark:text-surface-400">
                                     <span className="font-medium text-surface-700 dark:text-surface-300">{keywords.meta.from}</span>
-                                    {' '}à{' '}
+                                    {' '}{t?.common?.to ?? 'à'}{' '}
                                     <span className="font-medium text-surface-700 dark:text-surface-300">{keywords.meta.to}</span>
-                                    {' '}sur{' '}
+                                    {' '}{t?.common?.of ?? 'sur'}{' '}
                                     <span className="font-medium text-surface-700 dark:text-surface-300">{keywords.meta.total}</span>
-                                    {' '}keywords
+                                    {' '}{t?.common?.keywords ?? 'keywords'}
                                 </p>
                                 <div className="flex gap-2">
                                     {keywords.links.prev ? (
@@ -302,12 +305,12 @@ export default function KeywordsIndex({ keywords, sites, filters, stats }: Keywo
                                             className="inline-flex items-center gap-1.5 rounded-lg border border-surface-200 dark:border-surface-700 px-3 py-2 text-sm font-medium text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-800 hover:border-surface-300 dark:hover:border-surface-600 transition-colors"
                                         >
                                             <ChevronLeft className="h-4 w-4" />
-                                            Précédent
+                                            {t?.common?.previous ?? 'Précédent'}
                                         </Link>
                                     ) : (
                                         <span className="inline-flex items-center gap-1.5 rounded-lg border border-surface-100 dark:border-surface-800 px-3 py-2 text-sm font-medium text-surface-300 dark:text-surface-600 cursor-not-allowed">
                                             <ChevronLeft className="h-4 w-4" />
-                                            Précédent
+                                            {t?.common?.previous ?? 'Précédent'}
                                         </span>
                                     )}
                                     {keywords.links.next ? (
@@ -315,12 +318,12 @@ export default function KeywordsIndex({ keywords, sites, filters, stats }: Keywo
                                             href={keywords.links.next}
                                             className="inline-flex items-center gap-1.5 rounded-lg border border-surface-200 dark:border-surface-700 px-3 py-2 text-sm font-medium text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-800 hover:border-surface-300 dark:hover:border-surface-600 transition-colors"
                                         >
-                                            Suivant
+                                            {t?.common?.next ?? 'Suivant'}
                                             <ChevronRight className="h-4 w-4" />
                                         </Link>
                                     ) : (
                                         <span className="inline-flex items-center gap-1.5 rounded-lg border border-surface-100 dark:border-surface-800 px-3 py-2 text-sm font-medium text-surface-300 dark:text-surface-600 cursor-not-allowed">
-                                            Suivant
+                                            {t?.common?.next ?? 'Suivant'}
                                             <ChevronRight className="h-4 w-4" />
                                         </span>
                                     )}

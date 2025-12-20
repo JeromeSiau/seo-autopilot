@@ -8,39 +8,41 @@ import clsx from 'clsx';
 import { Site, PaginatedData, PageProps } from '@/types';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { useTranslations } from '@/hooks/useTranslations';
 
 interface SitesIndexProps extends PageProps {
     sites: PaginatedData<Site>;
 }
 
-const STATUS_CONFIG = {
-    active: {
-        label: 'Actif',
-        color: 'bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-400',
-        icon: Play,
-    },
-    paused: {
-        label: 'Pause',
-        color: 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400',
-        icon: Pause,
-    },
-    not_configured: {
-        label: 'Non configuré',
-        color: 'bg-surface-100 text-surface-600 dark:bg-surface-800 dark:text-surface-400',
-        icon: AlertCircle,
-    },
-    error: {
-        label: 'Erreur',
-        color: 'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400',
-        icon: AlertCircle,
-    },
-};
-
 export default function SitesIndex({ sites }: SitesIndexProps) {
+    const { t } = useTranslations();
+
+    const STATUS_CONFIG = {
+        active: {
+            label: t?.status?.active ?? 'Actif',
+            color: 'bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-400',
+            icon: Play,
+        },
+        paused: {
+            label: t?.status?.paused ?? 'Pause',
+            color: 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400',
+            icon: Pause,
+        },
+        not_configured: {
+            label: t?.status?.notConfigured ?? 'Non configuré',
+            color: 'bg-surface-100 text-surface-600 dark:bg-surface-800 dark:text-surface-400',
+            icon: AlertCircle,
+        },
+        error: {
+            label: t?.status?.error ?? 'Erreur',
+            color: 'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400',
+            icon: AlertCircle,
+        },
+    };
     const handleDelete = (e: React.MouseEvent, site: Site) => {
         e.preventDefault();
         e.stopPropagation();
-        if (confirm(`Êtes-vous sûr de vouloir supprimer ${site.domain} ?`)) {
+        if (confirm((t?.sites?.confirmDelete ?? 'Êtes-vous sûr de vouloir supprimer {domain} ?').replace('{domain}', site.domain))) {
             router.delete(route('sites.destroy', { site: site.id }));
         }
     };
@@ -50,9 +52,9 @@ export default function SitesIndex({ sites }: SitesIndexProps) {
             header={
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="font-display text-2xl font-bold text-surface-900 dark:text-white">Sites</h1>
+                        <h1 className="font-display text-2xl font-bold text-surface-900 dark:text-white">{t?.sites?.title ?? 'Sites'}</h1>
                         <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
-                            Gérez vos sites web connectés
+                            {t?.sites?.subtitle ?? 'Gérez vos sites web connectés'}
                         </p>
                     </div>
                     <Link
@@ -65,7 +67,7 @@ export default function SitesIndex({ sites }: SitesIndexProps) {
                         )}
                     >
                         <Plus className="h-4 w-4" />
-                        Ajouter un site
+                        {t?.sites?.addSite ?? 'Ajouter un site'}
                     </Link>
                 </div>
             }
@@ -78,10 +80,10 @@ export default function SitesIndex({ sites }: SitesIndexProps) {
                         <Globe className="h-7 w-7 text-surface-400" />
                     </div>
                     <h3 className="font-display font-semibold text-surface-900 dark:text-white mb-1">
-                        Aucun site configuré
+                        {t?.sites?.noSites ?? 'Aucun site configuré'}
                     </h3>
                     <p className="text-sm text-surface-500 dark:text-surface-400 max-w-sm mx-auto mb-6">
-                        Ajoutez votre premier site web pour commencer à découvrir des mots-clés et générer du contenu.
+                        {t?.sites?.noSitesDescription ?? 'Ajoutez votre premier site web pour commencer à découvrir des mots-clés et générer du contenu.'}
                     </p>
                     <Link
                         href={route('onboarding.create')}
@@ -93,7 +95,7 @@ export default function SitesIndex({ sites }: SitesIndexProps) {
                         )}
                     >
                         <Plus className="h-4 w-4" />
-                        Ajouter un site
+                        {t?.sites?.addSite ?? 'Ajouter un site'}
                     </Link>
                 </div>
             ) : (
@@ -149,12 +151,12 @@ export default function SitesIndex({ sites }: SitesIndexProps) {
                                     <div className="flex items-center gap-1.5 text-sm text-surface-600 dark:text-surface-300">
                                         <Search className="h-4 w-4 text-surface-400" />
                                         <span className="font-medium">{site.keywords_count || 0}</span>
-                                        <span className="text-surface-400">keywords</span>
+                                        <span className="text-surface-400">{t?.common?.keywords ?? 'keywords'}</span>
                                     </div>
                                     <div className="flex items-center gap-1.5 text-sm text-surface-600 dark:text-surface-300">
                                         <FileText className="h-4 w-4 text-surface-400" />
                                         <span className="font-medium">{site.articles_count || 0}</span>
-                                        <span className="text-surface-400">articles</span>
+                                        <span className="text-surface-400">{t?.common?.articles ?? 'articles'}</span>
                                     </div>
                                 </div>
 
@@ -202,7 +204,7 @@ export default function SitesIndex({ sites }: SitesIndexProps) {
                                         {status.label}
                                     </span>
                                     <span className="text-xs text-surface-400">
-                                        Ajouté le {format(new Date(site.created_at), 'd MMM yyyy', { locale: fr })}
+                                        {t?.sites?.addedOn ?? 'Ajouté le'} {format(new Date(site.created_at), 'd MMM yyyy', { locale: fr })}
                                     </span>
                                 </div>
                             </div>

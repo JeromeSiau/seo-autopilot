@@ -21,6 +21,7 @@ import { User as UserType } from '@/types';
 import NotificationDropdown from '@/Components/Notifications/NotificationDropdown';
 import Logo from '@/Components/Logo';
 import ThemeToggle from '@/Components/ThemeToggle';
+import { useTranslations } from '@/hooks/useTranslations';
 
 interface NavItem {
     name: string;
@@ -61,6 +62,7 @@ export default function AppLayout({
     children,
 }: PropsWithChildren<{ header?: ReactNode }>) {
     const { auth } = usePage<{ auth: { user: UserType } }>().props;
+    const { t } = useTranslations();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const userMenuRef = useRef<HTMLDivElement>(null);
@@ -80,28 +82,28 @@ export default function AppLayout({
 
     const navigation: NavSection[] = [
         {
-            title: 'MAIN',
+            title: t?.nav?.main ?? 'MAIN',
             items: [
                 {
-                    name: 'Dashboard',
+                    name: t?.nav?.dashboard ?? 'Dashboard',
                     href: route('dashboard'),
                     icon: LayoutDashboard,
                     current: currentPath === '/dashboard',
                 },
                 {
-                    name: 'Sites',
+                    name: t?.nav?.sites ?? 'Sites',
                     href: route('sites.index'),
                     icon: Globe,
                     current: currentPath.startsWith('/sites'),
                 },
                 {
-                    name: 'Articles',
+                    name: t?.nav?.articles ?? 'Articles',
                     href: route('articles.index'),
                     icon: FileText,
                     current: currentPath.startsWith('/articles'),
                 },
                 {
-                    name: 'Keywords',
+                    name: t?.nav?.keywords ?? 'Keywords',
                     href: route('keywords.index'),
                     icon: Search,
                     current: currentPath.startsWith('/keywords'),
@@ -109,16 +111,16 @@ export default function AppLayout({
             ],
         },
         {
-            title: 'ANALYTICS',
+            title: t?.nav?.analytics ?? 'ANALYTICS',
             items: [
                 {
-                    name: 'Performance',
+                    name: t?.nav?.performance ?? 'Performance',
                     href: route('analytics.index'),
                     icon: BarChart3,
                     current: currentPath === '/analytics',
                 },
                 {
-                    name: 'Rankings',
+                    name: t?.nav?.rankings ?? 'Rankings',
                     href: route('analytics.index') + '?tab=rankings',
                     icon: TrendingUp,
                     current: currentPath.startsWith('/analytics') && window.location.search.includes('rankings'),
@@ -126,16 +128,16 @@ export default function AppLayout({
             ],
         },
         {
-            title: 'SETTINGS',
+            title: t?.nav?.settings ?? 'SETTINGS',
             items: [
                 {
-                    name: 'Integrations',
+                    name: t?.nav?.integrations ?? 'Integrations',
                     href: route('integrations.index'),
                     icon: Plug,
                     current: currentPath.startsWith('/integrations'),
                 },
                 {
-                    name: 'Settings',
+                    name: t?.nav?.settings ?? 'Settings',
                     href: route('settings.index'),
                     icon: Settings,
                     current: currentPath.startsWith('/settings'),
@@ -223,7 +225,7 @@ export default function AppLayout({
                     {auth.user.current_team && (
                         <div className="mx-3 mb-3 rounded-xl bg-surface-50 dark:bg-surface-800/50 p-4">
                             <div className="flex items-center justify-between mb-2">
-                                <span className="text-xs font-medium text-surface-500 dark:text-surface-400 uppercase tracking-wide">Usage</span>
+                                <span className="text-xs font-medium text-surface-500 dark:text-surface-400 uppercase tracking-wide">{t?.usage?.title ?? 'Usage'}</span>
                                 <span className="text-xs font-semibold text-surface-700 dark:text-surface-300">
                                     {auth.user.current_team.articles_generated_count}/{auth.user.current_team.articles_limit}
                                 </span>
@@ -243,7 +245,7 @@ export default function AppLayout({
                                 className="mt-3 flex items-center justify-center gap-1 text-xs font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300"
                             >
                                 <Zap className="h-3 w-3" />
-                                Upgrade plan
+                                {t?.usage?.upgradePlan ?? 'Upgrade plan'}
                             </Link>
                         </div>
                     )}
@@ -299,14 +301,14 @@ export default function AppLayout({
                                         className="flex items-center gap-3 px-4 py-2.5 text-sm text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"
                                     >
                                         <User className="h-4 w-4 text-surface-400" />
-                                        Profile
+                                        {t?.user?.profile ?? 'Profile'}
                                     </Link>
                                     <Link
                                         href={route('settings.index')}
                                         className="flex items-center gap-3 px-4 py-2.5 text-sm text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"
                                     >
                                         <Settings className="h-4 w-4 text-surface-400" />
-                                        Settings
+                                        {t?.user?.settings ?? 'Settings'}
                                     </Link>
                                     <div className="border-t border-surface-100 dark:border-surface-800 mt-1 pt-1">
                                         <Link
@@ -316,7 +318,7 @@ export default function AppLayout({
                                             className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
                                         >
                                             <LogOut className="h-4 w-4" />
-                                            Log out
+                                            {t?.user?.logout ?? 'Log out'}
                                         </Link>
                                     </div>
                                 </div>

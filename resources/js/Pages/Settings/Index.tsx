@@ -3,48 +3,11 @@ import { Head, Link } from '@inertiajs/react';
 import { CreditCard, Users, Key, Bell, Palette, ChevronRight, Zap, Sparkles } from 'lucide-react';
 import clsx from 'clsx';
 import { PageProps, Team } from '@/types';
+import { useTranslations } from '@/hooks/useTranslations';
 
 interface SettingsIndexProps extends PageProps {
     team: Team;
 }
-
-const settingsLinks = [
-    {
-        name: 'Facturation',
-        description: 'Gérez votre abonnement et vos moyens de paiement',
-        href: 'settings.billing',
-        icon: CreditCard,
-        color: 'primary',
-    },
-    {
-        name: 'Équipe',
-        description: 'Invitez des membres et gérez les permissions',
-        href: 'settings.team',
-        icon: Users,
-        color: 'blue',
-    },
-    {
-        name: 'Clés API',
-        description: 'Gérez les clés API pour les services externes',
-        href: 'settings.api-keys',
-        icon: Key,
-        color: 'purple',
-    },
-    {
-        name: 'Voix de marque',
-        description: 'Configurez le ton et le style de votre contenu',
-        href: 'settings.brand-voices',
-        icon: Palette,
-        color: 'amber',
-    },
-    {
-        name: 'Notifications',
-        description: 'Configurez les notifications email et webhook',
-        href: 'settings.notifications',
-        icon: Bell,
-        color: 'blue',
-    },
-];
 
 const PLAN_CONFIG = {
     free: { label: 'Gratuit', color: 'bg-surface-100 text-surface-700 dark:bg-surface-800 dark:text-surface-300' },
@@ -54,8 +17,47 @@ const PLAN_CONFIG = {
 };
 
 export default function SettingsIndex({ team }: SettingsIndexProps) {
+    const { t } = useTranslations();
     const usagePercentage = Math.round((team.articles_generated_count / team.articles_limit) * 100);
     const planConfig = PLAN_CONFIG[team.plan] || PLAN_CONFIG.free;
+
+    const settingsLinks = [
+        {
+            name: t?.settings?.billing ?? 'Facturation',
+            description: t?.settings?.billingDescription ?? 'Gérez votre abonnement et vos moyens de paiement',
+            href: 'settings.billing',
+            icon: CreditCard,
+            color: 'primary',
+        },
+        {
+            name: t?.settings?.team ?? 'Équipe',
+            description: t?.settings?.teamDescription ?? 'Invitez des membres et gérez les permissions',
+            href: 'settings.team',
+            icon: Users,
+            color: 'blue',
+        },
+        {
+            name: t?.settings?.apiKeys ?? 'Clés API',
+            description: t?.settings?.apiKeysDescription ?? 'Gérez les clés API pour les services externes',
+            href: 'settings.api-keys',
+            icon: Key,
+            color: 'purple',
+        },
+        {
+            name: t?.settings?.brandVoices ?? 'Voix de marque',
+            description: t?.settings?.brandVoicesDescription ?? 'Configurez le ton et le style de votre contenu',
+            href: 'settings.brand-voices',
+            icon: Palette,
+            color: 'amber',
+        },
+        {
+            name: t?.settings?.notifications ?? 'Notifications',
+            description: t?.settings?.notificationsDescription ?? 'Configurez les notifications email et webhook',
+            href: 'settings.notifications',
+            icon: Bell,
+            color: 'blue',
+        },
+    ];
 
     const getColorClasses = (color: string) => {
         const colors: Record<string, { iconBg: string; icon: string }> = {
@@ -71,14 +73,16 @@ export default function SettingsIndex({ team }: SettingsIndexProps) {
         <AppLayout
             header={
                 <div>
-                    <h1 className="font-display text-2xl font-bold text-surface-900 dark:text-white">Paramètres</h1>
+                    <h1 className="font-display text-2xl font-bold text-surface-900 dark:text-white">
+                        {t?.settings?.title ?? 'Paramètres'}
+                    </h1>
                     <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
-                        Gérez votre compte et vos préférences
+                        {t?.settings?.subtitle ?? 'Gérez votre compte et vos préférences'}
                     </p>
                 </div>
             }
         >
-            <Head title="Paramètres" />
+            <Head title={t?.settings?.title ?? 'Paramètres'} />
 
             {/* Current Plan Card */}
             <div className="bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 p-6 mb-8">
@@ -86,7 +90,7 @@ export default function SettingsIndex({ team }: SettingsIndexProps) {
                     <div>
                         <div className="flex items-center gap-3">
                             <h2 className="font-display text-lg font-semibold text-surface-900 dark:text-white">
-                                Plan actuel
+                                {t?.settings?.currentPlan ?? 'Plan actuel'}
                             </h2>
                             <span className={clsx(
                                 'inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold',
@@ -97,7 +101,7 @@ export default function SettingsIndex({ team }: SettingsIndexProps) {
                             </span>
                         </div>
                         <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
-                            {team.articles_limit - team.articles_generated_count} articles restants ce mois-ci
+                            {team.articles_limit - team.articles_generated_count} {t?.settings?.articlesRemaining ?? 'articles restants ce mois-ci'}
                         </p>
                     </div>
                     <div className="flex flex-col items-start sm:items-end gap-3">
@@ -106,7 +110,9 @@ export default function SettingsIndex({ team }: SettingsIndexProps) {
                                 {team.articles_generated_count}
                                 <span className="text-lg font-normal text-surface-400"> / {team.articles_limit}</span>
                             </p>
-                            <p className="text-xs text-surface-500 dark:text-surface-400">articles ce mois</p>
+                            <p className="text-xs text-surface-500 dark:text-surface-400">
+                                {t?.settings?.articlesThisMonth ?? 'articles ce mois'}
+                            </p>
                         </div>
                         <Link
                             href={route('settings.billing')}
@@ -119,14 +125,14 @@ export default function SettingsIndex({ team }: SettingsIndexProps) {
                             )}
                         >
                             <Zap className="h-4 w-4" />
-                            Upgrader
+                            {t?.settings?.upgrade ?? 'Upgrader'}
                         </Link>
                     </div>
                 </div>
                 <div className="mt-5">
                     <div className="flex justify-between text-xs text-surface-500 dark:text-surface-400 mb-2">
-                        <span>{usagePercentage}% utilisé</span>
-                        <span>{team.articles_limit - team.articles_generated_count} restants</span>
+                        <span>{usagePercentage}% {t?.settings?.used ?? 'utilisé'}</span>
+                        <span>{team.articles_limit - team.articles_generated_count} {t?.settings?.remaining ?? 'restants'}</span>
                     </div>
                     <div className="h-2.5 w-full rounded-full bg-surface-100 dark:bg-surface-800">
                         <div

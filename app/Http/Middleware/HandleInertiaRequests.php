@@ -30,6 +30,7 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         $user = $request->user();
+        $locale = app()->getLocale();
 
         return [
             ...parent::share($request),
@@ -52,6 +53,29 @@ class HandleInertiaRequests extends Middleware
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),
             ],
+            'locale' => $locale,
+            'translations' => [
+                'app' => $this->loadTranslations($locale, 'app'),
+            ],
         ];
+    }
+
+    /**
+     * Load translations from JSON file.
+     */
+    private function loadTranslations(string $locale, string $file): array
+    {
+        $path = lang_path("{$locale}/{$file}.json");
+
+        if (file_exists($path)) {
+            return json_decode(file_get_contents($path), true) ?? [];
+        }
+
+        // Fallback to English
+        $fallbackPath = lang_path("en/{$file}.json");
+
+        return file_exists($fallbackPath)
+            ? json_decode(file_get_contents($fallbackPath), true) ?? []
+            : [];
     }
 }

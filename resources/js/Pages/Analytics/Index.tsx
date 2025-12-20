@@ -22,6 +22,7 @@ import {
 import { Site, AnalyticsData, PageProps } from '@/types';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { useTranslations } from '@/hooks/useTranslations';
 
 interface AnalyticsIndexProps extends PageProps {
     sites: Site[];
@@ -54,13 +55,6 @@ interface AnalyticsIndexProps extends PageProps {
     totalSitesCount: number;
 }
 
-const STAT_CARDS = [
-    { key: 'clicks', label: 'Total Clics', icon: MousePointer, color: 'primary' },
-    { key: 'impressions', label: 'Impressions', icon: Eye, color: 'blue' },
-    { key: 'ctr', label: 'CTR Moyen', icon: TrendingUp, color: 'primary' },
-    { key: 'position', label: 'Position Moyenne', icon: Target, color: 'purple' },
-] as const;
-
 export default function AnalyticsIndex({
     sites,
     selectedSite,
@@ -72,6 +66,14 @@ export default function AnalyticsIndex({
     connectedSitesCount,
     totalSitesCount,
 }: AnalyticsIndexProps) {
+    const { t } = useTranslations();
+
+    const STAT_CARDS = [
+        { key: 'clicks', label: t?.analytics?.totalClicks ?? 'Total Clics', icon: MousePointer, color: 'primary' },
+        { key: 'impressions', label: t?.analytics?.impressions ?? 'Impressions', icon: Eye, color: 'blue' },
+        { key: 'ctr', label: t?.analytics?.averageCtr ?? 'CTR Moyen', icon: TrendingUp, color: 'primary' },
+        { key: 'position', label: t?.analytics?.averagePosition ?? 'Position Moyenne', icon: Target, color: 'purple' },
+    ] as const;
     const handleSiteChange = (siteId: string) => {
         router.get(route('analytics.index'), { site_id: siteId || undefined });
     };
@@ -125,9 +127,9 @@ export default function AnalyticsIndex({
             header={
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <h1 className="font-display text-2xl font-bold text-surface-900 dark:text-white">Analytics</h1>
+                        <h1 className="font-display text-2xl font-bold text-surface-900 dark:text-white">{t?.analytics?.title ?? 'Analytics'}</h1>
                         <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
-                            Performances de recherche depuis Google Search Console
+                            {t?.analytics?.subtitle ?? 'Performances de recherche depuis Google Search Console'}
                         </p>
                     </div>
                     <div className="flex flex-wrap items-center gap-3">
@@ -146,7 +148,7 @@ export default function AnalyticsIndex({
                                 'transition-colors'
                             )}
                         >
-                            <option value="">Tous les sites</option>
+                            <option value="">{t?.articles?.allSites ?? 'Tous les sites'}</option>
                             {sites.map((site) => (
                                 <option key={site.id} value={site.id}>
                                     {site.name}
@@ -162,15 +164,15 @@ export default function AnalyticsIndex({
                                 'transition-colors'
                             )}
                         >
-                            <option value="7">7 derniers jours</option>
-                            <option value="28">28 derniers jours</option>
-                            <option value="90">90 derniers jours</option>
+                            <option value="7">{t?.analytics?.last7days ?? '7 derniers jours'}</option>
+                            <option value="28">{t?.analytics?.last28days ?? '28 derniers jours'}</option>
+                            <option value="90">{t?.analytics?.last3months ?? '90 derniers jours'}</option>
                         </select>
                     </div>
                 </div>
             }
         >
-            <Head title="Analytics" />
+            <Head title={t?.analytics?.title ?? 'Analytics'} />
 
             {!hasData ? (
                 selectedSite && !selectedSite.gsc_connected ? (
@@ -179,10 +181,10 @@ export default function AnalyticsIndex({
                             <BarChart3 className="h-7 w-7 text-surface-400" />
                         </div>
                         <h3 className="font-display font-semibold text-surface-900 dark:text-white mb-1">
-                            Connectez Google Search Console
+                            {t?.analytics?.connectGsc ?? 'Connectez Google Search Console'}
                         </h3>
                         <p className="text-sm text-surface-500 dark:text-surface-400 max-w-sm mx-auto mb-6">
-                            Connectez GSC pour voir les données de performance de {selectedSite.domain}.
+                            {t?.analytics?.connectGscDescription ?? `Connectez GSC pour voir les données de performance de ${selectedSite.domain}.`}
                         </p>
                         <Link
                             href={route('sites.edit', { site: selectedSite.id })}
@@ -193,7 +195,7 @@ export default function AnalyticsIndex({
                                 'transition-all'
                             )}
                         >
-                            Connecter GSC
+                            {t?.analytics?.connectGscButton ?? 'Connecter GSC'}
                         </Link>
                     </div>
                 ) : (
@@ -202,10 +204,10 @@ export default function AnalyticsIndex({
                             <BarChart3 className="h-7 w-7 text-surface-400" />
                         </div>
                         <h3 className="font-display font-semibold text-surface-900 dark:text-white mb-1">
-                            Aucun site connecté
+                            {t?.analytics?.noSitesConnected ?? 'Aucun site connecté'}
                         </h3>
                         <p className="text-sm text-surface-500 dark:text-surface-400 max-w-sm mx-auto mb-6">
-                            Connectez Google Search Console sur au moins un site pour voir les analytics.
+                            {t?.analytics?.noSitesConnectedDescription ?? 'Connectez Google Search Console sur au moins un site pour voir les analytics.'}
                         </p>
                         <Link
                             href={route('sites.index')}
@@ -216,7 +218,7 @@ export default function AnalyticsIndex({
                                 'transition-all'
                             )}
                         >
-                            Gérer les sites
+                            {t?.analytics?.manageSites ?? 'Gérer les sites'}
                         </Link>
                     </div>
                 )
@@ -246,7 +248,7 @@ export default function AnalyticsIndex({
                                                     trend >= 0 ? 'text-primary-600' : 'text-red-600'
                                                 )}>
                                                     <TrendingUp className={clsx('h-3 w-3', trend < 0 && 'rotate-180')} />
-                                                    {trend >= 0 ? '+' : ''}{trend}% vs période précédente
+                                                    {trend >= 0 ? '+' : ''}{trend}% {t?.analytics?.vsPreviousPeriod ?? 'vs période précédente'}
                                                 </p>
                                             )}
                                         </div>
@@ -263,8 +265,8 @@ export default function AnalyticsIndex({
                     {analyticsData.length > 0 && (
                         <div className="mt-6 bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 p-6">
                             <div className="mb-6">
-                                <h3 className="font-display font-semibold text-surface-900 dark:text-white">Performance dans le temps</h3>
-                                <p className="text-sm text-surface-500 dark:text-surface-400">Clics et impressions</p>
+                                <h3 className="font-display font-semibold text-surface-900 dark:text-white">{t?.analytics?.performanceOverTime ?? 'Performance dans le temps'}</h3>
+                                <p className="text-sm text-surface-500 dark:text-surface-400">{t?.analytics?.clicksAndImpressions ?? 'Clics et impressions'}</p>
                             </div>
                             <div className="h-80">
                                 <ResponsiveContainer width="100%" height="100%">
@@ -322,7 +324,7 @@ export default function AnalyticsIndex({
                                             fillOpacity={1}
                                             fill="url(#colorClicks)"
                                             strokeWidth={2}
-                                            name="Clics"
+                                            name={t?.analytics?.clicks ?? 'Clics'}
                                         />
                                         <Area
                                             yAxisId="right"
@@ -332,7 +334,7 @@ export default function AnalyticsIndex({
                                             fillOpacity={1}
                                             fill="url(#colorImpressions)"
                                             strokeWidth={2}
-                                            name="Impressions"
+                                            name={t?.analytics?.impressions ?? 'Impressions'}
                                         />
                                     </AreaChart>
                                 </ResponsiveContainer>
@@ -345,15 +347,15 @@ export default function AnalyticsIndex({
                         {/* Top Pages */}
                         <div className="bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 overflow-hidden">
                             <div className="border-b border-surface-100 dark:border-surface-800 px-6 py-4">
-                                <h3 className="font-display font-semibold text-surface-900 dark:text-white">Top Pages</h3>
+                                <h3 className="font-display font-semibold text-surface-900 dark:text-white">{t?.analytics?.topPages ?? 'Top Pages'}</h3>
                             </div>
                             {isAggregatedView ? (
                                 <div className="px-6 py-8 text-center text-sm text-surface-500 dark:text-surface-400">
-                                    Sélectionnez un site pour voir les top pages.
+                                    {t?.analytics?.selectSiteForPages ?? 'Sélectionnez un site pour voir les top pages.'}
                                 </div>
                             ) : topPages.length === 0 ? (
                                 <div className="px-6 py-8 text-center text-sm text-surface-500 dark:text-surface-400">
-                                    Aucune donnée disponible.
+                                    {t?.analytics?.noData ?? 'Aucune donnée disponible.'}
                                 </div>
                             ) : (
                                 <div className="overflow-x-auto">
@@ -361,13 +363,13 @@ export default function AnalyticsIndex({
                                         <thead>
                                             <tr className="bg-surface-50/50 dark:bg-surface-800/50">
                                                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-surface-500 dark:text-surface-400">
-                                                    Page
+                                                    {t?.analytics?.page ?? 'Page'}
                                                 </th>
                                                 <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-surface-500 dark:text-surface-400">
-                                                    Clics
+                                                    {t?.analytics?.clicks ?? 'Clics'}
                                                 </th>
                                                 <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-surface-500 dark:text-surface-400">
-                                                    Pos
+                                                    {t?.analytics?.position ?? 'Pos'}
                                                 </th>
                                             </tr>
                                         </thead>
@@ -394,15 +396,15 @@ export default function AnalyticsIndex({
                         {/* Top Queries */}
                         <div className="bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 overflow-hidden">
                             <div className="border-b border-surface-100 dark:border-surface-800 px-6 py-4">
-                                <h3 className="font-display font-semibold text-surface-900 dark:text-white">Top Requêtes</h3>
+                                <h3 className="font-display font-semibold text-surface-900 dark:text-white">{t?.analytics?.topQueries ?? 'Top Requêtes'}</h3>
                             </div>
                             {isAggregatedView ? (
                                 <div className="px-6 py-8 text-center text-sm text-surface-500 dark:text-surface-400">
-                                    Sélectionnez un site pour voir les top requêtes.
+                                    {t?.analytics?.selectSiteForQueries ?? 'Sélectionnez un site pour voir les top requêtes.'}
                                 </div>
                             ) : topQueries.length === 0 ? (
                                 <div className="px-6 py-8 text-center text-sm text-surface-500 dark:text-surface-400">
-                                    Aucune donnée disponible.
+                                    {t?.analytics?.noData ?? 'Aucune donnée disponible.'}
                                 </div>
                             ) : (
                                 <div className="overflow-x-auto">
@@ -410,13 +412,13 @@ export default function AnalyticsIndex({
                                         <thead>
                                             <tr className="bg-surface-50/50 dark:bg-surface-800/50">
                                                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-surface-500 dark:text-surface-400">
-                                                    Requête
+                                                    {t?.analytics?.query ?? 'Requête'}
                                                 </th>
                                                 <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-surface-500 dark:text-surface-400">
-                                                    Clics
+                                                    {t?.analytics?.clicks ?? 'Clics'}
                                                 </th>
                                                 <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-surface-500 dark:text-surface-400">
-                                                    Pos
+                                                    {t?.analytics?.position ?? 'Pos'}
                                                 </th>
                                             </tr>
                                         </thead>
