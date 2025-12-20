@@ -1,5 +1,8 @@
 <?php
 
+use App\Jobs\AutopilotDiscoveryJob;
+use App\Jobs\AutopilotGenerationJob;
+use App\Jobs\AutopilotPublishJob;
 use App\Jobs\SyncSiteAnalyticsJob;
 use App\Models\Site;
 use Illuminate\Foundation\Inspiring;
@@ -9,6 +12,15 @@ use Illuminate\Support\Facades\Schedule;
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
+
+// Keyword discovery - once daily at 6 AM
+Schedule::job(new AutopilotDiscoveryJob)->dailyAt('06:00');
+
+// Article generation - every hour from 8 AM to 8 PM
+Schedule::job(new AutopilotGenerationJob)->hourly()->between('8:00', '20:00');
+
+// Publishing - every hour
+Schedule::job(new AutopilotPublishJob)->hourly();
 
 // Sync analytics for all sites daily at 3 AM
 Schedule::call(function () {
