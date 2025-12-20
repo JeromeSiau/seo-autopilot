@@ -8,6 +8,7 @@ use App\Http\Controllers\Web\ArticleController;
 use App\Http\Controllers\Web\IntegrationController;
 use App\Http\Controllers\Web\KeywordController;
 use App\Http\Controllers\Web\NotificationController;
+use App\Http\Controllers\Web\OnboardingController;
 use App\Http\Controllers\Web\SettingsController;
 use App\Http\Controllers\Web\SiteController;
 use Illuminate\Foundation\Application;
@@ -30,6 +31,15 @@ Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])->
 Route::middleware(['auth', 'verified'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Onboarding Wizard
+    Route::get('/onboarding', [OnboardingController::class, 'create'])->name('onboarding.create');
+    Route::post('/onboarding/step1', [OnboardingController::class, 'storeStep1'])->name('onboarding.step1');
+    Route::post('/onboarding/{site}/step2', [OnboardingController::class, 'storeStep2'])->name('onboarding.step2');
+    Route::post('/onboarding/{site}/step3', [OnboardingController::class, 'storeStep3'])->name('onboarding.step3');
+    Route::post('/onboarding/{site}/step4', [OnboardingController::class, 'storeStep4'])->name('onboarding.step4');
+    Route::post('/onboarding/{site}/step5', [OnboardingController::class, 'storeStep5'])->name('onboarding.step5');
+    Route::post('/onboarding/{site}/complete', [OnboardingController::class, 'complete'])->name('onboarding.complete');
 
     // Sites
     Route::resource('sites', SiteController::class);
