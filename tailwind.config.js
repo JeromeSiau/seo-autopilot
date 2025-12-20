@@ -3,6 +3,7 @@ import forms from '@tailwindcss/forms';
 
 /** @type {import('tailwindcss').Config} */
 export default {
+    darkMode: 'class',
     content: [
         './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
         './storage/framework/views/*.php',
@@ -54,6 +55,9 @@ export default {
             boxShadow: {
                 'green': '0 4px 14px rgba(16, 185, 129, 0.35)',
                 'green-lg': '0 6px 20px rgba(16, 185, 129, 0.4)',
+                'green-glow': '0 0 30px rgba(16, 185, 129, 0.4)',
+                'green-glow-lg': '0 0 50px rgba(16, 185, 129, 0.5)',
+                'card-dark': '0 4px 24px rgba(0, 0, 0, 0.4)',
             },
             animation: {
                 'fade-in': 'fadeIn 0.6s ease-out forwards',

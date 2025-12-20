@@ -28,25 +28,25 @@ const STAT_CARDS = [
 ] as const;
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof Clock; animate?: boolean }> = {
-    pending: { label: 'En attente', color: 'bg-surface-100 text-surface-600', icon: Clock },
-    queued: { label: 'En queue', color: 'bg-blue-50 text-blue-700', icon: Clock },
-    generating: { label: 'En génération', color: 'bg-amber-50 text-amber-700', icon: Loader2, animate: true },
-    completed: { label: 'Complété', color: 'bg-primary-50 text-primary-700', icon: CheckCircle },
+    pending: { label: 'En attente', color: 'bg-surface-100 text-surface-600 dark:bg-surface-800 dark:text-surface-400', icon: Clock },
+    queued: { label: 'En queue', color: 'bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400', icon: Clock },
+    generating: { label: 'En génération', color: 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400', icon: Loader2, animate: true },
+    completed: { label: 'Complété', color: 'bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-400', icon: CheckCircle },
 };
 
 export default function KeywordsIndex({ keywords, sites, filters, stats }: KeywordsIndexProps) {
     const getDifficultyColor = (difficulty: number | null) => {
-        if (!difficulty) return 'bg-surface-100 text-surface-500';
-        if (difficulty < 30) return 'bg-primary-50 text-primary-700';
-        if (difficulty < 60) return 'bg-amber-50 text-amber-700';
-        return 'bg-red-50 text-red-700';
+        if (!difficulty) return 'bg-surface-100 text-surface-500 dark:bg-surface-800 dark:text-surface-400';
+        if (difficulty < 30) return 'bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-400';
+        if (difficulty < 60) return 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400';
+        return 'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400';
     };
 
     const getColorClasses = (color: string) => {
         const colors = {
-            primary: { bg: 'bg-primary-50', text: 'text-primary-600', iconBg: 'bg-primary-100' },
-            blue: { bg: 'bg-blue-50', text: 'text-blue-600', iconBg: 'bg-blue-100' },
-            amber: { bg: 'bg-amber-50', text: 'text-amber-600', iconBg: 'bg-amber-100' },
+            primary: { bg: 'bg-primary-50 dark:bg-primary-500/10', text: 'text-primary-600 dark:text-primary-400', iconBg: 'bg-primary-100 dark:bg-primary-500/15' },
+            blue: { bg: 'bg-blue-50 dark:bg-blue-500/10', text: 'text-blue-600 dark:text-blue-400', iconBg: 'bg-blue-100 dark:bg-blue-500/15' },
+            amber: { bg: 'bg-amber-50 dark:bg-amber-500/10', text: 'text-amber-600 dark:text-amber-400', iconBg: 'bg-amber-100 dark:bg-amber-500/15' },
         };
         return colors[color as keyof typeof colors] || colors.primary;
     };
@@ -56,14 +56,14 @@ export default function KeywordsIndex({ keywords, sites, filters, stats }: Keywo
             header={
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="font-display text-2xl font-bold text-surface-900">Keywords</h1>
-                        <p className="mt-1 text-sm text-surface-500">
+                        <h1 className="font-display text-2xl font-bold text-surface-900 dark:text-white">Keywords</h1>
+                        <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
                             Découverts automatiquement par l'Autopilot
                         </p>
                     </div>
                     <div className="flex items-center gap-2">
-                        <Target className="h-5 w-5 text-primary-500" />
-                        <span className="text-sm font-medium text-surface-700">
+                        <Target className="h-5 w-5 text-primary-500 dark:text-primary-400" />
+                        <span className="text-sm font-medium text-surface-700 dark:text-surface-300">
                             {stats.total} keywords suivis
                         </span>
                     </div>
@@ -81,16 +81,16 @@ export default function KeywordsIndex({ keywords, sites, filters, stats }: Keywo
                     return (
                         <div
                             key={card.key}
-                            className="bg-white rounded-2xl border border-surface-200 p-5 hover:shadow-md transition-shadow"
+                            className="bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 p-5 hover:shadow-md dark:hover:shadow-green-glow/20 transition-shadow"
                         >
                             <div className="flex items-start justify-between">
                                 <div>
-                                    <p className="text-sm font-medium text-surface-500">{card.label}</p>
+                                    <p className="text-sm font-medium text-surface-500 dark:text-surface-400">{card.label}</p>
                                     <p className={clsx(
                                         'mt-2 font-display text-2xl font-bold',
-                                        card.key === 'generating' ? 'text-amber-600' :
-                                        card.key === 'queued' ? 'text-blue-600' :
-                                        card.key === 'completed' ? 'text-primary-600' : 'text-surface-900'
+                                        card.key === 'generating' ? 'text-amber-600 dark:text-amber-400' :
+                                        card.key === 'queued' ? 'text-blue-600 dark:text-blue-400' :
+                                        card.key === 'completed' ? 'text-primary-600 dark:text-primary-400' : 'text-surface-900 dark:text-white'
                                     )}>
                                         {value}
                                     </p>
@@ -115,7 +115,7 @@ export default function KeywordsIndex({ keywords, sites, filters, stats }: Keywo
                         })
                     }
                     className={clsx(
-                        'rounded-xl border border-surface-200 bg-white px-4 py-2.5 text-sm text-surface-700',
+                        'rounded-xl border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 px-4 py-2.5 text-sm text-surface-700 dark:text-surface-300',
                         'focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500',
                         'transition-colors'
                     )}
@@ -137,7 +137,7 @@ export default function KeywordsIndex({ keywords, sites, filters, stats }: Keywo
                         })
                     }
                     className={clsx(
-                        'rounded-xl border border-surface-200 bg-white px-4 py-2.5 text-sm text-surface-700',
+                        'rounded-xl border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 px-4 py-2.5 text-sm text-surface-700 dark:text-surface-300',
                         'focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500',
                         'transition-colors'
                     )}
@@ -163,7 +163,7 @@ export default function KeywordsIndex({ keywords, sites, filters, stats }: Keywo
                             )
                         }
                         className={clsx(
-                            'w-full rounded-xl border border-surface-200 bg-white pl-10 pr-4 py-2.5 text-sm text-surface-900',
+                            'w-full rounded-xl border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 pl-10 pr-4 py-2.5 text-sm text-surface-900 dark:text-white',
                             'placeholder:text-surface-400',
                             'focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500',
                             'transition-colors'
@@ -175,65 +175,65 @@ export default function KeywordsIndex({ keywords, sites, filters, stats }: Keywo
             {/* Keywords Table / Empty State */}
             <div className="mt-6">
                 {keywords.data.length === 0 ? (
-                    <div className="bg-white rounded-2xl border border-surface-200 p-12 text-center">
-                        <div className="mx-auto w-14 h-14 rounded-2xl bg-surface-100 flex items-center justify-center mb-4">
+                    <div className="bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 p-12 text-center">
+                        <div className="mx-auto w-14 h-14 rounded-2xl bg-surface-100 dark:bg-surface-800 flex items-center justify-center mb-4">
                             <Search className="h-7 w-7 text-surface-400" />
                         </div>
-                        <h3 className="font-display font-semibold text-surface-900 mb-1">
+                        <h3 className="font-display font-semibold text-surface-900 dark:text-white mb-1">
                             Aucun keyword trouvé
                         </h3>
-                        <p className="text-sm text-surface-500 max-w-sm mx-auto">
+                        <p className="text-sm text-surface-500 dark:text-surface-400 max-w-sm mx-auto">
                             Les keywords seront découverts automatiquement par l'Autopilot une fois vos sites configurés.
                         </p>
                     </div>
                 ) : (
-                    <div className="bg-white rounded-2xl border border-surface-200 overflow-hidden">
+                    <div className="bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 overflow-hidden">
                         <div className="overflow-x-auto">
                             <table className="w-full">
                                 <thead>
-                                    <tr className="border-b border-surface-100 bg-surface-50/50">
-                                        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-surface-500">
+                                    <tr className="border-b border-surface-100 dark:border-surface-800 bg-surface-50/50 dark:bg-surface-800/50">
+                                        <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-surface-500 dark:text-surface-400">
                                             Keyword
                                         </th>
-                                        <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-surface-500">
+                                        <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-surface-500 dark:text-surface-400">
                                             Volume
                                         </th>
-                                        <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-surface-500">
+                                        <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-surface-500 dark:text-surface-400">
                                             Difficulté
                                         </th>
-                                        <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-surface-500">
+                                        <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-surface-500 dark:text-surface-400">
                                             Position
                                         </th>
-                                        <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-surface-500">
+                                        <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-surface-500 dark:text-surface-400">
                                             Priorité
                                         </th>
-                                        <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-surface-500">
+                                        <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-surface-500 dark:text-surface-400">
                                             Statut
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-surface-100">
+                                <tbody className="divide-y divide-surface-100 dark:divide-surface-800">
                                     {keywords.data.map((keyword) => {
                                         const statusConfig = STATUS_CONFIG[keyword.status as keyof typeof STATUS_CONFIG] || STATUS_CONFIG.pending;
                                         const StatusIcon = statusConfig.icon;
                                         return (
-                                            <tr key={keyword.id} className="hover:bg-surface-50/50 transition-colors">
+                                            <tr key={keyword.id} className="hover:bg-surface-50/50 dark:hover:bg-surface-800/50 transition-colors">
                                                 <td className="px-6 py-4">
                                                     <div>
-                                                        <p className="font-medium text-surface-900">{keyword.keyword}</p>
+                                                        <p className="font-medium text-surface-900 dark:text-white">{keyword.keyword}</p>
                                                         {keyword.site && (
-                                                            <p className="mt-0.5 text-xs text-surface-500">{keyword.site.domain}</p>
+                                                            <p className="mt-0.5 text-xs text-surface-500 dark:text-surface-400">{keyword.site.domain}</p>
                                                         )}
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-4 text-center">
                                                     {keyword.volume ? (
-                                                        <span className="inline-flex items-center gap-1.5 text-sm text-surface-700">
+                                                        <span className="inline-flex items-center gap-1.5 text-sm text-surface-700 dark:text-surface-300">
                                                             <Eye className="h-3.5 w-3.5 text-surface-400" />
                                                             {keyword.volume.toLocaleString()}
                                                         </span>
                                                     ) : (
-                                                        <span className="text-surface-300">—</span>
+                                                        <span className="text-surface-300 dark:text-surface-600">—</span>
                                                     )}
                                                 </td>
                                                 <td className="px-6 py-4 text-center">
@@ -247,21 +247,21 @@ export default function KeywordsIndex({ keywords, sites, filters, stats }: Keywo
                                                             {keyword.difficulty}
                                                         </span>
                                                     ) : (
-                                                        <span className="text-surface-300">—</span>
+                                                        <span className="text-surface-300 dark:text-surface-600">—</span>
                                                     )}
                                                 </td>
                                                 <td className="px-6 py-4 text-center">
                                                     {keyword.position ? (
-                                                        <span className="inline-flex items-center gap-1.5 text-sm text-surface-700">
-                                                            <TrendingUp className="h-3.5 w-3.5 text-primary-500" />
+                                                        <span className="inline-flex items-center gap-1.5 text-sm text-surface-700 dark:text-surface-300">
+                                                            <TrendingUp className="h-3.5 w-3.5 text-primary-500 dark:text-primary-400" />
                                                             {keyword.position.toFixed(1)}
                                                         </span>
                                                     ) : (
-                                                        <span className="text-surface-300">—</span>
+                                                        <span className="text-surface-300 dark:text-surface-600">—</span>
                                                     )}
                                                 </td>
                                                 <td className="px-6 py-4 text-center">
-                                                    <span className="font-display text-sm font-bold text-primary-600">
+                                                    <span className="font-display text-sm font-bold text-primary-600 dark:text-primary-400">
                                                         {keyword.priority || keyword.score || '—'}
                                                     </span>
                                                 </td>
@@ -286,26 +286,26 @@ export default function KeywordsIndex({ keywords, sites, filters, stats }: Keywo
 
                         {/* Pagination */}
                         {keywords.meta.last_page > 1 && (
-                            <div className="flex items-center justify-between border-t border-surface-100 px-6 py-4">
-                                <p className="text-sm text-surface-500">
-                                    <span className="font-medium text-surface-700">{keywords.meta.from}</span>
+                            <div className="flex items-center justify-between border-t border-surface-100 dark:border-surface-800 px-6 py-4">
+                                <p className="text-sm text-surface-500 dark:text-surface-400">
+                                    <span className="font-medium text-surface-700 dark:text-surface-300">{keywords.meta.from}</span>
                                     {' '}à{' '}
-                                    <span className="font-medium text-surface-700">{keywords.meta.to}</span>
+                                    <span className="font-medium text-surface-700 dark:text-surface-300">{keywords.meta.to}</span>
                                     {' '}sur{' '}
-                                    <span className="font-medium text-surface-700">{keywords.meta.total}</span>
+                                    <span className="font-medium text-surface-700 dark:text-surface-300">{keywords.meta.total}</span>
                                     {' '}keywords
                                 </p>
                                 <div className="flex gap-2">
                                     {keywords.links.prev ? (
                                         <Link
                                             href={keywords.links.prev}
-                                            className="inline-flex items-center gap-1.5 rounded-lg border border-surface-200 px-3 py-2 text-sm font-medium text-surface-700 hover:bg-surface-50 hover:border-surface-300 transition-colors"
+                                            className="inline-flex items-center gap-1.5 rounded-lg border border-surface-200 dark:border-surface-700 px-3 py-2 text-sm font-medium text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-800 hover:border-surface-300 dark:hover:border-surface-600 transition-colors"
                                         >
                                             <ChevronLeft className="h-4 w-4" />
                                             Précédent
                                         </Link>
                                     ) : (
-                                        <span className="inline-flex items-center gap-1.5 rounded-lg border border-surface-100 px-3 py-2 text-sm font-medium text-surface-300 cursor-not-allowed">
+                                        <span className="inline-flex items-center gap-1.5 rounded-lg border border-surface-100 dark:border-surface-800 px-3 py-2 text-sm font-medium text-surface-300 dark:text-surface-600 cursor-not-allowed">
                                             <ChevronLeft className="h-4 w-4" />
                                             Précédent
                                         </span>
@@ -313,13 +313,13 @@ export default function KeywordsIndex({ keywords, sites, filters, stats }: Keywo
                                     {keywords.links.next ? (
                                         <Link
                                             href={keywords.links.next}
-                                            className="inline-flex items-center gap-1.5 rounded-lg border border-surface-200 px-3 py-2 text-sm font-medium text-surface-700 hover:bg-surface-50 hover:border-surface-300 transition-colors"
+                                            className="inline-flex items-center gap-1.5 rounded-lg border border-surface-200 dark:border-surface-700 px-3 py-2 text-sm font-medium text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-800 hover:border-surface-300 dark:hover:border-surface-600 transition-colors"
                                         >
                                             Suivant
                                             <ChevronRight className="h-4 w-4" />
                                         </Link>
                                     ) : (
-                                        <span className="inline-flex items-center gap-1.5 rounded-lg border border-surface-100 px-3 py-2 text-sm font-medium text-surface-300 cursor-not-allowed">
+                                        <span className="inline-flex items-center gap-1.5 rounded-lg border border-surface-100 dark:border-surface-800 px-3 py-2 text-sm font-medium text-surface-300 dark:text-surface-600 cursor-not-allowed">
                                             Suivant
                                             <ChevronRight className="h-4 w-4" />
                                         </span>

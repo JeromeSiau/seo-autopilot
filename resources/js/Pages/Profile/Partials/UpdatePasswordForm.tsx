@@ -43,11 +43,13 @@ export default function UpdatePasswordForm() {
 
     const inputClasses = (hasError: boolean) =>
         clsx(
-            'block w-full rounded-xl border px-4 py-2.5 text-surface-900',
+            'block w-full rounded-xl border px-4 py-2.5 text-surface-900 dark:text-white',
             'placeholder:text-surface-400',
             'focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500',
             'transition-colors',
-            hasError ? 'border-red-300 bg-red-50' : 'border-surface-300 bg-white'
+            hasError
+                ? 'border-red-300 dark:border-red-500/30 bg-red-50 dark:bg-red-500/10'
+                : 'border-surface-300 dark:border-surface-700 bg-white dark:bg-surface-800'
         );
 
     return (
@@ -55,7 +57,7 @@ export default function UpdatePasswordForm() {
             <div>
                 <label
                     htmlFor="current_password"
-                    className="block text-sm font-medium text-surface-700 mb-1.5"
+                    className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5"
                 >
                     Mot de passe actuel
                 </label>
@@ -69,14 +71,14 @@ export default function UpdatePasswordForm() {
                     autoComplete="current-password"
                 />
                 {errors.current_password && (
-                    <p className="mt-1.5 text-sm text-red-600">{errors.current_password}</p>
+                    <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">{errors.current_password}</p>
                 )}
             </div>
 
             <div>
                 <label
                     htmlFor="password"
-                    className="block text-sm font-medium text-surface-700 mb-1.5"
+                    className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5"
                 >
                     Nouveau mot de passe
                 </label>
@@ -90,14 +92,14 @@ export default function UpdatePasswordForm() {
                     autoComplete="new-password"
                 />
                 {errors.password && (
-                    <p className="mt-1.5 text-sm text-red-600">{errors.password}</p>
+                    <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">{errors.password}</p>
                 )}
             </div>
 
             <div>
                 <label
                     htmlFor="password_confirmation"
-                    className="block text-sm font-medium text-surface-700 mb-1.5"
+                    className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5"
                 >
                     Confirmer le mot de passe
                 </label>
@@ -110,7 +112,7 @@ export default function UpdatePasswordForm() {
                     autoComplete="new-password"
                 />
                 {errors.password_confirmation && (
-                    <p className="mt-1.5 text-sm text-red-600">{errors.password_confirmation}</p>
+                    <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">{errors.password_confirmation}</p>
                 )}
             </div>
 
@@ -131,7 +133,7 @@ export default function UpdatePasswordForm() {
                 </button>
 
                 {recentlySuccessful && (
-                    <span className="inline-flex items-center gap-1.5 text-sm text-green-600">
+                    <span className="inline-flex items-center gap-1.5 text-sm text-green-600 dark:text-green-400">
                         <Check className="h-4 w-4" />
                         Enregistré
                     </span>

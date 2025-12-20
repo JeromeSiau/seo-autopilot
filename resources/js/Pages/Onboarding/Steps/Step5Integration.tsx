@@ -81,13 +81,13 @@ export default function Step5Integration({ siteId, onNext, onBack }: Props) {
         <div className="space-y-6">
             {/* Header */}
             <div className="text-center">
-                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-100 to-primary-200">
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-100 to-primary-200 dark:from-primary-500/20 dark:to-primary-500/10">
                     <Plug className="h-7 w-7 text-primary-600" />
                 </div>
-                <h2 className="mt-4 font-display text-2xl font-bold text-surface-900">
+                <h2 className="mt-4 font-display text-2xl font-bold text-surface-900 dark:text-white">
                     Intégration Publication
                 </h2>
-                <p className="mt-2 text-surface-500">
+                <p className="mt-2 text-surface-500 dark:text-surface-400">
                     Connectez votre CMS pour publier automatiquement les articles
                 </p>
             </div>
@@ -100,9 +100,9 @@ export default function Step5Integration({ siteId, onNext, onBack }: Props) {
                         onClick={() => handleConnect(platform.id)}
                         disabled={loading !== null}
                         className={clsx(
-                            'flex w-full items-center gap-4 rounded-xl border border-surface-200 p-4',
+                            'flex w-full items-center gap-4 rounded-xl border border-surface-200 dark:border-surface-700 p-4',
                             'text-left transition-all',
-                            'hover:border-primary-300 hover:bg-primary-50/50',
+                            'hover:border-primary-300 dark:hover:border-primary-600 hover:bg-primary-50/50 dark:hover:bg-primary-500/10',
                             'disabled:opacity-50 disabled:cursor-not-allowed'
                         )}
                     >
@@ -113,8 +113,8 @@ export default function Step5Integration({ siteId, onNext, onBack }: Props) {
                             {platform.icon}
                         </div>
                         <div className="flex-1">
-                            <p className="font-medium text-surface-900">{platform.name}</p>
-                            <p className="text-sm text-surface-500">{platform.description}</p>
+                            <p className="font-medium text-surface-900 dark:text-white">{platform.name}</p>
+                            <p className="text-sm text-surface-500 dark:text-surface-400">{platform.description}</p>
                         </div>
                         {loading === platform.id ? (
                             <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary-200 border-t-primary-600" />
@@ -126,11 +126,11 @@ export default function Step5Integration({ siteId, onNext, onBack }: Props) {
             </div>
 
             {/* Alternative Info */}
-            <div className="flex items-center gap-3 rounded-xl bg-surface-50 p-4">
-                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-surface-100">
-                    <Download className="h-5 w-5 text-surface-500" />
+            <div className="flex items-center gap-3 rounded-xl bg-surface-50 dark:bg-surface-800/50 p-4">
+                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-surface-100 dark:bg-surface-700">
+                    <Download className="h-5 w-5 text-surface-500 dark:text-surface-400" />
                 </div>
-                <p className="text-sm text-surface-600">
+                <p className="text-sm text-surface-600 dark:text-surface-400">
                     Sans intégration, les articles seront disponibles en téléchargement (HTML, Markdown, ou Word)
                 </p>
             </div>
@@ -139,7 +139,7 @@ export default function Step5Integration({ siteId, onNext, onBack }: Props) {
             <button
                 onClick={handleSkip}
                 disabled={loading !== null}
-                className="flex w-full items-center justify-center gap-2 py-2 text-sm text-surface-500 hover:text-surface-700 transition-colors"
+                className="flex w-full items-center justify-center gap-2 py-2 text-sm text-surface-500 dark:text-surface-400 hover:text-surface-700 dark:hover:text-surface-300 transition-colors"
             >
                 {loading === 'skip' ? (
                     <div className="h-4 w-4 animate-spin rounded-full border-2 border-surface-300 border-t-surface-600" />
@@ -155,7 +155,7 @@ export default function Step5Integration({ siteId, onNext, onBack }: Props) {
             <div className="pt-2">
                 <button
                     onClick={onBack}
-                    className="flex items-center gap-2 text-sm font-medium text-surface-600 hover:text-surface-900 transition-colors"
+                    className="flex items-center gap-2 text-sm font-medium text-surface-600 dark:text-surface-400 hover:text-surface-900 dark:hover:text-white transition-colors"
                 >
                     <ChevronLeft className="h-4 w-4" />
                     Retour

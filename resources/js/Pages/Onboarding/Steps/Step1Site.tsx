@@ -46,20 +46,20 @@ export default function Step1Site({ data, setData, onNext }: Props) {
         <form onSubmit={handleSubmit} className="space-y-6">
             {/* Header */}
             <div className="text-center">
-                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-100 to-primary-200">
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-100 to-primary-200 dark:from-primary-500/20 dark:to-primary-500/10">
                     <Globe className="h-7 w-7 text-primary-600" />
                 </div>
-                <h2 className="mt-4 font-display text-2xl font-bold text-surface-900">
+                <h2 className="mt-4 font-display text-2xl font-bold text-surface-900 dark:text-white">
                     Ajouter votre site
                 </h2>
-                <p className="mt-2 text-surface-500">
+                <p className="mt-2 text-surface-500 dark:text-surface-400">
                     Commençons par les informations de base
                 </p>
             </div>
 
             {/* Domain Field */}
             <div>
-                <label className="block text-sm font-medium text-surface-700 mb-1.5">
+                <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
                     Domaine
                 </label>
                 <input
@@ -68,20 +68,20 @@ export default function Step1Site({ data, setData, onNext }: Props) {
                     onChange={(e) => setData({ ...data, domain: e.target.value })}
                     placeholder="monsite.com"
                     className={clsx(
-                        'block w-full rounded-xl border bg-white px-4 py-3 text-surface-900 placeholder:text-surface-400',
+                        'block w-full rounded-xl border bg-white dark:bg-surface-800 px-4 py-3 text-surface-900 dark:text-white placeholder:text-surface-400',
                         'focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500',
                         'transition-colors',
-                        errors.domain ? 'border-red-300' : 'border-surface-200'
+                        errors.domain ? 'border-red-300 dark:border-red-500/50' : 'border-surface-200 dark:border-surface-700'
                     )}
                 />
                 {errors.domain && (
-                    <p className="mt-1.5 text-sm text-red-600">{errors.domain}</p>
+                    <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">{errors.domain}</p>
                 )}
             </div>
 
             {/* Name Field */}
             <div>
-                <label className="block text-sm font-medium text-surface-700 mb-1.5">
+                <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
                     Nom du site
                 </label>
                 <input
@@ -90,20 +90,20 @@ export default function Step1Site({ data, setData, onNext }: Props) {
                     onChange={(e) => setData({ ...data, name: e.target.value })}
                     placeholder="Mon Super Site"
                     className={clsx(
-                        'block w-full rounded-xl border bg-white px-4 py-3 text-surface-900 placeholder:text-surface-400',
+                        'block w-full rounded-xl border bg-white dark:bg-surface-800 px-4 py-3 text-surface-900 dark:text-white placeholder:text-surface-400',
                         'focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500',
                         'transition-colors',
-                        errors.name ? 'border-red-300' : 'border-surface-200'
+                        errors.name ? 'border-red-300 dark:border-red-500/50' : 'border-surface-200 dark:border-surface-700'
                     )}
                 />
                 {errors.name && (
-                    <p className="mt-1.5 text-sm text-red-600">{errors.name}</p>
+                    <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">{errors.name}</p>
                 )}
             </div>
 
             {/* Language Selection */}
             <div>
-                <label className="block text-sm font-medium text-surface-700 mb-1.5">
+                <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
                     Langue du contenu
                 </label>
                 <div className="grid grid-cols-5 gap-2">
@@ -115,14 +115,14 @@ export default function Step1Site({ data, setData, onNext }: Props) {
                             className={clsx(
                                 'flex flex-col items-center gap-1 rounded-xl border p-3 transition-all',
                                 data.language === lang.code
-                                    ? 'border-primary-500 bg-primary-50 ring-2 ring-primary-500/20'
-                                    : 'border-surface-200 hover:border-surface-300 hover:bg-surface-50'
+                                    ? 'border-primary-500 bg-primary-50 dark:bg-primary-500/10 ring-2 ring-primary-500/20'
+                                    : 'border-surface-200 dark:border-surface-700 hover:border-surface-300 dark:hover:border-surface-600 hover:bg-surface-50 dark:hover:bg-surface-800'
                             )}
                         >
                             <span className="text-xl">{lang.flag}</span>
                             <span className={clsx(
                                 'text-xs font-medium',
-                                data.language === lang.code ? 'text-primary-700' : 'text-surface-600'
+                                data.language === lang.code ? 'text-primary-700 dark:text-primary-400' : 'text-surface-600 dark:text-surface-400'
                             )}>
                                 {lang.code.toUpperCase()}
                             </span>

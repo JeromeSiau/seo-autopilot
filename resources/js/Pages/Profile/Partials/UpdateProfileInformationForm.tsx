@@ -28,7 +28,7 @@ export default function UpdateProfileInformation({
             <div>
                 <label
                     htmlFor="name"
-                    className="block text-sm font-medium text-surface-700 mb-1.5"
+                    className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5"
                 >
                     Nom
                 </label>
@@ -36,13 +36,13 @@ export default function UpdateProfileInformation({
                     id="name"
                     type="text"
                     className={clsx(
-                        'block w-full rounded-xl border px-4 py-2.5 text-surface-900',
+                        'block w-full rounded-xl border px-4 py-2.5 text-surface-900 dark:text-white',
                         'placeholder:text-surface-400',
                         'focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500',
                         'transition-colors',
                         errors.name
-                            ? 'border-red-300 bg-red-50'
-                            : 'border-surface-300 bg-white'
+                            ? 'border-red-300 dark:border-red-500/30 bg-red-50 dark:bg-red-500/10'
+                            : 'border-surface-300 dark:border-surface-700 bg-white dark:bg-surface-800'
                     )}
                     value={data.name}
                     onChange={(e) => setData('name', e.target.value)}
@@ -50,14 +50,14 @@ export default function UpdateProfileInformation({
                     autoComplete="name"
                 />
                 {errors.name && (
-                    <p className="mt-1.5 text-sm text-red-600">{errors.name}</p>
+                    <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">{errors.name}</p>
                 )}
             </div>
 
             <div>
                 <label
                     htmlFor="email"
-                    className="block text-sm font-medium text-surface-700 mb-1.5"
+                    className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5"
                 >
                     Adresse email
                 </label>
@@ -65,13 +65,13 @@ export default function UpdateProfileInformation({
                     id="email"
                     type="email"
                     className={clsx(
-                        'block w-full rounded-xl border px-4 py-2.5 text-surface-900',
+                        'block w-full rounded-xl border px-4 py-2.5 text-surface-900 dark:text-white',
                         'placeholder:text-surface-400',
                         'focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500',
                         'transition-colors',
                         errors.email
-                            ? 'border-red-300 bg-red-50'
-                            : 'border-surface-300 bg-white'
+                            ? 'border-red-300 dark:border-red-500/30 bg-red-50 dark:bg-red-500/10'
+                            : 'border-surface-300 dark:border-surface-700 bg-white dark:bg-surface-800'
                     )}
                     value={data.email}
                     onChange={(e) => setData('email', e.target.value)}
@@ -79,26 +79,26 @@ export default function UpdateProfileInformation({
                     autoComplete="username"
                 />
                 {errors.email && (
-                    <p className="mt-1.5 text-sm text-red-600">{errors.email}</p>
+                    <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">{errors.email}</p>
                 )}
             </div>
 
             {mustVerifyEmail && user.email_verified_at === null && (
-                <div className="rounded-xl bg-amber-50 border border-amber-200 p-4">
-                    <p className="text-sm text-amber-800">
+                <div className="rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 p-4">
+                    <p className="text-sm text-amber-800 dark:text-amber-400">
                         Votre adresse email n'est pas vérifiée.{' '}
                         <Link
                             href={route('verification.send')}
                             method="post"
                             as="button"
-                            className="font-medium text-amber-900 underline hover:no-underline"
+                            className="font-medium text-amber-900 dark:text-amber-300 underline hover:no-underline"
                         >
                             Cliquez ici pour renvoyer le lien de vérification.
                         </Link>
                     </p>
 
                     {status === 'verification-link-sent' && (
-                        <p className="mt-2 text-sm font-medium text-green-600">
+                        <p className="mt-2 text-sm font-medium text-green-600 dark:text-green-400">
                             Un nouveau lien de vérification a été envoyé à votre adresse email.
                         </p>
                     )}
@@ -122,7 +122,7 @@ export default function UpdateProfileInformation({
                 </button>
 
                 {recentlySuccessful && (
-                    <span className="inline-flex items-center gap-1.5 text-sm text-green-600">
+                    <span className="inline-flex items-center gap-1.5 text-sm text-green-600 dark:text-green-400">
                         <Check className="h-4 w-4" />
                         Enregistré
                     </span>

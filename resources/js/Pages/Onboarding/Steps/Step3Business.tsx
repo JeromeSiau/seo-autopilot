@@ -55,20 +55,20 @@ export default function Step3Business({ siteId, onNext, onBack }: Props) {
         <form onSubmit={handleSubmit} className="space-y-6">
             {/* Header */}
             <div className="text-center">
-                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-100 to-purple-200">
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-500/20 dark:to-purple-500/10">
                     <Briefcase className="h-7 w-7 text-purple-600" />
                 </div>
-                <h2 className="mt-4 font-display text-2xl font-bold text-surface-900">
+                <h2 className="mt-4 font-display text-2xl font-bold text-surface-900 dark:text-white">
                     Décrivez votre business
                 </h2>
-                <p className="mt-2 text-surface-500">
+                <p className="mt-2 text-surface-500 dark:text-surface-400">
                     Ces informations aident à générer des mots-clés pertinents
                 </p>
             </div>
 
             {/* Business Description */}
             <div>
-                <label className="block text-sm font-medium text-surface-700 mb-1.5">
+                <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
                     Description de votre activité
                 </label>
                 <textarea
@@ -77,20 +77,20 @@ export default function Step3Business({ siteId, onNext, onBack }: Props) {
                     placeholder="Décrivez votre entreprise, vos produits ou services en quelques phrases..."
                     rows={4}
                     className={clsx(
-                        'block w-full rounded-xl border bg-white px-4 py-3 text-surface-900 placeholder:text-surface-400',
+                        'block w-full rounded-xl border bg-white dark:bg-surface-800 px-4 py-3 text-surface-900 dark:text-white placeholder:text-surface-400',
                         'focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500',
                         'transition-colors resize-none',
-                        errors.business_description ? 'border-red-300' : 'border-surface-200'
+                        errors.business_description ? 'border-red-300 dark:border-red-500/50' : 'border-surface-200 dark:border-surface-700'
                     )}
                 />
                 {errors.business_description && (
-                    <p className="mt-1.5 text-sm text-red-600">{errors.business_description}</p>
+                    <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">{errors.business_description}</p>
                 )}
             </div>
 
             {/* Target Audience */}
             <div>
-                <label className="block text-sm font-medium text-surface-700 mb-1.5">
+                <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
                     Public cible <span className="text-surface-400 font-normal">(optionnel)</span>
                 </label>
                 <input
@@ -99,16 +99,16 @@ export default function Step3Business({ siteId, onNext, onBack }: Props) {
                     onChange={(e) => setData({ ...data, target_audience: e.target.value })}
                     placeholder="Ex: PME, développeurs, parents..."
                     className={clsx(
-                        'block w-full rounded-xl border bg-white px-4 py-3 text-surface-900 placeholder:text-surface-400',
+                        'block w-full rounded-xl border bg-white dark:bg-surface-800 px-4 py-3 text-surface-900 dark:text-white placeholder:text-surface-400',
                         'focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500',
-                        'transition-colors border-surface-200'
+                        'transition-colors border-surface-200 dark:border-surface-700'
                     )}
                 />
             </div>
 
             {/* Topics */}
             <div>
-                <label className="block text-sm font-medium text-surface-700 mb-1.5">
+                <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
                     Thématiques principales
                 </label>
                 <div className="flex gap-2">
@@ -119,9 +119,9 @@ export default function Step3Business({ siteId, onNext, onBack }: Props) {
                         onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTopic())}
                         placeholder="Ajouter une thématique..."
                         className={clsx(
-                            'block flex-1 rounded-xl border bg-white px-4 py-3 text-surface-900 placeholder:text-surface-400',
+                            'block flex-1 rounded-xl border bg-white dark:bg-surface-800 px-4 py-3 text-surface-900 dark:text-white placeholder:text-surface-400',
                             'focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500',
-                            'transition-colors border-surface-200'
+                            'transition-colors border-surface-200 dark:border-surface-700'
                         )}
                     />
                     <button
@@ -129,9 +129,9 @@ export default function Step3Business({ siteId, onNext, onBack }: Props) {
                         onClick={addTopic}
                         disabled={!topicInput.trim() || data.topics.length >= 10}
                         className={clsx(
-                            'flex items-center gap-1.5 rounded-xl border border-surface-200 px-4 py-3',
-                            'text-sm font-medium text-surface-700 bg-white',
-                            'hover:bg-surface-50 hover:border-surface-300 transition-colors',
+                            'flex items-center gap-1.5 rounded-xl border border-surface-200 dark:border-surface-700 px-4 py-3',
+                            'text-sm font-medium text-surface-700 dark:text-surface-300 bg-white dark:bg-surface-800',
+                            'hover:bg-surface-50 dark:hover:bg-surface-700 hover:border-surface-300 dark:hover:border-surface-600 transition-colors',
                             'disabled:opacity-50 disabled:cursor-not-allowed'
                         )}
                     >
@@ -144,13 +144,13 @@ export default function Step3Business({ siteId, onNext, onBack }: Props) {
                         {data.topics.map((topic, index) => (
                             <span
                                 key={index}
-                                className="inline-flex items-center gap-1.5 rounded-full bg-primary-50 px-3 py-1.5 text-sm font-medium text-primary-700"
+                                className="inline-flex items-center gap-1.5 rounded-full bg-primary-50 dark:bg-primary-500/15 px-3 py-1.5 text-sm font-medium text-primary-700 dark:text-primary-400"
                             >
                                 {topic}
                                 <button
                                     type="button"
                                     onClick={() => removeTopic(index)}
-                                    className="rounded-full p-0.5 hover:bg-primary-100 transition-colors"
+                                    className="rounded-full p-0.5 hover:bg-primary-100 dark:hover:bg-primary-500/25 transition-colors"
                                 >
                                     <X className="h-3.5 w-3.5" />
                                 </button>
@@ -158,7 +158,7 @@ export default function Step3Business({ siteId, onNext, onBack }: Props) {
                         ))}
                     </div>
                 )}
-                <p className="mt-2 text-xs text-surface-500">
+                <p className="mt-2 text-xs text-surface-500 dark:text-surface-400">
                     {data.topics.length}/10 thématiques ajoutées
                 </p>
             </div>
@@ -168,7 +168,7 @@ export default function Step3Business({ siteId, onNext, onBack }: Props) {
                 <button
                     type="button"
                     onClick={onBack}
-                    className="flex items-center gap-2 text-sm font-medium text-surface-600 hover:text-surface-900 transition-colors"
+                    className="flex items-center gap-2 text-sm font-medium text-surface-600 dark:text-surface-400 hover:text-surface-900 dark:hover:text-white transition-colors"
                 >
                     <ChevronLeft className="h-4 w-4" />
                     Retour

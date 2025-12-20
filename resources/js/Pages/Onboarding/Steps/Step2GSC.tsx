@@ -59,13 +59,13 @@ export default function Step2GSC({ siteId, onNext, onBack }: Props) {
         <div className="space-y-6">
             {/* Header */}
             <div className="text-center">
-                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-100 to-blue-200">
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-500/20 dark:to-blue-500/10">
                     <Search className="h-7 w-7 text-blue-600" />
                 </div>
-                <h2 className="mt-4 font-display text-2xl font-bold text-surface-900">
+                <h2 className="mt-4 font-display text-2xl font-bold text-surface-900 dark:text-white">
                     Google Search Console
                 </h2>
-                <p className="mt-2 text-surface-500">
+                <p className="mt-2 text-surface-500 dark:text-surface-400">
                     Connectez votre Search Console pour découvrir automatiquement des opportunités
                 </p>
             </div>
@@ -75,14 +75,14 @@ export default function Step2GSC({ siteId, onNext, onBack }: Props) {
                 {BENEFITS.map((benefit) => (
                     <div
                         key={benefit.title}
-                        className="flex items-start gap-3 rounded-xl bg-surface-50 p-4"
+                        className="flex items-start gap-3 rounded-xl bg-surface-50 dark:bg-surface-800/50 p-4"
                     >
-                        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-blue-100">
+                        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-500/20">
                             <benefit.icon className="h-5 w-5 text-blue-600" />
                         </div>
                         <div>
-                            <p className="font-medium text-surface-900">{benefit.title}</p>
-                            <p className="text-sm text-surface-500">{benefit.description}</p>
+                            <p className="font-medium text-surface-900 dark:text-white">{benefit.title}</p>
+                            <p className="text-sm text-surface-500 dark:text-surface-400">{benefit.description}</p>
                         </div>
                     </div>
                 ))}
@@ -119,7 +119,7 @@ export default function Step2GSC({ siteId, onNext, onBack }: Props) {
             <button
                 onClick={handleSkip}
                 disabled={loading}
-                className="flex w-full items-center justify-center gap-2 py-2 text-sm text-surface-500 hover:text-surface-700 transition-colors"
+                className="flex w-full items-center justify-center gap-2 py-2 text-sm text-surface-500 dark:text-surface-400 hover:text-surface-700 dark:hover:text-surface-300 transition-colors"
             >
                 Passer cette étape
                 <ArrowRight className="h-4 w-4" />
@@ -129,7 +129,7 @@ export default function Step2GSC({ siteId, onNext, onBack }: Props) {
             <div className="pt-2">
                 <button
                     onClick={onBack}
-                    className="flex items-center gap-2 text-sm font-medium text-surface-600 hover:text-surface-900 transition-colors"
+                    className="flex items-center gap-2 text-sm font-medium text-surface-600 dark:text-surface-400 hover:text-surface-900 dark:hover:text-white transition-colors"
                 >
                     <ChevronLeft className="h-4 w-4" />
                     Retour

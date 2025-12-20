@@ -16,6 +16,8 @@ import {
     Globe,
 } from 'lucide-react';
 import Logo from '@/Components/Logo';
+import ThemeToggle from '@/Components/ThemeToggle';
+import { useTheme } from '@/Contexts/ThemeContext';
 
 // Animated wave SVG component
 function WaveBackground({ className = '', opacity = 0.1 }: { className?: string; opacity?: number }) {
@@ -50,7 +52,7 @@ function WaveBackground({ className = '', opacity = 0.1 }: { className?: string;
 }
 
 // Wave separator between sections
-function WaveSeparator({ flip = false, fillColor = '#fafaf8' }: { flip?: boolean; fillColor?: string }) {
+function WaveSeparator({ flip = false, lightColor = '#fafaf8', darkColor = '#1a1a1a' }: { flip?: boolean; lightColor?: string; darkColor?: string }) {
     return (
         <div className={`relative w-full overflow-hidden ${flip ? 'rotate-180' : ''}`} style={{ height: '50px', marginTop: '-1px', marginBottom: '-1px' }}>
             <svg
@@ -60,10 +62,15 @@ function WaveSeparator({ flip = false, fillColor = '#fafaf8' }: { flip?: boolean
                 style={{ height: '100%' }}
             >
                 <path
-                    fill={fillColor}
+                    className="fill-current text-surface-50 dark:text-surface-900"
+                    style={{ fill: 'var(--wave-fill)' }}
                     d="M0,25 C240,50 480,0 720,25 C960,50 1200,0 1440,25 L1440,50 L0,50 Z"
                 />
             </svg>
+            <style>{`
+                :root { --wave-fill: ${lightColor}; }
+                .dark { --wave-fill: ${darkColor}; }
+            `}</style>
         </div>
     );
 }
@@ -224,12 +231,13 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
                 <meta name="description" content={t.meta.description} />
             </Head>
 
-            <div className="min-h-screen bg-surface-50 text-surface-700">
+            <div className="min-h-screen bg-surface-50 dark:bg-surface-900 text-surface-700 dark:text-surface-300 transition-colors duration-300">
+
                 {/* Header */}
                 <header
                     className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
                         isScrolled
-                            ? 'bg-surface-50/85 backdrop-blur-xl border-b border-black/5'
+                            ? 'bg-surface-50/85 dark:bg-surface-900/90 backdrop-blur-xl border-b border-black/5 dark:border-white/5'
                             : 'bg-transparent'
                     }`}
                 >
@@ -244,38 +252,41 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
                                 <nav className="hidden lg:flex items-center gap-1">
                                     <a
                                         href="#features"
-                                        className="px-4 py-2 text-[0.9rem] font-medium text-surface-500 hover:text-surface-900 hover:bg-white rounded-lg transition-all"
+                                        className="px-4 py-2 text-[0.9rem] font-medium text-surface-500 dark:text-surface-400 hover:text-surface-900 dark:hover:text-white hover:bg-white dark:hover:bg-surface-800 rounded-lg transition-all"
                                     >
                                         {t.nav.features}
                                     </a>
                                     <a
                                         href="#how-it-works"
-                                        className="px-4 py-2 text-[0.9rem] font-medium text-surface-500 hover:text-surface-900 hover:bg-white rounded-lg transition-all"
+                                        className="px-4 py-2 text-[0.9rem] font-medium text-surface-500 dark:text-surface-400 hover:text-surface-900 dark:hover:text-white hover:bg-white dark:hover:bg-surface-800 rounded-lg transition-all"
                                     >
                                         {t.nav.howItWorks}
                                     </a>
                                     <a
                                         href="#pricing"
-                                        className="px-4 py-2 text-[0.9rem] font-medium text-surface-500 hover:text-surface-900 hover:bg-white rounded-lg transition-all"
+                                        className="px-4 py-2 text-[0.9rem] font-medium text-surface-500 dark:text-surface-400 hover:text-surface-900 dark:hover:text-white hover:bg-white dark:hover:bg-surface-800 rounded-lg transition-all"
                                     >
                                         {t.nav.pricing}
                                     </a>
                                     <a
                                         href="#faq"
-                                        className="px-4 py-2 text-[0.9rem] font-medium text-surface-500 hover:text-surface-900 hover:bg-white rounded-lg transition-all"
+                                        className="px-4 py-2 text-[0.9rem] font-medium text-surface-500 dark:text-surface-400 hover:text-surface-900 dark:hover:text-white hover:bg-white dark:hover:bg-surface-800 rounded-lg transition-all"
                                     >
                                         {t.nav.faq}
                                     </a>
                                 </nav>
                             </div>
 
-                            {/* Right: Language Switcher + CTAs */}
+                            {/* Right: Theme Toggle + Language Switcher + CTAs */}
                             <div className="hidden lg:flex items-center gap-4">
+                                {/* Theme Toggle */}
+                                <ThemeToggle />
+
                                 {/* Language Switcher Dropdown */}
                                 <div className="relative" ref={langMenuRef}>
                                     <button
                                         onClick={() => setLangMenuOpen(!langMenuOpen)}
-                                        className="flex items-center gap-2 px-3 py-2 text-[0.9rem] font-medium text-surface-600 hover:text-surface-900 hover:bg-white/50 rounded-lg transition-all"
+                                        className="flex items-center gap-2 px-3 py-2 text-[0.9rem] font-medium text-surface-600 dark:text-surface-400 hover:text-surface-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-surface-800 rounded-lg transition-all"
                                     >
                                         <Globe className="w-4 h-4" />
                                         <span>{currentLang.label}</span>
@@ -283,7 +294,7 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
                                     </button>
 
                                     {langMenuOpen && (
-                                        <div className="absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-lg border border-surface-200 py-2 z-50">
+                                        <div className="absolute right-0 mt-2 w-44 bg-white dark:bg-surface-900 rounded-xl shadow-lg dark:shadow-card-dark border border-surface-200 dark:border-surface-800 py-2 z-50">
                                             {languages.map((lang) => (
                                                 <Link
                                                     key={lang.code}
@@ -291,14 +302,14 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
                                                     onClick={() => setLangMenuOpen(false)}
                                                     className={`flex items-center gap-3 px-4 py-2.5 text-[0.9rem] transition-colors ${
                                                         lang.code === locale
-                                                            ? 'bg-primary-50 text-primary-600 font-medium'
-                                                            : 'text-surface-600 hover:bg-surface-50'
+                                                            ? 'bg-primary-50 dark:bg-primary-500/10 text-primary-600 dark:text-primary-400 font-medium'
+                                                            : 'text-surface-600 dark:text-surface-400 hover:bg-surface-50 dark:hover:bg-surface-800'
                                                     }`}
                                                 >
                                                     <span className="text-base">{lang.flag}</span>
                                                     <span>{lang.name}</span>
                                                     {lang.code === locale && (
-                                                        <Check className="w-4 h-4 ml-auto text-primary-500" />
+                                                        <Check className="w-4 h-4 ml-auto text-primary-500 dark:text-primary-400" />
                                                     )}
                                                 </Link>
                                             ))}
@@ -309,7 +320,7 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
                                 {canLogin && (
                                     <Link
                                         href={route('login')}
-                                        className="px-4 py-2.5 text-[0.9rem] font-medium text-surface-900 hover:text-primary-600 transition-colors"
+                                        className="px-4 py-2.5 text-[0.9rem] font-medium text-surface-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
                                     >
                                         {t.nav.login}
                                     </Link>
@@ -317,7 +328,7 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
                                 {canRegister && (
                                     <Link
                                         href={route('register')}
-                                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary-500 to-primary-600 text-white text-[0.9rem] font-semibold rounded-xl shadow-green hover:shadow-green-lg hover:-translate-y-0.5 transition-all"
+                                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary-500 to-primary-600 text-white text-[0.9rem] font-semibold rounded-xl shadow-green dark:shadow-green-glow hover:shadow-green-lg dark:hover:shadow-green-glow-lg hover:-translate-y-0.5 transition-all"
                                     >
                                         {t.nav.getStarted}
                                         <ArrowRight className="w-4 h-4" />
@@ -326,33 +337,36 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
                             </div>
 
                             {/* Mobile menu button */}
-                            <button
-                                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                                className="lg:hidden p-2 text-surface-600"
-                            >
-                                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-                            </button>
+                            <div className="lg:hidden flex items-center gap-2">
+                                <ThemeToggle />
+                                <button
+                                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                                    className="p-2 text-surface-600 dark:text-surface-400"
+                                >
+                                    {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                                </button>
+                            </div>
                         </div>
                     </div>
 
                     {/* Mobile menu */}
                     {mobileMenuOpen && (
-                        <div className="lg:hidden bg-white border-t border-surface-200">
+                        <div className="lg:hidden bg-white dark:bg-surface-900 border-t border-surface-200 dark:border-surface-800">
                             <div className="px-6 py-4 space-y-2">
-                                <a href="#features" className="block py-3 text-surface-600 font-medium">
+                                <a href="#features" className="block py-3 text-surface-600 dark:text-surface-300 font-medium">
                                     {t.nav.features}
                                 </a>
-                                <a href="#how-it-works" className="block py-3 text-surface-600 font-medium">
+                                <a href="#how-it-works" className="block py-3 text-surface-600 dark:text-surface-300 font-medium">
                                     {t.nav.howItWorks}
                                 </a>
-                                <a href="#pricing" className="block py-3 text-surface-600 font-medium">
+                                <a href="#pricing" className="block py-3 text-surface-600 dark:text-surface-300 font-medium">
                                     {t.nav.pricing}
                                 </a>
-                                <a href="#faq" className="block py-3 text-surface-600 font-medium">
+                                <a href="#faq" className="block py-3 text-surface-600 dark:text-surface-300 font-medium">
                                     {t.nav.faq}
                                 </a>
                                 {/* Mobile Language Switcher */}
-                                <div className="py-3 border-t border-surface-200 mt-2">
+                                <div className="py-3 border-t border-surface-200 dark:border-surface-800 mt-2">
                                     <p className="text-xs font-medium text-surface-400 uppercase tracking-wide mb-2">Language</p>
                                     <div className="flex flex-col gap-1">
                                         {languages.map((lang) => (
@@ -361,22 +375,22 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
                                                 href={`/${lang.code}`}
                                                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${
                                                     lang.code === locale
-                                                        ? 'bg-primary-50 text-primary-600 font-medium'
-                                                        : 'text-surface-600 hover:bg-surface-50'
+                                                        ? 'bg-primary-50 dark:bg-primary-500/10 text-primary-600 dark:text-primary-400 font-medium'
+                                                        : 'text-surface-600 dark:text-surface-400 hover:bg-surface-50 dark:hover:bg-surface-800'
                                                 }`}
                                             >
                                                 <span className="text-lg">{lang.flag}</span>
                                                 <span>{lang.name}</span>
                                                 {lang.code === locale && (
-                                                    <Check className="w-4 h-4 ml-auto text-primary-500" />
+                                                    <Check className="w-4 h-4 ml-auto text-primary-500 dark:text-primary-400" />
                                                 )}
                                             </Link>
                                         ))}
                                     </div>
                                 </div>
-                                <div className="pt-4 border-t border-surface-200 space-y-3">
+                                <div className="pt-4 border-t border-surface-200 dark:border-surface-800 space-y-3">
                                     {canLogin && (
-                                        <Link href={route('login')} className="block py-2 text-surface-900 font-medium">
+                                        <Link href={route('login')} className="block py-2 text-surface-900 dark:text-white font-medium">
                                             {t.nav.login}
                                         </Link>
                                     )}
@@ -395,7 +409,7 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
                 </header>
 
                 {/* Hero Section */}
-                <section className="pt-32 pb-20 lg:pt-40 lg:pb-24 relative overflow-hidden">
+                <section className="pt-24 pb-28 lg:pt-32 lg:pb-32 relative overflow-hidden">
                     {/* Animated waves background */}
                     <WaveBackground className="text-primary-500" opacity={0.08} />
 
@@ -404,21 +418,21 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
                             {/* Left: Content */}
                             <div>
                                 <AnimatedSection>
-                                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 text-primary-600 text-[0.85rem] font-semibold rounded-full mb-6">
+                                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 dark:bg-primary-500/10 dark:border dark:border-primary-500/20 text-primary-600 dark:text-primary-400 text-[0.85rem] font-semibold rounded-full mb-6">
                                         <Compass className="w-4 h-4" />
                                         {t.hero.badge}
                                     </div>
                                 </AnimatedSection>
 
                                 <AnimatedSection delay={100}>
-                                    <h1 className="font-display text-[3.75rem] font-bold leading-[1.1] text-surface-900 mb-6 tracking-tight">
+                                    <h1 className="font-display text-[3.75rem] font-bold leading-[1.1] text-surface-900 dark:text-white mb-6 tracking-tight">
                                         {t.hero.title}{' '}
-                                        <span className="text-primary-500">{t.hero.titleAccent}</span>
+                                        <span className="text-primary-500 dark:text-primary-400">{t.hero.titleAccent}</span>
                                     </h1>
                                 </AnimatedSection>
 
                                 <AnimatedSection delay={150}>
-                                    <p className="text-[1.2rem] text-surface-500 leading-relaxed mb-8 max-w-[480px]">
+                                    <p className="text-[1.2rem] text-surface-500 dark:text-surface-400 leading-relaxed mb-8 max-w-[480px]">
                                         {t.hero.subtitle}
                                     </p>
                                 </AnimatedSection>
@@ -427,14 +441,14 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
                                     <div className="flex flex-wrap items-center gap-4 mb-10">
                                         <Link
                                             href={route('register')}
-                                            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-primary-500 to-primary-600 text-white text-base font-semibold rounded-xl shadow-green hover:shadow-green-lg hover:-translate-y-0.5 transition-all"
+                                            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-primary-500 to-primary-600 text-white text-base font-semibold rounded-xl shadow-green dark:shadow-green-glow hover:shadow-green-lg dark:hover:shadow-green-glow-lg hover:-translate-y-0.5 transition-all"
                                         >
                                             {t.hero.cta}
                                             <ArrowRight className="w-5 h-5" />
                                         </Link>
                                         <a
                                             href="#how-it-works"
-                                            className="inline-flex items-center gap-2 px-6 py-4 text-surface-900 text-base font-medium hover:text-primary-600 transition-colors"
+                                            className="inline-flex items-center gap-2 px-6 py-4 text-surface-900 dark:text-white text-base font-medium hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
                                         >
                                             <Play className="w-5 h-5" />
                                             {t.hero.ctaSecondary}
@@ -443,18 +457,18 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
                                 </AnimatedSection>
 
                                 <AnimatedSection delay={250}>
-                                    <div className="flex gap-10 pt-6 border-t border-surface-200">
+                                    <div className="flex gap-10 pt-6 border-t border-surface-200 dark:border-surface-800">
                                         <div>
-                                            <div className="font-display text-[1.75rem] font-bold text-surface-900">50K+</div>
-                                            <div className="text-[0.9rem] text-surface-500">{t.hero.stats.articles}</div>
+                                            <div className="font-display text-[1.75rem] font-bold text-surface-900 dark:text-white">50K+</div>
+                                            <div className="text-[0.9rem] text-surface-500 dark:text-surface-400">{t.hero.stats.articles}</div>
                                         </div>
                                         <div>
-                                            <div className="font-display text-[1.75rem] font-bold text-surface-900">2.5K+</div>
-                                            <div className="text-[0.9rem] text-surface-500">{t.hero.stats.users || 'Happy users'}</div>
+                                            <div className="font-display text-[1.75rem] font-bold text-surface-900 dark:text-white">2.5K+</div>
+                                            <div className="text-[0.9rem] text-surface-500 dark:text-surface-400">{t.hero.stats.users || 'Happy users'}</div>
                                         </div>
                                         <div>
-                                            <div className="font-display text-[1.75rem] font-bold text-surface-900">85%</div>
-                                            <div className="text-[0.9rem] text-surface-500">{t.hero.stats.ranking || 'Ranking boost'}</div>
+                                            <div className="font-display text-[1.75rem] font-bold text-surface-900 dark:text-white">85%</div>
+                                            <div className="text-[0.9rem] text-surface-500 dark:text-surface-400">{t.hero.stats.ranking || 'Ranking boost'}</div>
                                         </div>
                                     </div>
                                 </AnimatedSection>
@@ -463,28 +477,28 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
                             {/* Right: Bento Grid */}
                             <AnimatedSection delay={300} className="hidden lg:block">
                                 <div className="grid grid-cols-2 gap-4">
-                                    <div className="bg-white rounded-2xl p-6 shadow-md border border-black/5 hover:-translate-y-1 hover:shadow-lg hover:animate-sway transition-all">
-                                        <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center text-primary-600 mb-4">
+                                    <div className="bg-white dark:bg-surface-900/70 dark:backdrop-blur-xl rounded-2xl p-6 shadow-md dark:shadow-card-dark border border-black/5 dark:border-surface-800 hover:-translate-y-1 hover:shadow-lg dark:hover:border-primary-500/30 dark:hover:shadow-green-glow hover:animate-sway transition-all">
+                                        <div className="w-10 h-10 bg-primary-100 dark:bg-primary-500/15 rounded-xl flex items-center justify-center text-primary-600 dark:text-primary-400 mb-4">
                                             <Ship className="w-5 h-5" />
                                         </div>
-                                        <div className="text-[0.9rem] font-medium text-surface-900 mb-1">Articles Today</div>
-                                        <div className="font-display text-[2rem] font-bold text-primary-500">12</div>
+                                        <div className="text-[0.9rem] font-medium text-surface-900 dark:text-surface-200 mb-1">Articles Today</div>
+                                        <div className="font-display text-[2rem] font-bold text-primary-500 dark:text-primary-400">12</div>
                                     </div>
-                                    <div className="bg-white rounded-2xl p-6 shadow-md border border-black/5 hover:-translate-y-1 hover:shadow-lg hover:animate-sway transition-all">
-                                        <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center text-primary-600 mb-4">
+                                    <div className="bg-white dark:bg-surface-900/70 dark:backdrop-blur-xl rounded-2xl p-6 shadow-md dark:shadow-card-dark border border-black/5 dark:border-surface-800 hover:-translate-y-1 hover:shadow-lg dark:hover:border-primary-500/30 dark:hover:shadow-green-glow hover:animate-sway transition-all">
+                                        <div className="w-10 h-10 bg-primary-100 dark:bg-primary-500/15 rounded-xl flex items-center justify-center text-primary-600 dark:text-primary-400 mb-4">
                                             <Anchor className="w-5 h-5" />
                                         </div>
-                                        <div className="text-[0.9rem] font-medium text-surface-900 mb-1">Avg. Position</div>
-                                        <div className="font-display text-[2rem] font-bold text-primary-500">#4.2</div>
+                                        <div className="text-[0.9rem] font-medium text-surface-900 dark:text-surface-200 mb-1">Avg. Position</div>
+                                        <div className="font-display text-[2rem] font-bold text-primary-500 dark:text-primary-400">#4.2</div>
                                     </div>
-                                    <div className="col-span-2 bg-gradient-to-br from-primary-50 to-primary-100/50 rounded-2xl p-6 shadow-md border border-primary-200/50 hover:-translate-y-1 hover:shadow-lg transition-all relative overflow-hidden">
-                                        <div className="text-[0.9rem] font-medium text-surface-900 mb-1">Organic Traffic Growth</div>
-                                        <div className="text-[0.85rem] text-surface-500 mb-4">Last 7 days • +34% from previous week</div>
+                                    <div className="col-span-2 bg-gradient-to-br from-primary-50 to-primary-100/50 dark:from-primary-500/10 dark:to-primary-500/5 rounded-2xl p-6 shadow-md dark:shadow-card-dark border border-primary-200/50 dark:border-primary-500/20 hover:-translate-y-1 hover:shadow-lg dark:hover:shadow-green-glow transition-all relative overflow-hidden">
+                                        <div className="text-[0.9rem] font-medium text-surface-900 dark:text-surface-200 mb-1">Organic Traffic Growth</div>
+                                        <div className="text-[0.85rem] text-surface-500 dark:text-surface-400 mb-4">Last 7 days • +34% from previous week</div>
                                         <div className="flex items-end gap-2 h-[60px]">
                                             {[40, 55, 45, 70, 60, 85, 95].map((height, i) => (
                                                 <div
                                                     key={i}
-                                                    className={`flex-1 rounded-t transition-all duration-1000 ${i >= 5 ? 'bg-primary-500' : 'bg-primary-200'}`}
+                                                    className={`flex-1 rounded-t transition-all duration-1000 ${i >= 5 ? 'bg-primary-500 dark:shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'bg-primary-200 dark:bg-primary-500/25'}`}
                                                     style={{
                                                         height: `${height}%`,
                                                         animation: `float ${3 + i * 0.3}s ease-in-out infinite`,
@@ -501,14 +515,14 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
                 </section>
 
                 {/* Social Proof */}
-                <section className="py-12 border-y border-surface-200">
+                <section className="py-12 border-y border-surface-200 dark:border-surface-800">
                     <div className="max-w-[1200px] mx-auto px-8">
                         <AnimatedSection>
                             <div className="flex flex-col md:flex-row items-center justify-between gap-8">
                                 <span className="text-[0.9rem] font-medium text-surface-400">{t.socialProof.title}</span>
                                 <div className="flex flex-wrap items-center justify-center gap-12">
                                     {['Acme Inc', 'TechCorp', 'StartupXYZ', 'MediaGroup', 'GlobalCo'].map((company) => (
-                                        <span key={company} className="font-display text-xl font-semibold text-surface-300">
+                                        <span key={company} className="font-display text-xl font-semibold text-surface-300 dark:text-surface-600">
                                             {company}
                                         </span>
                                     ))}
@@ -519,20 +533,20 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
                 </section>
 
                 {/* Wave separator */}
-                <WaveSeparator fillColor="#fafaf8" />
+                <WaveSeparator lightColor="#fafaf8" darkColor="#1a1a1a" />
 
                 {/* Problem/Solution */}
-                <section className="py-24 bg-surface-50">
+                <section className="py-24 bg-surface-50 dark:bg-[#1a1a1a]">
                     <div className="max-w-[1200px] mx-auto px-8">
                         <AnimatedSection>
                             <div className="text-center mb-16">
-                                <span className="inline-flex items-center px-4 py-1.5 bg-primary-50 text-primary-600 text-[0.8rem] font-semibold rounded-full uppercase tracking-wide mb-4">
+                                <span className="inline-flex items-center px-4 py-1.5 bg-primary-50 dark:bg-primary-500/10 dark:border dark:border-primary-500/20 text-primary-600 dark:text-primary-400 text-[0.8rem] font-semibold rounded-full uppercase tracking-wide mb-4">
                                     {t.problem.label}
                                 </span>
-                                <h2 className="font-display text-display-sm font-bold text-surface-900 mb-4">
+                                <h2 className="font-display text-display-sm font-bold text-surface-900 dark:text-white mb-4">
                                     {t.problem.title}
                                 </h2>
-                                <p className="text-lg text-surface-500 max-w-[600px] mx-auto">
+                                <p className="text-lg text-surface-500 dark:text-surface-400 max-w-[600px] mx-auto">
                                     {t.problem.subtitle}
                                 </p>
                             </div>
@@ -541,15 +555,15 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
                         <div className="grid md:grid-cols-3 gap-8 items-start">
                             {/* Problem Card */}
                             <AnimatedSection delay={100}>
-                                <div className="bg-gradient-to-br from-red-50 to-white rounded-[20px] p-10 border border-red-200 shadow-md">
-                                    <h3 className="flex items-center gap-3 font-display text-[1.35rem] font-semibold text-red-600 mb-6">
+                                <div className="bg-gradient-to-br from-red-50 to-white dark:from-red-500/10 dark:to-surface-900/70 rounded-[20px] p-10 border border-red-200 dark:border-red-500/20 shadow-md dark:shadow-card-dark dark:backdrop-blur-xl">
+                                    <h3 className="flex items-center gap-3 font-display text-[1.35rem] font-semibold text-red-600 dark:text-red-400 mb-6">
                                         <X className="w-6 h-6" />
                                         {t.problem.cardTitle || 'Without SEO Autopilot'}
                                     </h3>
                                     <ul className="space-y-4">
                                         {(t.problem.pains || ['Hours spent researching keywords', 'Expensive freelance writers', 'Inconsistent content quality', 'Slow publishing schedule', 'No SEO optimization']).map((pain: string, i: number) => (
-                                            <li key={i} className="flex items-start gap-3 text-[0.95rem] text-surface-700 pb-4 border-b border-surface-200 last:border-0 last:pb-0">
-                                                <span className="text-red-500 font-semibold">✕</span>
+                                            <li key={i} className="flex items-start gap-3 text-[0.95rem] text-surface-700 dark:text-surface-300 pb-4 border-b border-surface-200 dark:border-surface-800 last:border-0 last:pb-0">
+                                                <span className="text-red-500 dark:text-red-400 font-semibold">✕</span>
                                                 {pain}
                                             </li>
                                         ))}
@@ -559,20 +573,20 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
 
                             {/* Arrow */}
                             <div className="hidden md:flex items-center justify-center pt-20">
-                                <ArrowRight className="w-10 h-10 text-primary-500" />
+                                <ArrowRight className="w-10 h-10 text-primary-500 dark:text-primary-400" />
                             </div>
 
                             {/* Solution Card */}
                             <AnimatedSection delay={200}>
-                                <div className="bg-gradient-to-br from-primary-50 to-white rounded-[20px] p-10 border border-primary-200 shadow-md">
-                                    <h3 className="flex items-center gap-3 font-display text-[1.35rem] font-semibold text-primary-600 mb-6">
+                                <div className="bg-gradient-to-br from-primary-50 to-white dark:from-primary-500/10 dark:to-surface-900/70 rounded-[20px] p-10 border border-primary-200 dark:border-primary-500/20 shadow-md dark:shadow-card-dark dark:backdrop-blur-xl">
+                                    <h3 className="flex items-center gap-3 font-display text-[1.35rem] font-semibold text-primary-600 dark:text-primary-400 mb-6">
                                         <Check className="w-6 h-6" />
                                         {t.solution.cardTitle || 'With SEO Autopilot'}
                                     </h3>
                                     <ul className="space-y-4">
                                         {(t.solution.points || ['AI finds winning keywords', 'Unlimited content generation', 'Consistent, high-quality output', 'Publish daily on autopilot', 'Built-in SEO best practices']).map((point: string, i: number) => (
-                                            <li key={i} className="flex items-start gap-3 text-[0.95rem] text-surface-700 pb-4 border-b border-surface-200 last:border-0 last:pb-0">
-                                                <span className="text-primary-500 font-semibold">✓</span>
+                                            <li key={i} className="flex items-start gap-3 text-[0.95rem] text-surface-700 dark:text-surface-300 pb-4 border-b border-surface-200 dark:border-surface-800 last:border-0 last:pb-0">
+                                                <span className="text-primary-500 dark:text-primary-400 font-semibold">✓</span>
                                                 {point}
                                             </li>
                                         ))}
@@ -584,20 +598,20 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
                 </section>
 
                 {/* Wave separator */}
-                <WaveSeparator fillColor="#f5f4f0" />
+                <WaveSeparator lightColor="#f5f4f0" darkColor="#1a1a1a" />
 
                 {/* Features */}
-                <section id="features" className="py-24 bg-surface-100">
+                <section id="features" className="py-24 bg-surface-100 dark:bg-surface-900">
                     <div className="max-w-[1200px] mx-auto px-8">
                         <AnimatedSection>
                             <div className="text-center mb-16">
-                                <span className="inline-flex items-center px-4 py-1.5 bg-primary-50 text-primary-600 text-[0.8rem] font-semibold rounded-full uppercase tracking-wide mb-4">
+                                <span className="inline-flex items-center px-4 py-1.5 bg-primary-50 dark:bg-primary-500/10 dark:border dark:border-primary-500/20 text-primary-600 dark:text-primary-400 text-[0.8rem] font-semibold rounded-full uppercase tracking-wide mb-4">
                                     {t.features.label}
                                 </span>
-                                <h2 className="font-display text-display-sm font-bold text-surface-900 mb-4">
+                                <h2 className="font-display text-display-sm font-bold text-surface-900 dark:text-white mb-4">
                                     {t.features.title}
                                 </h2>
-                                <p className="text-lg text-surface-500 max-w-[600px] mx-auto">
+                                <p className="text-lg text-surface-500 dark:text-surface-400 max-w-[600px] mx-auto">
                                     {t.features.subtitle}
                                 </p>
                             </div>
@@ -606,14 +620,14 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {features.map((feature, i) => (
                                 <AnimatedSection key={i} delay={i * 100}>
-                                    <div className="bg-white rounded-2xl p-8 shadow-sm border border-surface-200 hover:-translate-y-1 hover:shadow-lg hover:border-primary-200 hover:animate-sway transition-all">
-                                        <div className="w-12 h-12 bg-gradient-to-br from-primary-50 to-primary-100 rounded-xl flex items-center justify-center text-primary-600 mb-5 animate-float" style={{ animationDelay: `${i * 0.2}s` }}>
+                                    <div className="bg-white dark:bg-surface-800/50 dark:backdrop-blur-xl rounded-2xl p-8 shadow-sm dark:shadow-card-dark border border-surface-200 dark:border-surface-700 hover:-translate-y-1 hover:shadow-lg dark:hover:shadow-green-glow hover:border-primary-200 dark:hover:border-primary-500/30 hover:animate-sway transition-all">
+                                        <div className="w-12 h-12 bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-500/15 dark:to-primary-500/5 rounded-xl flex items-center justify-center text-primary-600 dark:text-primary-400 mb-5 animate-float" style={{ animationDelay: `${i * 0.2}s` }}>
                                             <feature.icon className="w-6 h-6" />
                                         </div>
-                                        <h3 className="font-display text-lg font-semibold text-surface-900 mb-2">
+                                        <h3 className="font-display text-lg font-semibold text-surface-900 dark:text-white mb-2">
                                             {feature.title}
                                         </h3>
-                                        <p className="text-[0.95rem] text-surface-500 leading-relaxed">
+                                        <p className="text-[0.95rem] text-surface-500 dark:text-surface-400 leading-relaxed">
                                             {feature.description}
                                         </p>
                                     </div>
@@ -624,20 +638,20 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
                 </section>
 
                 {/* Wave separator */}
-                <WaveSeparator fillColor="#fafaf8" flip />
+                <WaveSeparator lightColor="#fafaf8" darkColor="#1a1a1a" flip />
 
                 {/* How It Works */}
-                <section id="how-it-works" className="py-24">
+                <section id="how-it-works" className="py-24 dark:bg-[#1a1a1a]">
                     <div className="max-w-[1200px] mx-auto px-8">
                         <AnimatedSection>
                             <div className="text-center mb-16">
-                                <span className="inline-flex items-center px-4 py-1.5 bg-primary-50 text-primary-600 text-[0.8rem] font-semibold rounded-full uppercase tracking-wide mb-4">
+                                <span className="inline-flex items-center px-4 py-1.5 bg-primary-50 dark:bg-primary-500/10 dark:border dark:border-primary-500/20 text-primary-600 dark:text-primary-400 text-[0.8rem] font-semibold rounded-full uppercase tracking-wide mb-4">
                                     {t.howItWorks.label}
                                 </span>
-                                <h2 className="font-display text-display-sm font-bold text-surface-900 mb-4">
+                                <h2 className="font-display text-display-sm font-bold text-surface-900 dark:text-white mb-4">
                                     {t.howItWorks.title}
                                 </h2>
-                                <p className="text-lg text-surface-500 max-w-[600px] mx-auto">
+                                <p className="text-lg text-surface-500 dark:text-surface-400 max-w-[600px] mx-auto">
                                     {t.howItWorks.subtitle}
                                 </p>
                             </div>
@@ -648,15 +662,15 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
                                 <AnimatedSection key={i} delay={i * 100}>
                                     <div className="text-center relative">
                                         {i < steps.length - 1 && (
-                                            <div className="hidden lg:block absolute top-7 left-1/2 w-full h-0.5 bg-gradient-to-r from-primary-200 to-primary-500" />
+                                            <div className="hidden lg:block absolute top-7 left-1/2 w-full h-0.5 bg-gradient-to-r from-primary-200 to-primary-500 dark:from-primary-500/30 dark:to-primary-500" />
                                         )}
-                                        <div className="relative w-14 h-14 bg-gradient-to-br from-primary-500 to-primary-600 text-white rounded-full flex items-center justify-center font-display text-2xl font-bold mx-auto mb-5 shadow-green">
+                                        <div className="relative w-14 h-14 bg-gradient-to-br from-primary-500 to-primary-600 text-white rounded-full flex items-center justify-center font-display text-2xl font-bold mx-auto mb-5 shadow-green dark:shadow-green-glow">
                                             {step.number}
                                         </div>
-                                        <h3 className="font-display text-lg font-semibold text-surface-900 mb-2">
+                                        <h3 className="font-display text-lg font-semibold text-surface-900 dark:text-white mb-2">
                                             {step.title}
                                         </h3>
-                                        <p className="text-[0.9rem] text-surface-500">
+                                        <p className="text-[0.9rem] text-surface-500 dark:text-surface-400">
                                             {step.description}
                                         </p>
                                     </div>
@@ -667,17 +681,17 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
                 </section>
 
                 {/* Pricing */}
-                <section id="pricing" className="py-24 bg-surface-100">
+                <section id="pricing" className="py-24 bg-surface-100 dark:bg-surface-900">
                     <div className="max-w-[1000px] mx-auto px-8">
                         <AnimatedSection>
                             <div className="text-center mb-16">
-                                <span className="inline-flex items-center px-4 py-1.5 bg-primary-50 text-primary-600 text-[0.8rem] font-semibold rounded-full uppercase tracking-wide mb-4">
+                                <span className="inline-flex items-center px-4 py-1.5 bg-primary-50 dark:bg-primary-500/10 dark:border dark:border-primary-500/20 text-primary-600 dark:text-primary-400 text-[0.8rem] font-semibold rounded-full uppercase tracking-wide mb-4">
                                     {t.pricing.label}
                                 </span>
-                                <h2 className="font-display text-display-sm font-bold text-surface-900 mb-4">
+                                <h2 className="font-display text-display-sm font-bold text-surface-900 dark:text-white mb-4">
                                     {t.pricing.title}
                                 </h2>
-                                <p className="text-lg text-surface-500 max-w-[600px] mx-auto">
+                                <p className="text-lg text-surface-500 dark:text-surface-400 max-w-[600px] mx-auto">
                                     {t.pricing.subtitle}
                                 </p>
                             </div>
@@ -687,33 +701,33 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
                             {pricingPlans.map((plan, i) => (
                                 <AnimatedSection key={i} delay={i * 100}>
                                     <div
-                                        className={`relative bg-white rounded-[20px] p-10 shadow-md transition-all hover:-translate-y-1 ${
+                                        className={`relative bg-white dark:bg-surface-800/50 dark:backdrop-blur-xl rounded-[20px] p-10 shadow-md dark:shadow-card-dark transition-all hover:-translate-y-1 ${
                                             plan.featured
-                                                ? 'border-2 border-primary-500 shadow-lg ring-4 ring-primary-100'
-                                                : 'border border-surface-200'
+                                                ? 'border-2 border-primary-500 shadow-lg dark:shadow-green-glow ring-4 ring-primary-100 dark:ring-primary-500/10'
+                                                : 'border border-surface-200 dark:border-surface-700'
                                         }`}
                                     >
                                         {plan.popular && (
-                                            <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-primary-500 to-primary-600 text-white text-xs font-semibold rounded-full uppercase tracking-wide">
+                                            <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-primary-500 to-primary-600 text-white text-xs font-semibold rounded-full uppercase tracking-wide shadow-green dark:shadow-green-glow">
                                                 {plan.popular}
                                             </div>
                                         )}
                                         <div className="mb-6">
-                                            <h3 className="font-display text-[1.35rem] font-semibold text-surface-900 mb-1">
+                                            <h3 className="font-display text-[1.35rem] font-semibold text-surface-900 dark:text-white mb-1">
                                                 {plan.name}
                                             </h3>
-                                            <p className="text-[0.9rem] text-surface-500">{plan.description}</p>
+                                            <p className="text-[0.9rem] text-surface-500 dark:text-surface-400">{plan.description}</p>
                                         </div>
                                         <div className="mb-6">
-                                            <span className="font-display text-[3rem] font-bold text-surface-900">
+                                            <span className="font-display text-[3rem] font-bold text-surface-900 dark:text-white">
                                                 ${plan.price}
                                             </span>
-                                            <span className="text-surface-500">{t.pricing.perMonth}</span>
+                                            <span className="text-surface-500 dark:text-surface-400">{t.pricing.perMonth}</span>
                                         </div>
                                         <ul className="space-y-3 mb-8">
                                             {plan.features.map((feature: string, j: number) => (
-                                                <li key={j} className="flex items-center gap-3 text-[0.95rem] text-surface-700">
-                                                    <Check className="w-5 h-5 text-primary-500 flex-shrink-0" />
+                                                <li key={j} className="flex items-center gap-3 text-[0.95rem] text-surface-700 dark:text-surface-300">
+                                                    <Check className="w-5 h-5 text-primary-500 dark:text-primary-400 flex-shrink-0" />
                                                     {feature}
                                                 </li>
                                             ))}
@@ -722,8 +736,8 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
                                             href={route('register')}
                                             className={`block w-full text-center py-3.5 font-semibold rounded-xl transition-all ${
                                                 plan.featured
-                                                    ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-green hover:shadow-green-lg'
-                                                    : 'border-2 border-surface-200 text-surface-900 hover:border-primary-500 hover:text-primary-600'
+                                                    ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-green dark:shadow-green-glow hover:shadow-green-lg dark:hover:shadow-green-glow-lg'
+                                                    : 'border-2 border-surface-200 dark:border-surface-700 text-surface-900 dark:text-white hover:border-primary-500 dark:hover:border-primary-400 hover:text-primary-600 dark:hover:text-primary-400'
                                             }`}
                                         >
                                             {plan.cta}
@@ -736,20 +750,20 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
                 </section>
 
                 {/* Wave separator */}
-                <WaveSeparator fillColor="#fafaf8" flip />
+                <WaveSeparator lightColor="#fafaf8" darkColor="#1a1a1a" flip />
 
                 {/* Testimonials */}
-                <section className="py-24">
+                <section className="py-24 dark:bg-[#1a1a1a]">
                     <div className="max-w-[1200px] mx-auto px-8">
                         <AnimatedSection>
                             <div className="text-center mb-16">
-                                <span className="inline-flex items-center px-4 py-1.5 bg-primary-50 text-primary-600 text-[0.8rem] font-semibold rounded-full uppercase tracking-wide mb-4">
+                                <span className="inline-flex items-center px-4 py-1.5 bg-primary-50 dark:bg-primary-500/10 dark:border dark:border-primary-500/20 text-primary-600 dark:text-primary-400 text-[0.8rem] font-semibold rounded-full uppercase tracking-wide mb-4">
                                     {t.testimonials.label}
                                 </span>
-                                <h2 className="font-display text-display-sm font-bold text-surface-900 mb-4">
+                                <h2 className="font-display text-display-sm font-bold text-surface-900 dark:text-white mb-4">
                                     {t.testimonials.title}
                                 </h2>
-                                <p className="text-lg text-surface-500 max-w-[600px] mx-auto">
+                                <p className="text-lg text-surface-500 dark:text-surface-400 max-w-[600px] mx-auto">
                                     {t.testimonials.subtitle}
                                 </p>
                             </div>
@@ -758,25 +772,25 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
                         <div className="grid md:grid-cols-3 gap-6">
                             {testimonials.map((testimonial, i) => (
                                 <AnimatedSection key={i} delay={i * 100}>
-                                    <div className="bg-white rounded-2xl p-8 shadow-sm border border-surface-200">
+                                    <div className="bg-white dark:bg-surface-800/50 dark:backdrop-blur-xl rounded-2xl p-8 shadow-sm dark:shadow-card-dark border border-surface-200 dark:border-surface-700">
                                         <div className="flex gap-1 mb-4 text-yellow-400">
                                             {[...Array(5)].map((_, j) => (
                                                 <Star key={j} className="w-5 h-5 fill-current" />
                                             ))}
                                         </div>
-                                        <p className="text-surface-700 leading-relaxed mb-6">
+                                        <p className="text-surface-700 dark:text-surface-300 leading-relaxed mb-6">
                                             "{testimonial.quote}"
                                         </p>
                                         <div className="flex items-center gap-3">
-                                            <div className="w-11 h-11 bg-gradient-to-br from-primary-100 to-primary-200 rounded-full flex items-center justify-center font-semibold text-primary-700">
+                                            <div className="w-11 h-11 bg-gradient-to-br from-primary-100 to-primary-200 dark:from-primary-500/20 dark:to-primary-500/10 rounded-full flex items-center justify-center font-semibold text-primary-700 dark:text-primary-400">
                                                 {testimonial.author
                                                     .split(' ')
                                                     .map((n: string) => n[0])
                                                     .join('')}
                                             </div>
                                             <div>
-                                                <div className="font-semibold text-surface-900">{testimonial.author}</div>
-                                                <div className="text-[0.85rem] text-surface-500">
+                                                <div className="font-semibold text-surface-900 dark:text-white">{testimonial.author}</div>
+                                                <div className="text-[0.85rem] text-surface-500 dark:text-surface-400">
                                                     {testimonial.role}, {testimonial.company}
                                                 </div>
                                             </div>
@@ -789,17 +803,17 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
                 </section>
 
                 {/* Wave separator */}
-                <WaveSeparator fillColor="#f5f4f0" />
+                <WaveSeparator lightColor="#f5f4f0" darkColor="#1a1a1a" />
 
                 {/* FAQ */}
-                <section id="faq" className="py-24 bg-surface-100">
+                <section id="faq" className="py-24 bg-surface-100 dark:bg-surface-900">
                     <div className="max-w-[900px] mx-auto px-8">
                         <AnimatedSection>
                             <div className="text-center mb-16">
-                                <span className="inline-flex items-center px-4 py-1.5 bg-primary-50 text-primary-600 text-[0.8rem] font-semibold rounded-full uppercase tracking-wide mb-4">
+                                <span className="inline-flex items-center px-4 py-1.5 bg-primary-50 dark:bg-primary-500/10 dark:border dark:border-primary-500/20 text-primary-600 dark:text-primary-400 text-[0.8rem] font-semibold rounded-full uppercase tracking-wide mb-4">
                                     {t.faq.label}
                                 </span>
-                                <h2 className="font-display text-display-sm font-bold text-surface-900">
+                                <h2 className="font-display text-display-sm font-bold text-surface-900 dark:text-white">
                                     {t.faq.title}
                                 </h2>
                             </div>
@@ -808,11 +822,11 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
                         <div className="grid md:grid-cols-2 gap-6">
                             {faqs.map((faq, i) => (
                                 <AnimatedSection key={i} delay={i * 50}>
-                                    <div className="bg-white rounded-xl p-6 shadow-sm">
-                                        <h3 className="font-display text-[1.05rem] font-semibold text-surface-900 mb-3">
+                                    <div className="bg-white dark:bg-surface-800/50 dark:backdrop-blur-xl rounded-xl p-6 shadow-sm dark:shadow-card-dark border border-transparent dark:border-surface-700">
+                                        <h3 className="font-display text-[1.05rem] font-semibold text-surface-900 dark:text-white mb-3">
                                             {faq.question}
                                         </h3>
-                                        <p className="text-[0.95rem] text-surface-500 leading-relaxed">
+                                        <p className="text-[0.95rem] text-surface-500 dark:text-surface-400 leading-relaxed">
                                             {faq.answer}
                                         </p>
                                     </div>
@@ -823,12 +837,12 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
                 </section>
 
                 {/* CTA */}
-                <section className="py-24">
+                <section className="py-24 dark:bg-[#1a1a1a]">
                     <div className="max-w-[1200px] mx-auto px-8">
                         <AnimatedSection>
-                            <div className="bg-surface-900 rounded-3xl p-16 text-center relative overflow-hidden">
+                            <div className="bg-surface-900 dark:bg-surface-800/80 dark:backdrop-blur-xl dark:border dark:border-surface-700 rounded-3xl p-16 text-center relative overflow-hidden">
                                 {/* Background glow */}
-                                <div className="absolute inset-0 opacity-15">
+                                <div className="absolute inset-0 opacity-15 dark:opacity-25">
                                     <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary-500 rounded-full blur-3xl" />
                                     <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-primary-500 rounded-full blur-3xl" />
                                 </div>
@@ -841,7 +855,7 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
                                     </p>
                                     <Link
                                         href={route('register')}
-                                        className="inline-flex items-center gap-2 px-10 py-4 bg-gradient-to-r from-primary-500 to-primary-600 text-white text-base font-semibold rounded-xl shadow-green hover:shadow-green-lg hover:-translate-y-0.5 transition-all"
+                                        className="inline-flex items-center gap-2 px-10 py-4 bg-gradient-to-r from-primary-500 to-primary-600 text-white text-base font-semibold rounded-xl shadow-green dark:shadow-green-glow hover:shadow-green-lg dark:hover:shadow-green-glow-lg hover:-translate-y-0.5 transition-all"
                                     >
                                         {t.cta.button}
                                         <ArrowRight className="w-5 h-5" />

@@ -42,10 +42,10 @@ export default function DeleteUserForm() {
 
     return (
         <>
-            <div className="rounded-xl bg-red-50 border border-red-200 p-4 mb-5">
+            <div className="rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 p-4 mb-5">
                 <div className="flex gap-3">
-                    <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
-                    <p className="text-sm text-red-800">
+                    <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+                    <p className="text-sm text-red-800 dark:text-red-300">
                         Une fois votre compte supprimé, toutes ses ressources et données seront
                         définitivement effacées. Avant de supprimer votre compte, veuillez télécharger
                         toutes les données que vous souhaitez conserver.
@@ -71,27 +71,27 @@ export default function DeleteUserForm() {
             {confirmingUserDeletion && (
                 <div className="fixed inset-0 z-50 overflow-y-auto">
                     <div
-                        className="fixed inset-0 bg-surface-900/50 backdrop-blur-sm"
+                        className="fixed inset-0 bg-surface-900/50 dark:bg-black/70 backdrop-blur-sm"
                         onClick={closeModal}
                     />
                     <div className="flex min-h-full items-center justify-center p-4">
-                        <div className="relative w-full max-w-lg transform rounded-2xl bg-white p-6 shadow-xl transition-all">
+                        <div className="relative w-full max-w-lg transform rounded-2xl bg-white dark:bg-surface-900 p-6 shadow-xl dark:shadow-card-dark border dark:border-surface-800 transition-all">
                             <button
                                 onClick={closeModal}
-                                className="absolute right-4 top-4 p-2 text-surface-400 hover:text-surface-600 rounded-lg hover:bg-surface-100 transition-colors"
+                                className="absolute right-4 top-4 p-2 text-surface-400 hover:text-surface-600 dark:hover:text-white rounded-lg hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors"
                             >
                                 <X className="h-5 w-5" />
                             </button>
 
                             <div className="flex items-start gap-4 mb-6">
-                                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-red-100">
-                                    <AlertTriangle className="h-6 w-6 text-red-600" />
+                                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-red-100 dark:bg-red-500/15">
+                                    <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
                                 </div>
                                 <div>
-                                    <h3 className="font-display text-lg font-semibold text-surface-900">
+                                    <h3 className="font-display text-lg font-semibold text-surface-900 dark:text-white">
                                         Supprimer votre compte ?
                                     </h3>
-                                    <p className="mt-1 text-sm text-surface-500">
+                                    <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
                                         Cette action est irréversible. Toutes vos données seront
                                         définitivement supprimées.
                                     </p>
@@ -102,7 +102,7 @@ export default function DeleteUserForm() {
                                 <div className="mb-6">
                                     <label
                                         htmlFor="password"
-                                        className="block text-sm font-medium text-surface-700 mb-1.5"
+                                        className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5"
                                     >
                                         Confirmez votre mot de passe
                                     </label>
@@ -113,18 +113,18 @@ export default function DeleteUserForm() {
                                         value={data.password}
                                         onChange={(e) => setData('password', e.target.value)}
                                         className={clsx(
-                                            'block w-full rounded-xl border px-4 py-2.5 text-surface-900',
+                                            'block w-full rounded-xl border px-4 py-2.5 text-surface-900 dark:text-white',
                                             'placeholder:text-surface-400',
                                             'focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500',
                                             'transition-colors',
                                             errors.password
-                                                ? 'border-red-300 bg-red-50'
-                                                : 'border-surface-300 bg-white'
+                                                ? 'border-red-300 dark:border-red-500/30 bg-red-50 dark:bg-red-500/10'
+                                                : 'border-surface-300 dark:border-surface-700 bg-white dark:bg-surface-800'
                                         )}
                                         placeholder="Mot de passe"
                                     />
                                     {errors.password && (
-                                        <p className="mt-1.5 text-sm text-red-600">{errors.password}</p>
+                                        <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">{errors.password}</p>
                                     )}
                                 </div>
 
@@ -134,8 +134,8 @@ export default function DeleteUserForm() {
                                         onClick={closeModal}
                                         className={clsx(
                                             'inline-flex items-center rounded-xl px-5 py-2.5',
-                                            'text-sm font-semibold text-surface-700',
-                                            'bg-surface-100 hover:bg-surface-200',
+                                            'text-sm font-semibold text-surface-700 dark:text-surface-300',
+                                            'bg-surface-100 dark:bg-surface-800 hover:bg-surface-200 dark:hover:bg-surface-700',
                                             'focus:outline-none focus:ring-2 focus:ring-surface-500/50',
                                             'transition-all'
                                         )}

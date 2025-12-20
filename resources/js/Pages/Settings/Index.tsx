@@ -47,10 +47,10 @@ const settingsLinks = [
 ];
 
 const PLAN_CONFIG = {
-    free: { label: 'Gratuit', color: 'bg-surface-100 text-surface-700' },
-    starter: { label: 'Starter', color: 'bg-blue-50 text-blue-700' },
-    pro: { label: 'Pro', color: 'bg-primary-50 text-primary-700' },
-    enterprise: { label: 'Enterprise', color: 'bg-purple-50 text-purple-700' },
+    free: { label: 'Gratuit', color: 'bg-surface-100 text-surface-700 dark:bg-surface-800 dark:text-surface-300' },
+    starter: { label: 'Starter', color: 'bg-blue-50 text-blue-700 dark:bg-blue-500/15 dark:text-blue-400' },
+    pro: { label: 'Pro', color: 'bg-primary-50 text-primary-700 dark:bg-primary-500/15 dark:text-primary-400' },
+    enterprise: { label: 'Enterprise', color: 'bg-purple-50 text-purple-700 dark:bg-purple-500/15 dark:text-purple-400' },
 };
 
 export default function SettingsIndex({ team }: SettingsIndexProps) {
@@ -59,10 +59,10 @@ export default function SettingsIndex({ team }: SettingsIndexProps) {
 
     const getColorClasses = (color: string) => {
         const colors: Record<string, { iconBg: string; icon: string }> = {
-            primary: { iconBg: 'bg-primary-100', icon: 'text-primary-600' },
-            blue: { iconBg: 'bg-blue-100', icon: 'text-blue-600' },
-            purple: { iconBg: 'bg-purple-100', icon: 'text-purple-600' },
-            amber: { iconBg: 'bg-amber-100', icon: 'text-amber-600' },
+            primary: { iconBg: 'bg-primary-100 dark:bg-primary-500/15', icon: 'text-primary-600 dark:text-primary-400' },
+            blue: { iconBg: 'bg-blue-100 dark:bg-blue-500/15', icon: 'text-blue-600 dark:text-blue-400' },
+            purple: { iconBg: 'bg-purple-100 dark:bg-purple-500/15', icon: 'text-purple-600 dark:text-purple-400' },
+            amber: { iconBg: 'bg-amber-100 dark:bg-amber-500/15', icon: 'text-amber-600 dark:text-amber-400' },
         };
         return colors[color] || colors.primary;
     };
@@ -71,8 +71,8 @@ export default function SettingsIndex({ team }: SettingsIndexProps) {
         <AppLayout
             header={
                 <div>
-                    <h1 className="font-display text-2xl font-bold text-surface-900">Paramètres</h1>
-                    <p className="mt-1 text-sm text-surface-500">
+                    <h1 className="font-display text-2xl font-bold text-surface-900 dark:text-white">Paramètres</h1>
+                    <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
                         Gérez votre compte et vos préférences
                     </p>
                 </div>
@@ -81,11 +81,11 @@ export default function SettingsIndex({ team }: SettingsIndexProps) {
             <Head title="Paramètres" />
 
             {/* Current Plan Card */}
-            <div className="bg-white rounded-2xl border border-surface-200 p-6 mb-8">
+            <div className="bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 p-6 mb-8">
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                     <div>
                         <div className="flex items-center gap-3">
-                            <h2 className="font-display text-lg font-semibold text-surface-900">
+                            <h2 className="font-display text-lg font-semibold text-surface-900 dark:text-white">
                                 Plan actuel
                             </h2>
                             <span className={clsx(
@@ -96,17 +96,17 @@ export default function SettingsIndex({ team }: SettingsIndexProps) {
                                 {planConfig.label}
                             </span>
                         </div>
-                        <p className="mt-1 text-sm text-surface-500">
+                        <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
                             {team.articles_limit - team.articles_generated_count} articles restants ce mois-ci
                         </p>
                     </div>
                     <div className="flex flex-col items-start sm:items-end gap-3">
                         <div className="text-right">
-                            <p className="font-display text-2xl font-bold text-surface-900">
+                            <p className="font-display text-2xl font-bold text-surface-900 dark:text-white">
                                 {team.articles_generated_count}
                                 <span className="text-lg font-normal text-surface-400"> / {team.articles_limit}</span>
                             </p>
-                            <p className="text-xs text-surface-500">articles ce mois</p>
+                            <p className="text-xs text-surface-500 dark:text-surface-400">articles ce mois</p>
                         </div>
                         <Link
                             href={route('settings.billing')}
@@ -114,7 +114,7 @@ export default function SettingsIndex({ team }: SettingsIndexProps) {
                                 'inline-flex items-center gap-1.5 rounded-lg px-4 py-2',
                                 'text-sm font-semibold',
                                 'bg-gradient-to-r from-primary-500 to-primary-600 text-white',
-                                'shadow-green hover:shadow-green-lg hover:-translate-y-0.5',
+                                'shadow-green dark:shadow-green-glow hover:shadow-green-lg hover:-translate-y-0.5',
                                 'transition-all'
                             )}
                         >
@@ -124,11 +124,11 @@ export default function SettingsIndex({ team }: SettingsIndexProps) {
                     </div>
                 </div>
                 <div className="mt-5">
-                    <div className="flex justify-between text-xs text-surface-500 mb-2">
+                    <div className="flex justify-between text-xs text-surface-500 dark:text-surface-400 mb-2">
                         <span>{usagePercentage}% utilisé</span>
                         <span>{team.articles_limit - team.articles_generated_count} restants</span>
                     </div>
-                    <div className="h-2.5 w-full rounded-full bg-surface-100">
+                    <div className="h-2.5 w-full rounded-full bg-surface-100 dark:bg-surface-800">
                         <div
                             className={clsx(
                                 'h-2.5 rounded-full transition-all',
@@ -149,7 +149,7 @@ export default function SettingsIndex({ team }: SettingsIndexProps) {
                         <Link
                             key={item.name}
                             href={route(item.href)}
-                            className="group bg-white rounded-2xl border border-surface-200 p-5 hover:shadow-lg hover:border-primary-200 transition-all"
+                            className="group bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 p-5 hover:shadow-lg hover:border-primary-200 dark:hover:border-primary-800 transition-all"
                         >
                             <div className="flex items-start gap-4">
                                 <div className={clsx(
@@ -161,12 +161,12 @@ export default function SettingsIndex({ team }: SettingsIndexProps) {
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center justify-between">
-                                        <h3 className="font-display font-semibold text-surface-900 group-hover:text-primary-600 transition-colors">
+                                        <h3 className="font-display font-semibold text-surface-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
                                             {item.name}
                                         </h3>
-                                        <ChevronRight className="h-4 w-4 text-surface-300 group-hover:text-primary-500 group-hover:translate-x-0.5 transition-all" />
+                                        <ChevronRight className="h-4 w-4 text-surface-300 dark:text-surface-600 group-hover:text-primary-500 dark:group-hover:text-primary-400 group-hover:translate-x-0.5 transition-all" />
                                     </div>
-                                    <p className="mt-1 text-sm text-surface-500 line-clamp-2">
+                                    <p className="mt-1 text-sm text-surface-500 dark:text-surface-400 line-clamp-2">
                                         {item.description}
                                     </p>
                                 </div>

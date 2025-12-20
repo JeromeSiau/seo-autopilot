@@ -59,21 +59,21 @@ export default function Step4Config({ siteId, team, onNext, onBack }: Props) {
         <form onSubmit={handleSubmit} className="space-y-6">
             {/* Header */}
             <div className="text-center">
-                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-100 to-amber-200">
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-100 to-amber-200 dark:from-amber-500/20 dark:to-amber-500/10">
                     <Settings className="h-7 w-7 text-amber-600" />
                 </div>
-                <h2 className="mt-4 font-display text-2xl font-bold text-surface-900">
+                <h2 className="mt-4 font-display text-2xl font-bold text-surface-900 dark:text-white">
                     Configuration Autopilot
                 </h2>
-                <p className="mt-2 text-surface-500">
+                <p className="mt-2 text-surface-500 dark:text-surface-400">
                     Définissez le rythme de publication
                 </p>
             </div>
 
             {/* Articles per Week */}
-            <div className="rounded-xl bg-surface-50 p-5">
+            <div className="rounded-xl bg-surface-50 dark:bg-surface-800/50 p-5">
                 <div className="flex items-center justify-between mb-4">
-                    <label className="text-sm font-medium text-surface-700">
+                    <label className="text-sm font-medium text-surface-700 dark:text-surface-300">
                         Articles par semaine
                     </label>
                     <span className="font-display text-2xl font-bold text-primary-600">
@@ -86,7 +86,7 @@ export default function Step4Config({ siteId, team, onNext, onBack }: Props) {
                     max={maxPerWeek}
                     value={data.articles_per_week}
                     onChange={(e) => setData({ ...data, articles_per_week: parseInt(e.target.value) })}
-                    className="w-full h-2 bg-surface-200 rounded-full appearance-none cursor-pointer
+                    className="w-full h-2 bg-surface-200 dark:bg-surface-700 rounded-full appearance-none cursor-pointer
                         [&::-webkit-slider-thumb]:appearance-none
                         [&::-webkit-slider-thumb]:h-5
                         [&::-webkit-slider-thumb]:w-5
@@ -97,7 +97,7 @@ export default function Step4Config({ siteId, team, onNext, onBack }: Props) {
                         [&::-webkit-slider-thumb]:transition-transform
                         [&::-webkit-slider-thumb]:hover:scale-110"
                 />
-                <div className="mt-2 flex justify-between text-xs text-surface-500">
+                <div className="mt-2 flex justify-between text-xs text-surface-500 dark:text-surface-400">
                     <span>1 article</span>
                     <span>{maxPerWeek} articles</span>
                 </div>
@@ -105,7 +105,7 @@ export default function Step4Config({ siteId, team, onNext, onBack }: Props) {
 
             {/* Publish Days */}
             <div>
-                <label className="block text-sm font-medium text-surface-700 mb-3">
+                <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-3">
                     Jours de publication
                 </label>
                 <div className="flex gap-2">
@@ -119,21 +119,21 @@ export default function Step4Config({ siteId, team, onNext, onBack }: Props) {
                                 'flex-1 rounded-xl py-3 text-sm font-semibold transition-all',
                                 data.publish_days.includes(day.key)
                                     ? 'bg-primary-500 text-white shadow-green'
-                                    : 'bg-surface-100 text-surface-500 hover:bg-surface-200'
+                                    : 'bg-surface-100 dark:bg-surface-800 text-surface-500 dark:text-surface-400 hover:bg-surface-200 dark:hover:bg-surface-700'
                             )}
                         >
                             {day.label}
                         </button>
                     ))}
                 </div>
-                <p className="mt-2 text-xs text-surface-500">
+                <p className="mt-2 text-xs text-surface-500 dark:text-surface-400">
                     {data.publish_days.length} jour{data.publish_days.length > 1 ? 's' : ''} sélectionné{data.publish_days.length > 1 ? 's' : ''}
                 </p>
             </div>
 
             {/* Publish Mode */}
             <div>
-                <label className="block text-sm font-medium text-surface-700 mb-3">
+                <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-3">
                     Mode de publication
                 </label>
                 <div className="space-y-3">
@@ -141,8 +141,8 @@ export default function Step4Config({ siteId, team, onNext, onBack }: Props) {
                         className={clsx(
                             'flex items-start gap-4 rounded-xl border p-4 cursor-pointer transition-all',
                             data.auto_publish
-                                ? 'border-primary-500 bg-primary-50/50 ring-2 ring-primary-500/20'
-                                : 'border-surface-200 hover:border-surface-300 hover:bg-surface-50'
+                                ? 'border-primary-500 bg-primary-50/50 dark:bg-primary-500/10 ring-2 ring-primary-500/20'
+                                : 'border-surface-200 dark:border-surface-700 hover:border-surface-300 dark:hover:border-surface-600 hover:bg-surface-50 dark:hover:bg-surface-800'
                         )}
                     >
                         <input
@@ -153,7 +153,7 @@ export default function Step4Config({ siteId, team, onNext, onBack }: Props) {
                         />
                         <div className={clsx(
                             'flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl',
-                            data.auto_publish ? 'bg-primary-100' : 'bg-surface-100'
+                            data.auto_publish ? 'bg-primary-100 dark:bg-primary-500/20' : 'bg-surface-100 dark:bg-surface-800'
                         )}>
                             <Zap className={clsx(
                                 'h-5 w-5',
@@ -164,15 +164,15 @@ export default function Step4Config({ siteId, team, onNext, onBack }: Props) {
                             <div className="flex items-center gap-2">
                                 <p className={clsx(
                                     'font-medium',
-                                    data.auto_publish ? 'text-primary-900' : 'text-surface-900'
+                                    data.auto_publish ? 'text-primary-900 dark:text-primary-400' : 'text-surface-900 dark:text-white'
                                 )}>
                                     Auto-publish
                                 </p>
-                                <span className="rounded-full bg-primary-100 px-2 py-0.5 text-xs font-medium text-primary-700">
+                                <span className="rounded-full bg-primary-100 dark:bg-primary-500/20 px-2 py-0.5 text-xs font-medium text-primary-700 dark:text-primary-400">
                                     Recommandé
                                 </span>
                             </div>
-                            <p className="mt-0.5 text-sm text-surface-500">
+                            <p className="mt-0.5 text-sm text-surface-500 dark:text-surface-400">
                                 Les articles sont publiés automatiquement selon le planning
                             </p>
                         </div>
@@ -182,8 +182,8 @@ export default function Step4Config({ siteId, team, onNext, onBack }: Props) {
                         className={clsx(
                             'flex items-start gap-4 rounded-xl border p-4 cursor-pointer transition-all',
                             !data.auto_publish
-                                ? 'border-primary-500 bg-primary-50/50 ring-2 ring-primary-500/20'
-                                : 'border-surface-200 hover:border-surface-300 hover:bg-surface-50'
+                                ? 'border-primary-500 bg-primary-50/50 dark:bg-primary-500/10 ring-2 ring-primary-500/20'
+                                : 'border-surface-200 dark:border-surface-700 hover:border-surface-300 dark:hover:border-surface-600 hover:bg-surface-50 dark:hover:bg-surface-800'
                         )}
                     >
                         <input
@@ -194,7 +194,7 @@ export default function Step4Config({ siteId, team, onNext, onBack }: Props) {
                         />
                         <div className={clsx(
                             'flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl',
-                            !data.auto_publish ? 'bg-primary-100' : 'bg-surface-100'
+                            !data.auto_publish ? 'bg-primary-100 dark:bg-primary-500/20' : 'bg-surface-100 dark:bg-surface-800'
                         )}>
                             <Eye className={clsx(
                                 'h-5 w-5',
@@ -204,11 +204,11 @@ export default function Step4Config({ siteId, team, onNext, onBack }: Props) {
                         <div>
                             <p className={clsx(
                                 'font-medium',
-                                !data.auto_publish ? 'text-primary-900' : 'text-surface-900'
+                                !data.auto_publish ? 'text-primary-900 dark:text-primary-400' : 'text-surface-900 dark:text-white'
                             )}>
                                 Review avant publication
                             </p>
-                            <p className="mt-0.5 text-sm text-surface-500">
+                            <p className="mt-0.5 text-sm text-surface-500 dark:text-surface-400">
                                 Validez chaque article avant publication
                             </p>
                         </div>
@@ -221,7 +221,7 @@ export default function Step4Config({ siteId, team, onNext, onBack }: Props) {
                 <button
                     type="button"
                     onClick={onBack}
-                    className="flex items-center gap-2 text-sm font-medium text-surface-600 hover:text-surface-900 transition-colors"
+                    className="flex items-center gap-2 text-sm font-medium text-surface-600 dark:text-surface-400 hover:text-surface-900 dark:hover:text-white transition-colors"
                 >
                     <ChevronLeft className="h-4 w-4" />
                     Retour

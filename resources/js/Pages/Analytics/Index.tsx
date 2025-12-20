@@ -88,9 +88,9 @@ export default function AnalyticsIndex({
 
     const getColorClasses = (color: string) => {
         const colors = {
-            primary: { text: 'text-primary-600', iconBg: 'bg-primary-100' },
-            blue: { text: 'text-blue-600', iconBg: 'bg-blue-100' },
-            purple: { text: 'text-purple-600', iconBg: 'bg-purple-100' },
+            primary: { text: 'text-primary-600', iconBg: 'bg-primary-100 dark:bg-primary-900/30' },
+            blue: { text: 'text-blue-600', iconBg: 'bg-blue-100 dark:bg-blue-900/30' },
+            purple: { text: 'text-purple-600', iconBg: 'bg-purple-100 dark:bg-purple-900/30' },
         };
         return colors[color as keyof typeof colors] || colors.primary;
     };
@@ -125,14 +125,14 @@ export default function AnalyticsIndex({
             header={
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <h1 className="font-display text-2xl font-bold text-surface-900">Analytics</h1>
-                        <p className="mt-1 text-sm text-surface-500">
+                        <h1 className="font-display text-2xl font-bold text-surface-900 dark:text-white">Analytics</h1>
+                        <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
                             Performances de recherche depuis Google Search Console
                         </p>
                     </div>
                     <div className="flex flex-wrap items-center gap-3">
                         {isAggregatedView && connectedSitesCount < totalSitesCount && (
-                            <div className="inline-flex items-center gap-1.5 rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700">
+                            <div className="inline-flex items-center gap-1.5 rounded-lg bg-blue-50 dark:bg-blue-900/30 px-3 py-1.5 text-xs font-medium text-blue-700 dark:text-blue-300">
                                 <Info className="h-3.5 w-3.5" />
                                 {connectedSitesCount}/{totalSitesCount} sites connectés
                             </div>
@@ -141,7 +141,7 @@ export default function AnalyticsIndex({
                             value={selectedSite?.id || ''}
                             onChange={(e) => handleSiteChange(e.target.value)}
                             className={clsx(
-                                'rounded-xl border border-surface-200 bg-white px-4 py-2.5 text-sm text-surface-700',
+                                'rounded-xl border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 px-4 py-2.5 text-sm text-surface-700 dark:text-surface-300',
                                 'focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500',
                                 'transition-colors'
                             )}
@@ -157,7 +157,7 @@ export default function AnalyticsIndex({
                             value={dateRange}
                             onChange={(e) => handleDateRangeChange(e.target.value)}
                             className={clsx(
-                                'rounded-xl border border-surface-200 bg-white px-4 py-2.5 text-sm text-surface-700',
+                                'rounded-xl border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 px-4 py-2.5 text-sm text-surface-700 dark:text-surface-300',
                                 'focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500',
                                 'transition-colors'
                             )}
@@ -174,14 +174,14 @@ export default function AnalyticsIndex({
 
             {!hasData ? (
                 selectedSite && !selectedSite.gsc_connected ? (
-                    <div className="bg-white rounded-2xl border border-surface-200 p-12 text-center">
-                        <div className="mx-auto w-14 h-14 rounded-2xl bg-surface-100 flex items-center justify-center mb-4">
+                    <div className="bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 p-12 text-center">
+                        <div className="mx-auto w-14 h-14 rounded-2xl bg-surface-100 dark:bg-surface-800 flex items-center justify-center mb-4">
                             <BarChart3 className="h-7 w-7 text-surface-400" />
                         </div>
-                        <h3 className="font-display font-semibold text-surface-900 mb-1">
+                        <h3 className="font-display font-semibold text-surface-900 dark:text-white mb-1">
                             Connectez Google Search Console
                         </h3>
-                        <p className="text-sm text-surface-500 max-w-sm mx-auto mb-6">
+                        <p className="text-sm text-surface-500 dark:text-surface-400 max-w-sm mx-auto mb-6">
                             Connectez GSC pour voir les données de performance de {selectedSite.domain}.
                         </p>
                         <Link
@@ -189,7 +189,7 @@ export default function AnalyticsIndex({
                             className={clsx(
                                 'inline-flex items-center gap-2 rounded-xl px-5 py-2.5',
                                 'bg-gradient-to-r from-primary-500 to-primary-600 text-white text-sm font-semibold',
-                                'shadow-green hover:shadow-green-lg',
+                                'shadow-green dark:shadow-green-glow hover:shadow-green-lg',
                                 'transition-all'
                             )}
                         >
@@ -197,14 +197,14 @@ export default function AnalyticsIndex({
                         </Link>
                     </div>
                 ) : (
-                    <div className="bg-white rounded-2xl border border-surface-200 p-12 text-center">
-                        <div className="mx-auto w-14 h-14 rounded-2xl bg-surface-100 flex items-center justify-center mb-4">
+                    <div className="bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 p-12 text-center">
+                        <div className="mx-auto w-14 h-14 rounded-2xl bg-surface-100 dark:bg-surface-800 flex items-center justify-center mb-4">
                             <BarChart3 className="h-7 w-7 text-surface-400" />
                         </div>
-                        <h3 className="font-display font-semibold text-surface-900 mb-1">
+                        <h3 className="font-display font-semibold text-surface-900 dark:text-white mb-1">
                             Aucun site connecté
                         </h3>
-                        <p className="text-sm text-surface-500 max-w-sm mx-auto mb-6">
+                        <p className="text-sm text-surface-500 dark:text-surface-400 max-w-sm mx-auto mb-6">
                             Connectez Google Search Console sur au moins un site pour voir les analytics.
                         </p>
                         <Link
@@ -212,7 +212,7 @@ export default function AnalyticsIndex({
                             className={clsx(
                                 'inline-flex items-center gap-2 rounded-xl px-5 py-2.5',
                                 'bg-gradient-to-r from-primary-500 to-primary-600 text-white text-sm font-semibold',
-                                'shadow-green hover:shadow-green-lg',
+                                'shadow-green dark:shadow-green-glow hover:shadow-green-lg',
                                 'transition-all'
                             )}
                         >
@@ -232,12 +232,12 @@ export default function AnalyticsIndex({
                             return (
                                 <div
                                     key={card.key}
-                                    className="bg-white rounded-2xl border border-surface-200 p-5 hover:shadow-md transition-shadow"
+                                    className="bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 p-5 hover:shadow-md transition-shadow"
                                 >
                                     <div className="flex items-start justify-between">
                                         <div>
-                                            <p className="text-sm font-medium text-surface-500">{card.label}</p>
-                                            <p className="mt-2 font-display text-2xl font-bold text-surface-900">
+                                            <p className="text-sm font-medium text-surface-500 dark:text-surface-400">{card.label}</p>
+                                            <p className="mt-2 font-display text-2xl font-bold text-surface-900 dark:text-white">
                                                 {value}
                                             </p>
                                             {trend !== null && (
@@ -261,10 +261,10 @@ export default function AnalyticsIndex({
 
                     {/* Chart */}
                     {analyticsData.length > 0 && (
-                        <div className="mt-6 bg-white rounded-2xl border border-surface-200 p-6">
+                        <div className="mt-6 bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 p-6">
                             <div className="mb-6">
-                                <h3 className="font-display font-semibold text-surface-900">Performance dans le temps</h3>
-                                <p className="text-sm text-surface-500">Clics et impressions</p>
+                                <h3 className="font-display font-semibold text-surface-900 dark:text-white">Performance dans le temps</h3>
+                                <p className="text-sm text-surface-500 dark:text-surface-400">Clics et impressions</p>
                             </div>
                             <div className="h-80">
                                 <ResponsiveContainer width="100%" height="100%">
@@ -279,15 +279,16 @@ export default function AnalyticsIndex({
                                                 <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
                                             </linearGradient>
                                         </defs>
-                                        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" className="dark:stroke-surface-800" />
                                         <XAxis
                                             dataKey="date"
                                             tickFormatter={(value) => format(new Date(value), 'd MMM', { locale: fr })}
                                             tick={{ fontSize: 12, fill: '#78716c' }}
                                             stroke="#e7e5e4"
+                                            className="dark:stroke-surface-700"
                                         />
-                                        <YAxis yAxisId="left" tick={{ fontSize: 12, fill: '#78716c' }} stroke="#e7e5e4" />
-                                        <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 12, fill: '#78716c' }} stroke="#e7e5e4" />
+                                        <YAxis yAxisId="left" tick={{ fontSize: 12, fill: '#78716c' }} stroke="#e7e5e4" className="dark:stroke-surface-700" />
+                                        <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 12, fill: '#78716c' }} stroke="#e7e5e4" className="dark:stroke-surface-700" />
                                         <Tooltip
                                             contentStyle={{
                                                 backgroundColor: 'white',
@@ -295,7 +296,22 @@ export default function AnalyticsIndex({
                                                 borderRadius: '12px',
                                                 boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
                                             }}
-                                            labelFormatter={(value) => format(new Date(value), 'd MMMM yyyy', { locale: fr })}
+                                            wrapperClassName="dark:[&_.recharts-tooltip-wrapper]:opacity-100"
+                                            content={(props) => {
+                                                if (!props.active || !props.payload) return null;
+                                                return (
+                                                    <div className="bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-xl p-3 shadow-lg">
+                                                        <p className="text-sm font-medium text-surface-900 dark:text-white mb-2">
+                                                            {props.label && format(new Date(props.label as string), 'd MMMM yyyy', { locale: fr })}
+                                                        </p>
+                                                        {props.payload.map((entry: any, index: number) => (
+                                                            <p key={index} className="text-sm text-surface-700 dark:text-surface-300">
+                                                                <span className="font-medium">{entry.name}:</span> {entry.value}
+                                                            </p>
+                                                        ))}
+                                                    </div>
+                                                );
+                                            }}
                                         />
                                         <Legend />
                                         <Area
@@ -327,44 +343,44 @@ export default function AnalyticsIndex({
                     {/* Tables */}
                     <div className="mt-6 grid gap-6 lg:grid-cols-2">
                         {/* Top Pages */}
-                        <div className="bg-white rounded-2xl border border-surface-200 overflow-hidden">
-                            <div className="border-b border-surface-100 px-6 py-4">
-                                <h3 className="font-display font-semibold text-surface-900">Top Pages</h3>
+                        <div className="bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 overflow-hidden">
+                            <div className="border-b border-surface-100 dark:border-surface-800 px-6 py-4">
+                                <h3 className="font-display font-semibold text-surface-900 dark:text-white">Top Pages</h3>
                             </div>
                             {isAggregatedView ? (
-                                <div className="px-6 py-8 text-center text-sm text-surface-500">
+                                <div className="px-6 py-8 text-center text-sm text-surface-500 dark:text-surface-400">
                                     Sélectionnez un site pour voir les top pages.
                                 </div>
                             ) : topPages.length === 0 ? (
-                                <div className="px-6 py-8 text-center text-sm text-surface-500">
+                                <div className="px-6 py-8 text-center text-sm text-surface-500 dark:text-surface-400">
                                     Aucune donnée disponible.
                                 </div>
                             ) : (
                                 <div className="overflow-x-auto">
                                     <table className="w-full">
                                         <thead>
-                                            <tr className="bg-surface-50/50">
-                                                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-surface-500">
+                                            <tr className="bg-surface-50/50 dark:bg-surface-800/50">
+                                                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-surface-500 dark:text-surface-400">
                                                     Page
                                                 </th>
-                                                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-surface-500">
+                                                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-surface-500 dark:text-surface-400">
                                                     Clics
                                                 </th>
-                                                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-surface-500">
+                                                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-surface-500 dark:text-surface-400">
                                                     Pos
                                                 </th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-surface-100">
+                                        <tbody className="divide-y divide-surface-100 dark:divide-surface-800">
                                             {topPages.slice(0, 10).map((page, index) => (
-                                                <tr key={index} className="hover:bg-surface-50/50 transition-colors">
-                                                    <td className="max-w-xs truncate px-4 py-3 text-sm text-surface-900">
+                                                <tr key={index} className="hover:bg-surface-50/50 dark:hover:bg-surface-800/50 transition-colors">
+                                                    <td className="max-w-xs truncate px-4 py-3 text-sm text-surface-900 dark:text-white">
                                                         {page.page}
                                                     </td>
-                                                    <td className="whitespace-nowrap px-4 py-3 text-right text-sm font-medium text-surface-700">
+                                                    <td className="whitespace-nowrap px-4 py-3 text-right text-sm font-medium text-surface-700 dark:text-surface-300">
                                                         {page.clicks.toLocaleString()}
                                                     </td>
-                                                    <td className="whitespace-nowrap px-4 py-3 text-right text-sm text-surface-500">
+                                                    <td className="whitespace-nowrap px-4 py-3 text-right text-sm text-surface-500 dark:text-surface-400">
                                                         {page.position.toFixed(1)}
                                                     </td>
                                                 </tr>
@@ -376,44 +392,44 @@ export default function AnalyticsIndex({
                         </div>
 
                         {/* Top Queries */}
-                        <div className="bg-white rounded-2xl border border-surface-200 overflow-hidden">
-                            <div className="border-b border-surface-100 px-6 py-4">
-                                <h3 className="font-display font-semibold text-surface-900">Top Requêtes</h3>
+                        <div className="bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 overflow-hidden">
+                            <div className="border-b border-surface-100 dark:border-surface-800 px-6 py-4">
+                                <h3 className="font-display font-semibold text-surface-900 dark:text-white">Top Requêtes</h3>
                             </div>
                             {isAggregatedView ? (
-                                <div className="px-6 py-8 text-center text-sm text-surface-500">
+                                <div className="px-6 py-8 text-center text-sm text-surface-500 dark:text-surface-400">
                                     Sélectionnez un site pour voir les top requêtes.
                                 </div>
                             ) : topQueries.length === 0 ? (
-                                <div className="px-6 py-8 text-center text-sm text-surface-500">
+                                <div className="px-6 py-8 text-center text-sm text-surface-500 dark:text-surface-400">
                                     Aucune donnée disponible.
                                 </div>
                             ) : (
                                 <div className="overflow-x-auto">
                                     <table className="w-full">
                                         <thead>
-                                            <tr className="bg-surface-50/50">
-                                                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-surface-500">
+                                            <tr className="bg-surface-50/50 dark:bg-surface-800/50">
+                                                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-surface-500 dark:text-surface-400">
                                                     Requête
                                                 </th>
-                                                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-surface-500">
+                                                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-surface-500 dark:text-surface-400">
                                                     Clics
                                                 </th>
-                                                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-surface-500">
+                                                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-surface-500 dark:text-surface-400">
                                                     Pos
                                                 </th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-surface-100">
+                                        <tbody className="divide-y divide-surface-100 dark:divide-surface-800">
                                             {topQueries.slice(0, 10).map((query, index) => (
-                                                <tr key={index} className="hover:bg-surface-50/50 transition-colors">
-                                                    <td className="max-w-xs truncate px-4 py-3 text-sm text-surface-900">
+                                                <tr key={index} className="hover:bg-surface-50/50 dark:hover:bg-surface-800/50 transition-colors">
+                                                    <td className="max-w-xs truncate px-4 py-3 text-sm text-surface-900 dark:text-white">
                                                         {query.query}
                                                     </td>
-                                                    <td className="whitespace-nowrap px-4 py-3 text-right text-sm font-medium text-surface-700">
+                                                    <td className="whitespace-nowrap px-4 py-3 text-right text-sm font-medium text-surface-700 dark:text-surface-300">
                                                         {query.clicks.toLocaleString()}
                                                     </td>
-                                                    <td className="whitespace-nowrap px-4 py-3 text-right text-sm text-surface-500">
+                                                    <td className="whitespace-nowrap px-4 py-3 text-right text-sm text-surface-500 dark:text-surface-400">
                                                         {query.position.toFixed(1)}
                                                     </td>
                                                 </tr>

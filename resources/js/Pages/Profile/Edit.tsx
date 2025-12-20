@@ -14,8 +14,8 @@ export default function Edit({
         <AppLayout
             header={
                 <div>
-                    <h1 className="font-display text-2xl font-bold text-surface-900">Profil</h1>
-                    <p className="mt-1 text-sm text-surface-500">
+                    <h1 className="font-display text-2xl font-bold text-surface-900 dark:text-white">Profil</h1>
+                    <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
                         Gérez vos informations personnelles et vos préférences de sécurité
                     </p>
                 </div>
@@ -25,16 +25,16 @@ export default function Edit({
 
             <div className="space-y-6">
                 {/* Profile Information */}
-                <div className="bg-white rounded-2xl border border-surface-200 p-6">
+                <div className="bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 p-6">
                     <div className="flex items-start gap-4 mb-6">
-                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-primary-100">
-                            <User className="h-6 w-6 text-primary-600" />
+                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-primary-100 dark:bg-primary-500/15">
+                            <User className="h-6 w-6 text-primary-600 dark:text-primary-400" />
                         </div>
                         <div>
-                            <h2 className="font-display text-lg font-semibold text-surface-900">
+                            <h2 className="font-display text-lg font-semibold text-surface-900 dark:text-white">
                                 Informations du profil
                             </h2>
-                            <p className="mt-1 text-sm text-surface-500">
+                            <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
                                 Mettez à jour votre nom et votre adresse email
                             </p>
                         </div>
@@ -46,16 +46,16 @@ export default function Edit({
                 </div>
 
                 {/* Password */}
-                <div className="bg-white rounded-2xl border border-surface-200 p-6">
+                <div className="bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 p-6">
                     <div className="flex items-start gap-4 mb-6">
-                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-blue-100">
-                            <Lock className="h-6 w-6 text-blue-600" />
+                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-500/15">
+                            <Lock className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                         </div>
                         <div>
-                            <h2 className="font-display text-lg font-semibold text-surface-900">
+                            <h2 className="font-display text-lg font-semibold text-surface-900 dark:text-white">
                                 Mot de passe
                             </h2>
-                            <p className="mt-1 text-sm text-surface-500">
+                            <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
                                 Assurez-vous d'utiliser un mot de passe long et sécurisé
                             </p>
                         </div>
@@ -64,16 +64,16 @@ export default function Edit({
                 </div>
 
                 {/* Delete Account */}
-                <div className="bg-white rounded-2xl border border-red-200 p-6">
+                <div className="bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-red-200 dark:border-red-500/20 p-6">
                     <div className="flex items-start gap-4 mb-6">
-                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-red-100">
-                            <Trash2 className="h-6 w-6 text-red-600" />
+                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-red-100 dark:bg-red-500/15">
+                            <Trash2 className="h-6 w-6 text-red-600 dark:text-red-400" />
                         </div>
                         <div>
-                            <h2 className="font-display text-lg font-semibold text-surface-900">
+                            <h2 className="font-display text-lg font-semibold text-surface-900 dark:text-white">
                                 Supprimer le compte
                             </h2>
-                            <p className="mt-1 text-sm text-surface-500">
+                            <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
                                 Supprimez définitivement votre compte et toutes vos données
                             </p>
                         </div>
