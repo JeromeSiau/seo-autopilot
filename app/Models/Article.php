@@ -23,6 +23,8 @@ class Article extends Model
         'error_message',
         'published_at',
         'published_url',
+        'published_remote_id',
+        'published_via',
         'llm_used',
         'generation_cost',
         'word_count',
