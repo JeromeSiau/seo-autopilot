@@ -100,12 +100,25 @@ class SiteCrawlerService
     private function importFromGSC(Site $site): int
     {
         try {
-            $pages = $this->searchConsole->getTopPages($site, 28, 100);
+            $endDate = now()->subDay()->format('Y-m-d');
+            $startDate = now()->subDays(28)->format('Y-m-d');
+
+            $pages = $this->searchConsole->getSearchAnalytics(
+                $site,
+                $startDate,
+                $endDate,
+                ['page'],
+                100
+            );
+
             $count = 0;
 
-            foreach ($pages as $page) {
+            foreach ($pages as $row) {
+                $pageUrl = $row->keys[0] ?? null;
+                if (!$pageUrl) continue;
+
                 SitePage::updateOrCreate(
-                    ['site_id' => $site->id, 'url' => $page->url],
+                    ['site_id' => $site->id, 'url' => $pageUrl],
                     ['source' => 'gsc', 'last_seen_at' => now()]
                 );
                 $count++;
