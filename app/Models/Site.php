@@ -83,6 +83,26 @@ class Site extends Model
         return $this->hasMany(AutopilotLog::class);
     }
 
+    public function pages(): HasMany
+    {
+        return $this->hasMany(SitePage::class);
+    }
+
+    public function scheduledArticles(): HasMany
+    {
+        return $this->hasMany(ScheduledArticle::class);
+    }
+
+    public function contentPlanGenerations(): HasMany
+    {
+        return $this->hasMany(ContentPlanGeneration::class);
+    }
+
+    public function latestContentPlanGeneration(): HasOne
+    {
+        return $this->hasOne(ContentPlanGeneration::class)->latestOfMany();
+    }
+
     public function isGscConnected(): bool
     {
         return !empty($this->gsc_token);
