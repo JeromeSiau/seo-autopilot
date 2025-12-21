@@ -17,7 +17,12 @@ class OpenAIProvider implements LLMProviderInterface
         'gpt-5-nano' => ['input' => 0.05, 'output' => 0.40],
         'gpt-4o' => ['input' => 5.00, 'output' => 15.00],
         'gpt-4o-mini' => ['input' => 0.15, 'output' => 0.60],
+        'o1' => ['input' => 15.00, 'output' => 60.00],
+        'o1-mini' => ['input' => 3.00, 'output' => 12.00],
     ];
+
+    // Models that use max_completion_tokens instead of max_tokens
+    private const REASONING_MODELS = ['o1', 'o1-mini', 'o1-preview', 'gpt-5', 'gpt-5-nano'];
 
     public function __construct(
         private readonly string $apiKey,
@@ -28,18 +33,27 @@ class OpenAIProvider implements LLMProviderInterface
     {
         $model = $options['model'] ?? $this->defaultModel;
         $startTime = microtime(true);
+        $isReasoningModel = in_array($model, self::REASONING_MODELS);
 
-        $response = Http::withHeaders([
-            'Authorization' => "Bearer {$this->apiKey}",
-            'Content-Type' => 'application/json',
-        ])->timeout(120)->post(self::API_URL, [
+        $requestBody = [
             'model' => $model,
             'messages' => [
                 ['role' => 'user', 'content' => $prompt],
             ],
-            'temperature' => $options['temperature'] ?? 0.7,
-            'max_tokens' => $options['max_tokens'] ?? 4096,
-        ]);
+        ];
+
+        // Reasoning models don't support temperature and use max_completion_tokens
+        if ($isReasoningModel) {
+            $requestBody['max_completion_tokens'] = $options['max_tokens'] ?? 4096;
+        } else {
+            $requestBody['temperature'] = $options['temperature'] ?? 0.7;
+            $requestBody['max_tokens'] = $options['max_tokens'] ?? 4096;
+        }
+
+        $response = Http::withHeaders([
+            'Authorization' => "Bearer {$this->apiKey}",
+            'Content-Type' => 'application/json',
+        ])->timeout(120)->post(self::API_URL, $requestBody);
 
         $latencyMs = (microtime(true) - $startTime) * 1000;
 
@@ -71,16 +85,23 @@ class OpenAIProvider implements LLMProviderInterface
     {
         $model = $options['model'] ?? $this->defaultModel;
         $startTime = microtime(true);
+        $isReasoningModel = in_array($model, self::REASONING_MODELS);
 
         $requestBody = [
             'model' => $model,
             'messages' => [
                 ['role' => 'user', 'content' => $prompt],
             ],
-            'temperature' => $options['temperature'] ?? 0.3,
-            'max_tokens' => $options['max_tokens'] ?? 4096,
             'response_format' => ['type' => 'json_object'],
         ];
+
+        // Reasoning models don't support temperature and use max_completion_tokens
+        if ($isReasoningModel) {
+            $requestBody['max_completion_tokens'] = $options['max_tokens'] ?? 4096;
+        } else {
+            $requestBody['temperature'] = $options['temperature'] ?? 0.3;
+            $requestBody['max_tokens'] = $options['max_tokens'] ?? 4096;
+        }
 
         $response = Http::withHeaders([
             'Authorization' => "Bearer {$this->apiKey}",
