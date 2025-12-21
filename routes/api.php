@@ -60,6 +60,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('sites/{site}/analytics', [AnalyticsController::class, 'dashboard']);
     Route::get('articles/{article}/analytics', [AnalyticsController::class, 'article']);
     Route::post('sites/{site}/analytics/sync', [AnalyticsController::class, 'sync']);
+
+    // Content Plan
+    Route::get('sites/{site}/generation-status', [\App\Http\Controllers\Api\ContentPlanController::class, 'generationStatus']);
+    Route::get('sites/{site}/content-plan', [\App\Http\Controllers\Api\ContentPlanController::class, 'contentPlan']);
 });
 
 // Google OAuth (doesn't require auth for callback)
