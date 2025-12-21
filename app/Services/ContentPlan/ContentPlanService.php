@@ -41,7 +41,7 @@ class ContentPlanService
                     'difficulty' => $keywordData['difficulty'] ?? null,
                     'score' => $keywordData['score'] ?? 0,
                     'source' => $keywordData['source'] ?? 'ai_generated',
-                    'status' => 'queued',
+                    'status' => 'scheduled',
                 ]
             );
 

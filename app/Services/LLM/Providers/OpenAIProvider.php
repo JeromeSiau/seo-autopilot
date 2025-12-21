@@ -13,20 +13,18 @@ class OpenAIProvider implements LLMProviderInterface
 
     // Pricing per 1M tokens (December 2025)
     private const PRICING = [
-        'gpt-5' => ['input' => 1.25, 'output' => 10.00],
-        'gpt-5-nano' => ['input' => 0.05, 'output' => 0.40],
-        'gpt-4o' => ['input' => 5.00, 'output' => 15.00],
+        'gpt-4o' => ['input' => 2.50, 'output' => 10.00],
         'gpt-4o-mini' => ['input' => 0.15, 'output' => 0.60],
         'o1' => ['input' => 15.00, 'output' => 60.00],
         'o1-mini' => ['input' => 3.00, 'output' => 12.00],
     ];
 
     // Models that use max_completion_tokens instead of max_tokens
-    private const REASONING_MODELS = ['o1', 'o1-mini', 'o1-preview', 'gpt-5', 'gpt-5-nano'];
+    private const REASONING_MODELS = ['o1', 'o1-mini', 'o1-preview'];
 
     public function __construct(
         private readonly string $apiKey,
-        private readonly string $defaultModel = 'gpt-5',
+        private readonly string $defaultModel = 'gpt-4o',
     ) {}
 
     public function complete(string $prompt, array $options = []): LLMResponse
@@ -146,7 +144,7 @@ class OpenAIProvider implements LLMProviderInterface
 
     public function calculateCost(string $model, int $inputTokens, int $outputTokens): float
     {
-        $pricing = self::PRICING[$model] ?? self::PRICING['gpt-5'];
+        $pricing = self::PRICING[$model] ?? self::PRICING['gpt-4o'];
 
         $inputCost = ($inputTokens / 1_000_000) * $pricing['input'];
         $outputCost = ($outputTokens / 1_000_000) * $pricing['output'];

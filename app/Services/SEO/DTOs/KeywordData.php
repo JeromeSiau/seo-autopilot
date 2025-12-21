@@ -31,12 +31,14 @@ readonly class KeywordData
 
     public static function fromDataForSEO(array $data): self
     {
+        $competition = $data['competition'] ?? null;
+
         return new self(
             keyword: $data['keyword'] ?? '',
-            volume: $data['search_volume'] ?? 0,
-            difficulty: $data['keyword_difficulty'] ?? 0,
-            cpc: $data['cpc'] ?? 0,
-            competition: $data['competition'] ?? null,
+            volume: (int) ($data['search_volume'] ?? 0),
+            difficulty: (float) ($data['keyword_difficulty'] ?? 0),
+            cpc: (float) ($data['cpc'] ?? 0),
+            competition: $competition !== null ? (float) $competition : null,
             trend: $data['monthly_searches'] ?? null,
             language: $data['language_code'] ?? null,
             location: $data['location_code'] ?? null,

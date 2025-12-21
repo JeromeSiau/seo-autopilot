@@ -151,7 +151,7 @@ Respond with ONLY the image prompt, nothing else. Keep it under 200 words.
 PROMPT;
 
         $response = $this->llm->complete('openai', $prompt, [
-            'model' => 'gpt-5-nano',
+            'model' => 'gpt-4o-mini',
             'temperature' => 0.8,
             'max_tokens' => 300,
         ]);

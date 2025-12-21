@@ -69,6 +69,7 @@ class ContentPlanGeneratorService
                     'existing_keywords' => $keywords->pluck('keyword')->toArray(),
                 ]);
                 $keywords = $keywords->merge($aiKeywords);
+                Log::info("Generated keywords via AI", ['count' => $aiKeywords->count()]);
                 $generation->markStepCompleted($stepIndex);
                 $stepIndex++;
             }

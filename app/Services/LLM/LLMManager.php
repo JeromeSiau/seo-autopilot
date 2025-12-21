@@ -108,7 +108,7 @@ class LLMManager
             ],
             'outline' => [
                 'provider' => 'openai',
-                'model' => 'gpt-5',
+                'model' => 'gpt-4o',
                 'json' => true,
             ],
             'write_section' => [
@@ -118,7 +118,7 @@ class LLMManager
             ],
             'polish' => [
                 'provider' => 'openai',
-                'model' => 'gpt-5-nano',
+                'model' => 'gpt-4o-mini',
                 'json' => true,
             ],
         ];

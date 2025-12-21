@@ -134,21 +134,23 @@ Generate diverse keyword ideas including:
 - Long-tail variations
 - Related topics
 
-Respond with a JSON array of objects, each with:
+Respond with a JSON object containing a "keywords" array. Each keyword object should have:
 - keyword: the search term
 - intent: informational, commercial, or transactional
 - topic_cluster: a category/cluster name for grouping
 
-Return ONLY valid JSON array.
+Example format:
+{"keywords": [{"keyword": "example", "intent": "informational", "topic_cluster": "guides"}]}
 PROMPT;
 
         try {
             $response = $this->llm->completeJson('openai', $prompt, [], [
-                'model' => 'gpt-5-nano',
+                'model' => 'gpt-4o-mini',
                 'temperature' => 0.8,
             ]);
 
-            $ideas = $response->getJson() ?? [];
+            $result = $response->getJson() ?? [];
+            $ideas = $result['keywords'] ?? [];
 
             return collect($ideas)->map(fn($idea) => [
                 'keyword' => $idea['keyword'] ?? '',
@@ -270,7 +272,7 @@ PROMPT;
 
         try {
             $response = $this->llm->completeJson('openai', $prompt, [], [
-                'model' => 'gpt-5',
+                'model' => 'gpt-4o',
                 'temperature' => 0.3,
             ]);
 
