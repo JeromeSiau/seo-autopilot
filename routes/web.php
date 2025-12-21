@@ -47,6 +47,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/onboarding/{site}/complete', [OnboardingController::class, 'complete'])->name('onboarding.complete');
     Route::get('/onboarding/generating/{site}', [OnboardingController::class, 'generating'])->name('onboarding.generating');
 
+    // Content Plan API (JSON endpoints for frontend polling)
+    Route::get('/sites/{site}/generation-status', [\App\Http\Controllers\Api\ContentPlanController::class, 'generationStatus'])->name('sites.generation-status');
+    Route::get('/sites/{site}/content-plan', [\App\Http\Controllers\Api\ContentPlanController::class, 'contentPlan'])->name('sites.content-plan');
+
     // Sites
     Route::resource('sites', SiteController::class);
 

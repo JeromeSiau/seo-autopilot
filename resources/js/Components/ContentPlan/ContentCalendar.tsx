@@ -30,7 +30,18 @@ export default function ContentCalendar({ siteId, initialMonth }: Props) {
     const fetchCalendar = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`/api/sites/${siteId}/content-plan?month=${month}`);
+            const res = await fetch(`/sites/${siteId}/content-plan?month=${month}`, {
+                headers: {
+                    'Accept': 'application/json',
+                },
+            });
+
+            if (!res.ok) {
+                console.error('API error:', res.status);
+                setLoading(false);
+                return;
+            }
+
             const data = await res.json();
             setArticles(data.articles || []);
         } catch (e) {

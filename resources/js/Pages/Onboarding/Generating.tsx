@@ -40,7 +40,17 @@ export default function Generating({ site }: Props) {
     useEffect(() => {
         const fetchStatus = async () => {
             try {
-                const res = await fetch(`/api/sites/${site.id}/generation-status`);
+                const res = await fetch(`/sites/${site.id}/generation-status`, {
+                    headers: {
+                        'Accept': 'application/json',
+                    },
+                });
+
+                if (!res.ok) {
+                    console.error('API error:', res.status);
+                    return;
+                }
+
                 const data = await res.json();
                 setStatus(data);
 
