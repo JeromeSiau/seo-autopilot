@@ -15,6 +15,7 @@ import {
     LogOut,
     User,
     Zap,
+    Calendar,
 } from 'lucide-react';
 import clsx from 'clsx';
 import { User as UserType, PageProps } from '@/types';
@@ -108,6 +109,12 @@ export default function AppLayout({
                     href: route('keywords.index'),
                     icon: Search,
                     current: currentPath.startsWith('/keywords'),
+                },
+                {
+                    name: t?.nav?.contentPlans ?? 'Content Plans',
+                    href: route('content-plans.index'),
+                    icon: Calendar,
+                    current: currentPath.startsWith('/content-plans'),
                 },
             ],
         },
@@ -266,7 +273,7 @@ export default function AppLayout({
                         <Menu className="h-5 w-5" />
                     </button>
 
-                    <div className="flex flex-1 justify-end gap-x-3 lg:gap-x-4">
+                    <div className="flex flex-1 items-center justify-end gap-x-2 lg:gap-x-3">
                         {/* Language switcher */}
                         <LanguageSwitcher />
 

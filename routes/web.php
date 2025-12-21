@@ -13,6 +13,7 @@ use App\Http\Controllers\Web\NotificationController;
 use App\Http\Controllers\Web\OnboardingController;
 use App\Http\Controllers\Web\SettingsController;
 use App\Http\Controllers\Web\SiteController;
+use App\Http\Controllers\Web\ContentPlanController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -51,7 +52,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/sites/{site}/generation-status', [\App\Http\Controllers\Api\ContentPlanController::class, 'generationStatus'])->name('sites.generation-status');
     Route::get('/sites/{site}/content-plan', [\App\Http\Controllers\Api\ContentPlanController::class, 'contentPlan'])->name('sites.content-plan');
 
-    // Content Plan Page (Inertia)
+    // Content Plans
+    Route::get('/content-plans', [ContentPlanController::class, 'index'])->name('content-plans.index');
     Route::get('/sites/{site}/content-plan-page', [SiteController::class, 'contentPlanPage'])->name('sites.content-plan-page');
     Route::post('/sites/{site}/content-plan/regenerate', [SiteController::class, 'regenerateContentPlan'])->name('sites.content-plan.regenerate');
 
