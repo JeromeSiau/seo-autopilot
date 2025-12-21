@@ -48,8 +48,15 @@ class ContentPlanGeneratorService
             // Step 2: Analyze GSC (if connected)
             if ($site->isGscConnected()) {
                 $generation->markStepRunning($stepIndex);
-                $gscKeywords = $this->keywordDiscovery->mineFromSearchConsole($site);
-                $keywords = $keywords->merge($gscKeywords);
+                try {
+                    $gscKeywords = $this->keywordDiscovery->mineFromSearchConsole($site);
+                    $keywords = $keywords->merge($gscKeywords);
+                } catch (\Exception $e) {
+                    Log::warning("GSC analysis failed, continuing without", [
+                        'site_id' => $site->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
                 $generation->markStepCompleted($stepIndex);
                 $stepIndex++;
             }
