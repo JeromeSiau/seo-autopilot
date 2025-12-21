@@ -125,18 +125,30 @@ class OnboardingController extends Controller
 
     public function complete(Site $site)
     {
+        if ($site->team_id !== auth()->user()->team_id) {
+            abort(403);
+        }
+
         $site->update(['onboarding_completed_at' => now()]);
 
-        // Enable autopilot
         SiteSetting::updateOrCreate(
             ['site_id' => $site->id],
             ['autopilot_enabled' => true]
         );
 
-        // Queue initial keyword discovery
-        DiscoverKeywordsJob::dispatch($site);
+        \App\Jobs\GenerateContentPlanJob::dispatch($site);
 
-        return redirect()->route('dashboard')
-            ->with('success', 'Autopilot activé ! La découverte de keywords a commencé.');
+        return redirect()->route('onboarding.generating', $site);
+    }
+
+    public function generating(Site $site)
+    {
+        if ($site->team_id !== auth()->user()->team_id) {
+            abort(403);
+        }
+
+        return Inertia::render('Onboarding/Generating', [
+            'site' => $site->only(['id', 'name', 'domain']),
+        ]);
     }
 }
