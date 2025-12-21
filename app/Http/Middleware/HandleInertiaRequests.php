@@ -54,10 +54,24 @@ class HandleInertiaRequests extends Middleware
                 'error' => fn () => $request->session()->get('error'),
             ],
             'locale' => $locale,
+            'theme' => $this->resolveTheme($request),
+            'availableLocales' => ['en', 'fr', 'es'],
             'translations' => [
                 'app' => $this->loadTranslations($locale, 'app'),
             ],
         ];
+    }
+
+    /**
+     * Resolve the current theme preference.
+     */
+    private function resolveTheme(Request $request): string
+    {
+        if ($user = $request->user()) {
+            return $user->theme ?? 'system';
+        }
+
+        return $request->cookie('theme', 'system');
     }
 
     /**

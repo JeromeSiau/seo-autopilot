@@ -157,4 +157,10 @@ export type PageProps<
         success?: string;
         error?: string;
     };
+    locale: string;
+    theme: 'light' | 'dark' | 'system';
+    availableLocales: string[];
+    translations?: {
+        app: Record<string, any>;
+    };
 };

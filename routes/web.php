@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LandingController;
+use App\Http\Controllers\PreferencesController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Web\AnalyticsController;
 use App\Http\Controllers\Web\ArticleController;
@@ -27,6 +28,9 @@ Route::get('/{locale}', [LandingController::class, 'index'])
 // Google OAuth
 Route::get('/auth/google', [GoogleAuthController::class, 'redirect'])->name('auth.google');
 Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])->name('auth.google.callback');
+
+// User preferences (locale, theme) - accessible to all users
+Route::post('/preferences', [PreferencesController::class, 'update'])->name('preferences.update');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // Dashboard

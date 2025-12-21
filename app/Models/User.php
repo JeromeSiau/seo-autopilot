@@ -27,6 +27,8 @@ class User extends Authenticatable
         'notification_email_frequency',
         'notification_immediate_failures',
         'notification_immediate_quota',
+        'locale',
+        'theme',
     ];
 
     /**

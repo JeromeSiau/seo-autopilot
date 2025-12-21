@@ -17,10 +17,11 @@ import {
     Zap,
 } from 'lucide-react';
 import clsx from 'clsx';
-import { User as UserType } from '@/types';
+import { User as UserType, PageProps } from '@/types';
 import NotificationDropdown from '@/Components/Notifications/NotificationDropdown';
 import Logo from '@/Components/Logo';
 import ThemeToggle from '@/Components/ThemeToggle';
+import LanguageSwitcher from '@/Components/LanguageSwitcher';
 import { useTranslations } from '@/hooks/useTranslations';
 
 interface NavItem {
@@ -61,7 +62,7 @@ export default function AppLayout({
     header,
     children,
 }: PropsWithChildren<{ header?: ReactNode }>) {
-    const { auth } = usePage<{ auth: { user: UserType } }>().props;
+    const { auth } = usePage<PageProps>().props;
     const { t } = useTranslations();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -266,6 +267,9 @@ export default function AppLayout({
                     </button>
 
                     <div className="flex flex-1 justify-end gap-x-3 lg:gap-x-4">
+                        {/* Language switcher */}
+                        <LanguageSwitcher />
+
                         {/* Theme toggle */}
                         <ThemeToggle />
 

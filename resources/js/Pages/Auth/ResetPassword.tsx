@@ -5,6 +5,7 @@ import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
 
 export default function ResetPassword({
     token,
@@ -13,6 +14,7 @@ export default function ResetPassword({
     token: string;
     email: string;
 }) {
+    const { t } = useTranslations();
     const { data, setData, post, processing, errors, reset } = useForm({
         token: token,
         email: email,
@@ -30,11 +32,11 @@ export default function ResetPassword({
 
     return (
         <GuestLayout>
-            <Head title="Reset Password" />
+            <Head title={t?.auth?.resetPassword?.title ?? 'Reset Password'} />
 
             <form onSubmit={submit}>
                 <div>
-                    <InputLabel htmlFor="email" value="Email" />
+                    <InputLabel htmlFor="email" value={t?.auth?.resetPassword?.email ?? 'Email'} />
 
                     <TextInput
                         id="email"
@@ -50,7 +52,7 @@ export default function ResetPassword({
                 </div>
 
                 <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
+                    <InputLabel htmlFor="password" value={t?.auth?.resetPassword?.password ?? 'Password'} />
 
                     <TextInput
                         id="password"
@@ -69,7 +71,7 @@ export default function ResetPassword({
                 <div className="mt-4">
                     <InputLabel
                         htmlFor="password_confirmation"
-                        value="Confirm Password"
+                        value={t?.auth?.resetPassword?.confirmPassword ?? 'Confirm Password'}
                     />
 
                     <TextInput
@@ -89,9 +91,9 @@ export default function ResetPassword({
                     />
                 </div>
 
-                <div className="mt-4 flex items-center justify-end">
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Reset Password
+                <div className="mt-6 flex items-center justify-end">
+                    <PrimaryButton className="w-full" disabled={processing}>
+                        {t?.auth?.resetPassword?.submit ?? 'Reset Password'}
                     </PrimaryButton>
                 </div>
             </form>

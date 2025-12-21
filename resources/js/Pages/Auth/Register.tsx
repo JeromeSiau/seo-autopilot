@@ -5,8 +5,10 @@ import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
 
 export default function Register() {
+    const { t } = useTranslations();
     const { data, setData, post, processing, errors, reset } = useForm({
         name: '',
         email: '',
@@ -24,11 +26,11 @@ export default function Register() {
 
     return (
         <GuestLayout>
-            <Head title="Register" />
+            <Head title={t?.auth?.register?.title ?? 'Create account'} />
 
             <form onSubmit={submit}>
                 <div>
-                    <InputLabel htmlFor="name" value="Name" />
+                    <InputLabel htmlFor="name" value={t?.auth?.register?.name ?? 'Name'} />
 
                     <TextInput
                         id="name"
@@ -45,7 +47,7 @@ export default function Register() {
                 </div>
 
                 <div className="mt-4">
-                    <InputLabel htmlFor="email" value="Email" />
+                    <InputLabel htmlFor="email" value={t?.auth?.register?.email ?? 'Email'} />
 
                     <TextInput
                         id="email"
@@ -62,7 +64,7 @@ export default function Register() {
                 </div>
 
                 <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
+                    <InputLabel htmlFor="password" value={t?.auth?.register?.password ?? 'Password'} />
 
                     <TextInput
                         id="password"
@@ -81,7 +83,7 @@ export default function Register() {
                 <div className="mt-4">
                     <InputLabel
                         htmlFor="password_confirmation"
-                        value="Confirm Password"
+                        value={t?.auth?.register?.confirmPassword ?? 'Confirm Password'}
                     />
 
                     <TextInput
@@ -103,19 +105,24 @@ export default function Register() {
                     />
                 </div>
 
-                <div className="mt-4 flex items-center justify-end">
-                    <Link
-                        href={route('login')}
-                        className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                    >
-                        Already registered?
-                    </Link>
-
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Register
+                <div className="mt-6 flex items-center justify-end">
+                    <PrimaryButton className="w-full" disabled={processing}>
+                        {t?.auth?.register?.submit ?? 'Create account'}
                     </PrimaryButton>
                 </div>
             </form>
+
+            <div className="mt-6 text-center border-t border-surface-200 dark:border-surface-700 pt-6">
+                <span className="text-sm text-surface-500 dark:text-surface-400">
+                    {t?.auth?.register?.hasAccount ?? 'Already have an account?'}{' '}
+                    <Link
+                        href={route('login')}
+                        className="font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
+                    >
+                        {t?.auth?.register?.signIn ?? 'Sign in'}
+                    </Link>
+                </span>
+            </div>
         </GuestLayout>
     );
 }

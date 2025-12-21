@@ -6,6 +6,7 @@ import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
 
 export default function Login({
     status,
@@ -14,6 +15,7 @@ export default function Login({
     status?: string;
     canResetPassword: boolean;
 }) {
+    const { t } = useTranslations();
     const { data, setData, post, processing, errors, reset } = useForm({
         email: '',
         password: '',
@@ -30,17 +32,17 @@ export default function Login({
 
     return (
         <GuestLayout>
-            <Head title="Log in" />
+            <Head title={t?.auth?.login?.title ?? 'Log in'} />
 
             {status && (
-                <div className="mb-4 text-sm font-medium text-green-600">
+                <div className="mb-4 text-sm font-medium text-green-600 dark:text-green-400">
                     {status}
                 </div>
             )}
 
             <form onSubmit={submit}>
                 <div>
-                    <InputLabel htmlFor="email" value="Email" />
+                    <InputLabel htmlFor="email" value={t?.auth?.login?.email ?? 'Email'} />
 
                     <TextInput
                         id="email"
@@ -57,7 +59,7 @@ export default function Login({
                 </div>
 
                 <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
+                    <InputLabel htmlFor="password" value={t?.auth?.login?.password ?? 'Password'} />
 
                     <TextInput
                         id="password"
@@ -84,27 +86,39 @@ export default function Login({
                                 )
                             }
                         />
-                        <span className="ms-2 text-sm text-gray-600">
-                            Remember me
+                        <span className="ms-2 text-sm text-surface-600 dark:text-surface-400">
+                            {t?.auth?.login?.rememberMe ?? 'Remember me'}
                         </span>
                     </label>
                 </div>
 
-                <div className="mt-4 flex items-center justify-end">
+                <div className="mt-6 flex items-center justify-between">
                     {canResetPassword && (
                         <Link
                             href={route('password.request')}
-                            className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                            className="text-sm text-surface-600 dark:text-surface-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
                         >
-                            Forgot your password?
+                            {t?.auth?.login?.forgotPassword ?? 'Forgot your password?'}
                         </Link>
                     )}
 
                     <PrimaryButton className="ms-4" disabled={processing}>
-                        Log in
+                        {t?.auth?.login?.submit ?? 'Log in'}
                     </PrimaryButton>
                 </div>
             </form>
+
+            <div className="mt-6 text-center border-t border-surface-200 dark:border-surface-700 pt-6">
+                <span className="text-sm text-surface-500 dark:text-surface-400">
+                    {t?.auth?.login?.noAccount ?? "Don't have an account?"}{' '}
+                    <Link
+                        href={route('register')}
+                        className="font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
+                    >
+                        {t?.auth?.login?.signUp ?? 'Sign up'}
+                    </Link>
+                </span>
+            </div>
         </GuestLayout>
     );
 }

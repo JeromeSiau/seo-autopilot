@@ -191,5 +191,53 @@
     "title": "Uso",
     "upgradePlan": "Mejorar plan",
     "of": "de"
+  },
+  "auth": {
+    "login": {
+      "title": "Iniciar sesión",
+      "email": "Email",
+      "password": "Contraseña",
+      "rememberMe": "Recordarme",
+      "forgotPassword": "¿Olvidaste tu contraseña?",
+      "submit": "Iniciar sesión",
+      "noAccount": "¿No tienes una cuenta?",
+      "signUp": "Regístrate"
+    },
+    "register": {
+      "title": "Crear cuenta",
+      "name": "Nombre",
+      "email": "Email",
+      "password": "Contraseña",
+      "confirmPassword": "Confirmar contraseña",
+      "submit": "Crear cuenta",
+      "hasAccount": "¿Ya tienes una cuenta?",
+      "signIn": "Inicia sesión"
+    },
+    "forgotPassword": {
+      "title": "Olvidé mi contraseña",
+      "description": "¿Olvidaste tu contraseña? No hay problema. Solo dinos tu dirección de email y te enviaremos un enlace para restablecer tu contraseña que te permitirá elegir una nueva.",
+      "submit": "Enviar enlace"
+    },
+    "resetPassword": {
+      "title": "Restablecer contraseña",
+      "email": "Email",
+      "password": "Contraseña",
+      "confirmPassword": "Confirmar contraseña",
+      "submit": "Restablecer"
+    },
+    "confirmPassword": {
+      "title": "Confirmar contraseña",
+      "description": "Esta es una área segura de la aplicación. Por favor confirma tu contraseña antes de continuar.",
+      "password": "Contraseña",
+      "submit": "Confirmar"
+    },
+    "verifyEmail": {
+      "title": "Verificación de email",
+      "description": "¡Gracias por registrarte! Antes de comenzar, ¿podrías verificar tu dirección de email haciendo clic en el enlace que te acabamos de enviar? Si no recibiste el email, con gusto te enviaremos otro.",
+      "linkSent": "Se ha enviado un nuevo enlace de verificación a la dirección de email que proporcionaste durante el registro.",
+      "submit": "Reenviar email de verificación",
+      "logout": "Cerrar sesión"
+    },
+    "backToHome": "Volver al inicio"
   }
 }

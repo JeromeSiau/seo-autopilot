@@ -191,5 +191,53 @@
     "title": "Utilisation",
     "upgradePlan": "Mettre à niveau",
     "of": "sur"
+  },
+  "auth": {
+    "login": {
+      "title": "Connexion",
+      "email": "Email",
+      "password": "Mot de passe",
+      "rememberMe": "Se souvenir de moi",
+      "forgotPassword": "Mot de passe oublié ?",
+      "submit": "Se connecter",
+      "noAccount": "Vous n'avez pas de compte ?",
+      "signUp": "Inscrivez-vous"
+    },
+    "register": {
+      "title": "Créer un compte",
+      "name": "Nom",
+      "email": "Email",
+      "password": "Mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "submit": "Créer un compte",
+      "hasAccount": "Vous avez déjà un compte ?",
+      "signIn": "Connectez-vous"
+    },
+    "forgotPassword": {
+      "title": "Mot de passe oublié",
+      "description": "Mot de passe oublié ? Pas de problème. Indiquez-nous votre adresse email et nous vous enverrons un lien de réinitialisation qui vous permettra d'en choisir un nouveau.",
+      "submit": "Envoyer le lien"
+    },
+    "resetPassword": {
+      "title": "Réinitialiser le mot de passe",
+      "email": "Email",
+      "password": "Mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "submit": "Réinitialiser"
+    },
+    "confirmPassword": {
+      "title": "Confirmer le mot de passe",
+      "description": "Ceci est une zone sécurisée de l'application. Veuillez confirmer votre mot de passe avant de continuer.",
+      "password": "Mot de passe",
+      "submit": "Confirmer"
+    },
+    "verifyEmail": {
+      "title": "Vérification de l'email",
+      "description": "Merci de vous être inscrit ! Avant de commencer, pourriez-vous vérifier votre adresse email en cliquant sur le lien que nous venons de vous envoyer ? Si vous n'avez pas reçu l'email, nous vous en enverrons volontiers un autre.",
+      "linkSent": "Un nouveau lien de vérification a été envoyé à l'adresse email que vous avez fournie lors de l'inscription.",
+      "submit": "Renvoyer l'email de vérification",
+      "logout": "Déconnexion"
+    },
+    "backToHome": "Retour à l'accueil"
   }
 }

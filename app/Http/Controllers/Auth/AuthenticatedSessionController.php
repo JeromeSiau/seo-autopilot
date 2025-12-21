@@ -33,6 +33,24 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        // Sync cookie preferences to user if they don't have preferences set
+        $user = Auth::user();
+        $needsSave = false;
+
+        if (!$user->locale && $locale = $request->cookie('locale')) {
+            $user->locale = $locale;
+            $needsSave = true;
+        }
+
+        if (!$user->theme && $theme = $request->cookie('theme')) {
+            $user->theme = $theme;
+            $needsSave = true;
+        }
+
+        if ($needsSave) {
+            $user->save();
+        }
+
         return redirect()->intended(route('dashboard', absolute: false));
     }
 
