@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { LayoutDashboard, Settings } from 'lucide-react';
+import { Calendar, LayoutDashboard } from 'lucide-react';
 import ContentCalendar from './ContentCalendar';
 
 interface Site {
@@ -32,18 +32,18 @@ export default function CalendarReveal({ site, articlesPlanned }: Props) {
             {/* Actions */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Link
-                    href={route('dashboard')}
+                    href={route('sites.content-plan-page', { site: site.id })}
                     className="inline-flex items-center gap-2 px-6 py-3 bg-primary-500 text-white font-semibold rounded-xl hover:bg-primary-600 transition-colors"
                 >
-                    <LayoutDashboard className="h-5 w-5" />
-                    Voir le Dashboard
+                    <Calendar className="h-5 w-5" />
+                    Gérer le Content Plan
                 </Link>
                 <Link
-                    href={route('sites.show', site.id)}
+                    href={route('dashboard')}
                     className="inline-flex items-center gap-2 px-6 py-3 bg-surface-100 dark:bg-surface-800 text-surface-700 dark:text-surface-300 font-semibold rounded-xl hover:bg-surface-200 dark:hover:bg-surface-700 transition-colors"
                 >
-                    <Settings className="h-5 w-5" />
-                    Gérer le site
+                    <LayoutDashboard className="h-5 w-5" />
+                    Aller au Dashboard
                 </Link>
             </div>
         </div>

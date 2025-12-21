@@ -51,6 +51,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/sites/{site}/generation-status', [\App\Http\Controllers\Api\ContentPlanController::class, 'generationStatus'])->name('sites.generation-status');
     Route::get('/sites/{site}/content-plan', [\App\Http\Controllers\Api\ContentPlanController::class, 'contentPlan'])->name('sites.content-plan');
 
+    // Content Plan Page (Inertia)
+    Route::get('/sites/{site}/content-plan-page', [SiteController::class, 'contentPlanPage'])->name('sites.content-plan-page');
+    Route::post('/sites/{site}/content-plan/regenerate', [SiteController::class, 'regenerateContentPlan'])->name('sites.content-plan.regenerate');
+
     // Sites
     Route::resource('sites', SiteController::class);
 

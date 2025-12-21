@@ -283,6 +283,13 @@ export default function SiteShow({ site }: SiteShowProps) {
                         <h2 className="mb-4 font-semibold text-surface-900 dark:text-white">Actions rapides</h2>
                         <div className="space-y-2">
                             <Link
+                                href={route('sites.content-plan-page', { site: site.id })}
+                                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-surface-600 dark:text-surface-400 hover:bg-surface-50 dark:hover:bg-surface-800"
+                            >
+                                <Calendar className="h-4 w-4" />
+                                Content Plan
+                            </Link>
+                            <Link
                                 href={route('keywords.index', { site_id: site.id })}
                                 className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-surface-600 dark:text-surface-400 hover:bg-surface-50 dark:hover:bg-surface-800"
                             >

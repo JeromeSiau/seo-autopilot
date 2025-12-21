@@ -107,4 +107,38 @@ class SiteController extends Controller
         return redirect()->route('sites.index')
             ->with('success', 'Site deleted successfully.');
     }
+
+    public function contentPlanPage(Site $site): Response
+    {
+        $this->authorize('view', $site);
+
+        $stats = [
+            'keywords_total' => $site->keywords()->count(),
+            'articles_planned' => $site->scheduledArticles()->where('status', 'planned')->count(),
+            'articles_generated' => $site->scheduledArticles()->whereIn('status', ['ready', 'generating'])->count(),
+            'articles_published' => $site->scheduledArticles()->where('status', 'published')->count(),
+        ];
+
+        $lastGeneration = $site->contentPlanGenerations()->latest()->first();
+        $canRegenerate = !$lastGeneration || $lastGeneration->status !== 'running';
+
+        return Inertia::render('Sites/ContentPlan', [
+            'site' => (new SiteResource($site))->resolve(),
+            'stats' => $stats,
+            'canRegenerate' => $canRegenerate,
+        ]);
+    }
+
+    public function regenerateContentPlan(Site $site): RedirectResponse
+    {
+        $this->authorize('update', $site);
+
+        // Delete existing generation and schedule new one
+        $site->contentPlanGenerations()->delete();
+        $site->scheduledArticles()->where('status', 'planned')->delete();
+
+        \App\Jobs\GenerateContentPlanJob::dispatch($site);
+
+        return redirect()->route('onboarding.generating', ['site' => $site->id]);
+    }
 }
