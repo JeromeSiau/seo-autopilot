@@ -128,19 +128,35 @@ PROMPT;
         $prompt .= <<<PROMPT
 
 
-Generate diverse keyword ideas including:
-- Informational queries (how to, what is, guide to)
-- Commercial queries (best, review, comparison)
-- Long-tail variations
-- Related topics
+IMPORTANT: Generate keywords that real people actually search for. Focus on:
+
+1. HEAD TERMS (30% - high volume, 1-3 words):
+   - Core industry terms people search
+   - Popular product/service categories
+   - Example: "trail running", "vélo VTT", "randonnée montagne"
+
+2. MEDIUM-TAIL (40% - moderate volume, 2-4 words):
+   - Specific topics with good search volume
+   - Commercial intent keywords
+   - Example: "chaussures trail running", "meilleur VTT électrique"
+
+3. LONG-TAIL (30% - lower volume but targeted, 4+ words):
+   - Specific questions or comparisons
+   - "How to" guides, reviews, comparisons
+   - Example: "comment choisir chaussures trail"
+
+AVOID:
+- Overly long question sentences (7+ words)
+- Keywords that are too specific to have any search volume
+- Generic phrases that don't match real searches
 
 Respond with a JSON object containing a "keywords" array. Each keyword object should have:
-- keyword: the search term
+- keyword: the search term (keep it concise, 1-5 words preferred)
 - intent: informational, commercial, or transactional
 - topic_cluster: a category/cluster name for grouping
 
 Example format:
-{"keywords": [{"keyword": "example", "intent": "informational", "topic_cluster": "guides"}]}
+{"keywords": [{"keyword": "trail running", "intent": "informational", "topic_cluster": "sports outdoor"}]}
 PROMPT;
 
         try {
@@ -175,19 +191,47 @@ PROMPT;
             return $keywords;
         }
 
-        try {
-            $seoData = $this->dataForSEO->getKeywordData($keywordTexts, $language);
+        // Map language to location
+        $location = match ($language) {
+            'fr' => 'France',
+            'de' => 'Germany',
+            'es' => 'Spain',
+            'it' => 'Italy',
+            'pt' => 'Brazil',
+            default => 'United States',
+        };
 
+        try {
+            // Get volume data
+            $seoData = $this->dataForSEO->getKeywordData($keywordTexts, $language, $location);
             $seoDataMap = $seoData->keyBy('keyword');
 
-            return $keywords->map(function ($kw) use ($seoDataMap) {
+            // Get difficulty data (separate API call)
+            $difficultyData = collect();
+            try {
+                $difficultyData = $this->dataForSEO->getKeywordDifficulty($keywordTexts, $language, $location);
+            } catch (\Exception $e) {
+                Log::warning("DataForSEO difficulty fetch failed: {$e->getMessage()}");
+            }
+
+            // Normalize difficulty keys to lowercase for matching
+            $difficultyDataLower = $difficultyData->mapWithKeys(fn($item, $key) => [mb_strtolower($key) => $item]);
+
+            return $keywords->map(function ($kw) use ($seoDataMap, $difficultyDataLower) {
                 $data = $seoDataMap->get($kw['keyword']);
+                $difficulty = $difficultyDataLower->get(mb_strtolower($kw['keyword']));
 
                 if ($data) {
                     $kw['volume'] = $data->volume;
-                    $kw['difficulty'] = $data->difficulty;
                     $kw['cpc'] = $data->cpc;
                     $kw['trend'] = $data->trend;
+                }
+
+                // Use difficulty from dedicated endpoint if available
+                if ($difficulty) {
+                    $kw['difficulty'] = $difficulty['difficulty'] ?? 0;
+                } elseif ($data) {
+                    $kw['difficulty'] = $data->difficulty;
                 }
 
                 return $kw;

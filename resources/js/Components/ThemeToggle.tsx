@@ -11,11 +11,7 @@ export default function ThemeToggle({ className = '' }: ThemeToggleProps) {
     return (
         <button
             onClick={toggleTheme}
-            className={`relative p-2 rounded-lg transition-all duration-300 ${
-                resolvedTheme === 'dark'
-                    ? 'bg-surface-800 text-primary-400 hover:bg-surface-700'
-                    : 'bg-surface-100 text-surface-600 hover:bg-surface-200'
-            } ${className}`}
+            className={`relative h-9 w-9 flex items-center justify-center rounded-lg transition-colors text-surface-500 dark:text-surface-400 hover:bg-surface-100 dark:hover:bg-surface-800 hover:text-surface-700 dark:hover:text-surface-200 ${className}`}
             aria-label={resolvedTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
         >
             <div className="relative w-5 h-5">

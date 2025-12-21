@@ -168,7 +168,62 @@
     },
     "step2": {
       "title": "Connectez Google Search Console",
-      "description": "Liez votre compte GSC pour la découverte de mots-clés"
+      "description": "Liez votre compte GSC pour la découverte de mots-clés",
+      "connect": {
+        "title": "Connexion Google",
+        "subtitle": "Connectez Search Console et Analytics pour un suivi complet",
+        "button": "Connecter avec Google",
+        "skipStep": "Passer cette étape"
+      },
+      "benefits": {
+        "autoDiscovery": "Découverte automatique",
+        "autoDiscoveryDesc": "Identifie les mots-clés performants",
+        "hiddenOpportunities": "Opportunités cachées",
+        "hiddenOpportunitiesDesc": "Positions 5-30 à exploiter",
+        "tracking": "Suivi des performances",
+        "trackingDesc": "Analytics en temps réel"
+      },
+      "selectGsc": {
+        "title": "Compte Google connecté",
+        "subtitle": "Sélectionnez la propriété Search Console à utiliser",
+        "skipOption": "Ne pas utiliser Search Console",
+        "skipOptionDesc": "Vous pourrez le configurer plus tard",
+        "recommended": "Recommandé",
+        "domain": "Domaine",
+        "searchPlaceholder": "Rechercher une propriété..."
+      },
+      "selectGa4": {
+        "title": "Google Analytics 4",
+        "subtitle": "Sélectionnez la propriété Analytics à utiliser",
+        "skipOption": "Ne pas utiliser Analytics",
+        "skipOptionDesc": "Vous pourrez le configurer plus tard",
+        "recommended": "Recommandé",
+        "gscStatus": "Search Console",
+        "gscNotUsed": "Non utilisé",
+        "searchPlaceholder": "Rechercher une propriété..."
+      },
+      "summary": {
+        "titleComplete": "Google connecté",
+        "titlePartial": "Configuration partielle",
+        "searchConsole": "Search Console",
+        "analytics": "Google Analytics 4",
+        "notConfigured": "Non configuré",
+        "propertyId": "Property ID",
+        "modifyConfig": "Modifier la configuration"
+      },
+      "warnings": {
+        "title": "Fonctionnalités limitées",
+        "noGscNoGa4": "Sans Search Console ni Analytics, l'IA générera des sujets basés sur votre description, mais ils seront moins ciblés. Les opportunités « quick-win » (positions 5-30) ne seront pas détectées.",
+        "noGsc": "Sans Search Console, l'autopilot ne pourra pas découvrir vos mots-clés existants ni leurs positions. Les opportunités « quick-win » ne seront pas détectées.",
+        "noGa4": "Sans Analytics, vous ne pourrez pas suivre le trafic généré par vos articles ni mesurer leur impact sur les conversions."
+      },
+      "errors": {
+        "fetchGsc": "Impossible de récupérer les propriétés GSC",
+        "fetchGa4": "Impossible de récupérer les propriétés GA4",
+        "saveGsc": "Impossible de sauvegarder la propriété GSC",
+        "saveGa4": "Impossible de sauvegarder la propriété GA4",
+        "title": "Erreur"
+      }
     },
     "step3": {
       "title": "Configurez votre voix de marque",
@@ -185,7 +240,8 @@
     "next": "Suivant",
     "back": "Retour",
     "skip": "Passer",
-    "finish": "Terminer la configuration"
+    "finish": "Terminer la configuration",
+    "continue": "Continuer"
   },
   "usage": {
     "title": "Utilisation",

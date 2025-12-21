@@ -22,6 +22,10 @@ interface Site {
     name: string;
     language: string;
     business_description?: string;
+    gsc_connected?: boolean;
+    gsc_property_id?: string;
+    ga4_connected?: boolean;
+    ga4_property_id?: string;
     settings?: {
         articles_per_week: number;
         publish_days: string[];
@@ -155,7 +159,15 @@ export default function Wizard({ team, site, resumeStep }: WizardProps) {
                             />
                         )}
                         {currentStep === 2 && siteId && (
-                            <Step2GSC siteId={siteId} onNext={nextStep} onBack={prevStep} />
+                            <Step2GSC
+                                siteId={siteId}
+                                gscConnected={site?.gsc_connected || false}
+                                gscPropertyId={site?.gsc_property_id}
+                                ga4Connected={site?.ga4_connected || false}
+                                ga4PropertyId={site?.ga4_property_id}
+                                onNext={nextStep}
+                                onBack={prevStep}
+                            />
                         )}
                         {currentStep === 3 && siteId && (
                             <Step3Business siteId={siteId} onNext={nextStep} onBack={prevStep} />

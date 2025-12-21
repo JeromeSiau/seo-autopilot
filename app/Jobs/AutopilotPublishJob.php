@@ -47,9 +47,9 @@ class AutopilotPublishJob implements ShouldQueue
         NotificationService $notifications
     ): void {
         $site = $article->site;
-        $integration = $site->integrations()->where('is_active', true)->first();
+        $integration = $site->integration;
 
-        if (!$integration) {
+        if (!$integration || !$integration->is_active) {
             Log::info("AutopilotPublishJob: No integration for site {$site->id}, keeping as ready");
             return;
         }

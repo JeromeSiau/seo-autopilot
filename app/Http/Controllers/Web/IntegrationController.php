@@ -63,13 +63,17 @@ class IntegrationController extends Controller
         // Verify site belongs to team
         $site = $team->sites()->findOrFail($validated['site_id']);
 
-        $site->integrations()->create([
-            'team_id' => $team->id,
-            'type' => $validated['type'],
-            'name' => $validated['name'],
-            'credentials' => $validated['credentials'], // Model auto-encrypts via 'encrypted:array' cast
-            'is_active' => true,
-        ]);
+        // Update or create - only one integration per site allowed
+        Integration::updateOrCreate(
+            ['site_id' => $site->id],
+            [
+                'team_id' => $team->id,
+                'type' => $validated['type'],
+                'name' => $validated['name'],
+                'credentials' => $validated['credentials'],
+                'is_active' => true,
+            ]
+        );
 
         // Redirect back to wizard if onboarding not completed
         if (!$site->onboarding_completed_at) {

@@ -19,6 +19,7 @@ class SiteResource extends JsonResource
             'target_audience' => $this->target_audience,
             'topics' => $this->topics,
             'gsc_connected' => $this->isGscConnected(),
+            'gsc_property_id' => $this->when($this->gsc_property_id, $this->gsc_property_id),
             'ga4_connected' => $this->isGa4Connected(),
             'ga4_property_id' => $this->when($this->ga4_property_id, $this->ga4_property_id),
             'keywords_count' => $this->whenCounted('keywords'),

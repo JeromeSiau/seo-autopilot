@@ -18,6 +18,7 @@ class Site extends Model
         'gsc_token',
         'gsc_refresh_token',
         'gsc_token_expires_at',
+        'gsc_property_id',
         'ga4_token',
         'ga4_refresh_token',
         'ga4_token_expires_at',
@@ -48,6 +49,11 @@ class Site extends Model
         'onboarding_completed_at' => 'datetime',
     ];
 
+    protected $appends = [
+        'gsc_connected',
+        'ga4_connected',
+    ];
+
     public function team(): BelongsTo
     {
         return $this->belongsTo(Team::class);
@@ -63,9 +69,9 @@ class Site extends Model
         return $this->hasMany(Article::class);
     }
 
-    public function integrations(): HasMany
+    public function integration(): HasOne
     {
-        return $this->hasMany(Integration::class);
+        return $this->hasOne(Integration::class);
     }
 
     public function analytics(): HasManyThrough
@@ -108,9 +114,19 @@ class Site extends Model
         return !empty($this->gsc_token);
     }
 
+    public function getGscConnectedAttribute(): bool
+    {
+        return $this->isGscConnected();
+    }
+
     public function isGa4Connected(): bool
     {
         return !empty($this->ga4_token);
+    }
+
+    public function getGa4ConnectedAttribute(): bool
+    {
+        return $this->isGa4Connected();
     }
 
     public function getPublishedArticlesCountAttribute(): int

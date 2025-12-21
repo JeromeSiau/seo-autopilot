@@ -218,16 +218,20 @@ class SearchConsoleService
 
     /**
      * Get the Search Console site URL format for a site.
+     * Uses gsc_property_id if set, otherwise falls back to sc-domain format.
      */
     private function getSiteUrl(Site $site): string
     {
-        $domain = $site->domain;
+        // Use saved property ID if available
+        if ($site->gsc_property_id) {
+            return $site->gsc_property_id;
+        }
 
-        // Remove protocol if present
+        // Fallback to domain property format
+        $domain = $site->domain;
         $domain = preg_replace('#^https?://#', '', $domain);
         $domain = rtrim($domain, '/');
 
-        // Use domain property format
         return 'sc-domain:' . $domain;
     }
 }

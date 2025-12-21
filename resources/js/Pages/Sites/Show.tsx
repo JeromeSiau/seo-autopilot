@@ -112,12 +112,15 @@ export default function SiteShow({ site }: SiteShowProps) {
                     {/* Top Keywords */}
                     <Card>
                         <div className="flex items-center justify-between border-b border-surface-100 dark:border-surface-800 pb-4">
-                            <h2 className="font-semibold text-surface-900 dark:text-white">Top Keywords</h2>
+                            <div>
+                                <h2 className="font-semibold text-surface-900 dark:text-white">Top 10 Keywords</h2>
+                                <p className="text-xs text-surface-500 dark:text-surface-400">Triés par score</p>
+                            </div>
                             <Link
                                 href={route('keywords.index', { site_id: site.id })}
                                 className="flex items-center gap-1 text-sm text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300"
                             >
-                                Voir tous
+                                Voir tous ({site.keywords_count || 0})
                                 <ArrowRight className="h-4 w-4" />
                             </Link>
                         </div>
@@ -125,11 +128,19 @@ export default function SiteShow({ site }: SiteShowProps) {
                             <div className="divide-y divide-surface-50 dark:divide-surface-800">
                                 {site.keywords.map((keyword) => (
                                     <div key={keyword.id} className="flex items-center justify-between py-3">
-                                        <div>
-                                            <p className="font-medium text-surface-900 dark:text-white">{keyword.keyword}</p>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="font-medium text-surface-900 dark:text-white truncate">{keyword.keyword}</p>
                                             <div className="flex items-center gap-3 text-xs text-surface-500 dark:text-surface-400">
-                                                {keyword.volume && <span>{keyword.volume.toLocaleString()} vol.</span>}
-                                                {keyword.position && <span>Position: {keyword.position}</span>}
+                                                <span className="font-medium text-primary-600 dark:text-primary-400">
+                                                    Score: {Number(keyword.score).toFixed(0)}
+                                                </span>
+                                                {keyword.volume !== null && keyword.volume > 0 && (
+                                                    <span>{keyword.volume.toLocaleString()} vol.</span>
+                                                )}
+                                                {keyword.difficulty !== null && (
+                                                    <span>Diff: {Number(keyword.difficulty).toFixed(0)}</span>
+                                                )}
+                                                {keyword.position && <span>Pos: {keyword.position}</span>}
                                             </div>
                                         </div>
                                         <Badge

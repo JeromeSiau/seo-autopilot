@@ -70,7 +70,7 @@ class SiteController extends Controller
         ]);
 
         return Inertia::render('Sites/Show', [
-            'site' => (new SiteResource($site))->resolve(),
+            'site' => (new SiteResource($site))->response()->getData(true)['data'],
         ]);
     }
 
@@ -79,7 +79,7 @@ class SiteController extends Controller
         $this->authorize('update', $site);
 
         return Inertia::render('Sites/Edit', [
-            'site' => (new SiteResource($site))->resolve(),
+            'site' => (new SiteResource($site))->response()->getData(true)['data'],
         ]);
     }
 
@@ -123,7 +123,7 @@ class SiteController extends Controller
         $canRegenerate = !$lastGeneration || $lastGeneration->status !== 'running';
 
         return Inertia::render('Sites/ContentPlan', [
-            'site' => (new SiteResource($site))->resolve(),
+            'site' => (new SiteResource($site))->response()->getData(true)['data'],
             'stats' => $stats,
             'canRegenerate' => $canRegenerate,
         ]);

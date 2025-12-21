@@ -42,6 +42,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/onboarding/{site}/resume', [OnboardingController::class, 'resume'])->name('onboarding.resume');
     Route::post('/onboarding/step1', [OnboardingController::class, 'storeStep1'])->name('onboarding.step1');
     Route::post('/onboarding/{site}/step2', [OnboardingController::class, 'storeStep2'])->name('onboarding.step2');
+    Route::get('/onboarding/{site}/gsc-sites', [OnboardingController::class, 'getGscSites'])->name('onboarding.gsc-sites');
+    Route::post('/onboarding/{site}/gsc-property', [OnboardingController::class, 'selectGscProperty'])->name('onboarding.gsc-property');
+    Route::get('/onboarding/{site}/ga4-properties', [OnboardingController::class, 'getGa4Properties'])->name('onboarding.ga4-properties');
+    Route::post('/onboarding/{site}/ga4-property', [OnboardingController::class, 'selectGa4Property'])->name('onboarding.ga4-property');
     Route::post('/onboarding/{site}/step3', [OnboardingController::class, 'storeStep3'])->name('onboarding.step3');
     Route::post('/onboarding/{site}/step4', [OnboardingController::class, 'storeStep4'])->name('onboarding.step4');
     Route::post('/onboarding/{site}/step5', [OnboardingController::class, 'storeStep5'])->name('onboarding.step5');

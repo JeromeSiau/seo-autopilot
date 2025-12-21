@@ -1,14 +1,32 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+@php
+    // Priority: 1) User preference from DB, 2) Cookie, 3) System preference (JS)
+    $user = auth()->user();
+    $theme = $user?->theme ?? request()->cookie('theme');
+
+    // Resolve 'system' to actual theme using cookie hint, or let JS handle it
+    if ($theme === 'system') {
+        $theme = null;
+    } elseif (!in_array($theme, ['light', 'dark'])) {
+        $theme = null;
+    }
+@endphp
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="{{ $theme }}">
     <head>
-        <!-- Prevent flash of wrong theme -->
+        @unless($theme)
+        <!-- Resolve system preference if no cookie set -->
         <script>
             (function() {
-                const theme = localStorage.getItem('theme') ||
-                    (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                const theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
                 document.documentElement.classList.add(theme);
             })();
         </script>
+        @endunless
+        <style>
+            /* Critical CSS to prevent flash before Tailwind loads */
+            html.dark body { background-color: #1a1a1a; }
+            html.light body, html:not(.dark):not(.dark) body { background-color: #fafaf8; }
+        </style>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 

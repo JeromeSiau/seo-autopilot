@@ -1,5 +1,6 @@
+import { useState, useRef, useEffect } from 'react';
 import { usePage, router } from '@inertiajs/react';
-import { Globe } from 'lucide-react';
+import { Globe, ChevronDown } from 'lucide-react';
 import clsx from 'clsx';
 import { PageProps } from '@/types';
 
@@ -15,40 +16,69 @@ interface LanguageSwitcherProps {
 
 export default function LanguageSwitcher({ className = '' }: LanguageSwitcherProps) {
     const { locale } = usePage<PageProps>().props;
+    const [isOpen, setIsOpen] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
 
     const handleChange = (newLocale: string) => {
+        setIsOpen(false);
         router.post(route('preferences.update'), { locale: newLocale }, {
             preserveState: true,
             preserveScroll: true,
         });
     };
 
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setIsOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
     const currentLocale = LOCALES.find(l => l.code === locale) || LOCALES[0];
 
     return (
-        <div className={clsx('relative', className)}>
-            <select
-                value={locale}
-                onChange={(e) => handleChange(e.target.value)}
+        <div className={clsx('relative', className)} ref={dropdownRef}>
+            <button
+                onClick={() => setIsOpen(!isOpen)}
                 className={clsx(
-                    'appearance-none cursor-pointer',
-                    'pl-8 pr-3 py-2 rounded-lg',
+                    'flex items-center gap-1.5 h-9 px-2.5 rounded-lg',
                     'text-sm font-medium',
-                    'bg-surface-100 dark:bg-surface-800',
-                    'text-surface-700 dark:text-surface-300',
-                    'border-0',
-                    'focus:outline-none focus:ring-2 focus:ring-primary-500/20',
-                    'hover:bg-surface-200 dark:hover:bg-surface-700',
+                    'text-surface-600 dark:text-surface-300',
+                    'hover:bg-surface-100 dark:hover:bg-surface-800',
                     'transition-colors'
                 )}
             >
-                {LOCALES.map((l) => (
-                    <option key={l.code} value={l.code}>
-                        {l.flag} {l.label}
-                    </option>
-                ))}
-            </select>
-            <Globe className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-surface-500 dark:text-surface-400 pointer-events-none" />
+                <Globe className="h-4 w-4 text-surface-400" />
+                <span>{currentLocale.flag}</span>
+                <span>{currentLocale.label}</span>
+                <ChevronDown className={clsx(
+                    'h-3 w-3 text-surface-400 transition-transform',
+                    isOpen && 'rotate-180'
+                )} />
+            </button>
+
+            {isOpen && (
+                <div className="absolute right-0 mt-1 py-1 w-32 rounded-lg bg-white dark:bg-surface-900 shadow-lg ring-1 ring-surface-200 dark:ring-surface-800 z-50">
+                    {LOCALES.map((l) => (
+                        <button
+                            key={l.code}
+                            onClick={() => handleChange(l.code)}
+                            className={clsx(
+                                'flex items-center gap-2 w-full px-3 py-2 text-sm',
+                                l.code === locale
+                                    ? 'bg-primary-50 dark:bg-primary-500/10 text-primary-700 dark:text-primary-400'
+                                    : 'text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-800'
+                            )}
+                        >
+                            <span>{l.flag}</span>
+                            <span>{l.label}</span>
+                        </button>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }

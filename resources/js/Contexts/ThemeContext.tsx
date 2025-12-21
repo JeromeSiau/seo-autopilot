@@ -42,8 +42,11 @@ export function ThemeProvider({ children, initialTheme = 'system' }: ThemeProvid
         setResolvedTheme(resolved);
 
         const root = window.document.documentElement;
-        root.classList.remove('light', 'dark');
-        root.classList.add(resolved);
+        // Only modify classes if needed to prevent flash
+        if (!root.classList.contains(resolved)) {
+            root.classList.remove('light', 'dark');
+            root.classList.add(resolved);
+        }
     }, [theme]);
 
     // Listen for system theme changes when theme is set to 'system'
@@ -71,6 +74,9 @@ export function ThemeProvider({ children, initialTheme = 'system' }: ThemeProvid
 
     const setTheme = (newTheme: Theme) => {
         setThemeState(newTheme);
+        // Save to cookie for server-side rendering on next page load
+        const resolved = resolveTheme(newTheme);
+        document.cookie = `theme=${resolved}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
         router.post(route('preferences.update'), { theme: newTheme }, {
             preserveState: true,
             preserveScroll: true,
