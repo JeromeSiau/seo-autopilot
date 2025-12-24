@@ -5,6 +5,7 @@ namespace App\Services\Autopilot;
 use App\Models\Site;
 use App\Models\Keyword;
 use App\Models\AutopilotLog;
+use App\Models\ScheduledArticle;
 use App\Jobs\GenerateArticleJob;
 use Illuminate\Support\Facades\Log;
 
@@ -45,12 +46,6 @@ class AutopilotService
             return false;
         }
 
-        // Check if today is a publish day
-        if (!$settings->canPublishToday()) {
-            Log::info("AutopilotService: Not a publish day for site {$site->id}");
-            return false;
-        }
-
         // Check weekly quota
         $articlesThisWeek = $site->articles()
             ->where('created_at', '>=', now()->startOfWeek())
@@ -61,23 +56,40 @@ class AutopilotService
             return false;
         }
 
-        // Get next keyword from queue
-        $keyword = $site->keywords()
-            ->queued()
+        // Get next scheduled article for today or earlier (catch up on missed days)
+        $scheduledArticle = $site->scheduledArticles()
+            ->where('status', 'planned')
+            ->whereDate('scheduled_date', '<=', now())
+            ->with('keyword')
+            ->orderBy('scheduled_date')
             ->first();
 
-        if (!$keyword) {
-            Log::info("AutopilotService: No keywords in queue for site {$site->id}");
+        if (!$scheduledArticle) {
+            Log::info("AutopilotService: No scheduled articles for today for site {$site->id}");
             return false;
         }
 
-        // Dispatch generation job
+        $keyword = $scheduledArticle->keyword;
+
+        if (!$keyword) {
+            Log::warning("AutopilotService: Scheduled article has no keyword", [
+                'scheduled_article_id' => $scheduledArticle->id,
+            ]);
+            $scheduledArticle->update(['status' => 'failed']);
+            return false;
+        }
+
+        // Update statuses
         $keyword->markAsGenerating();
+        $scheduledArticle->update(['status' => 'generating']);
+
+        // Dispatch generation job
         GenerateArticleJob::dispatch($keyword);
 
         AutopilotLog::log($site->id, AutopilotLog::TYPE_ARTICLE_GENERATED, [
             'keyword_id' => $keyword->id,
             'keyword' => $keyword->keyword,
+            'scheduled_article_id' => $scheduledArticle->id,
         ]);
 
         return true;

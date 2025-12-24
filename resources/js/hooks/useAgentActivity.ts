@@ -18,10 +18,13 @@ interface UseAgentActivityOptions {
     enabled?: boolean;
 }
 
+const MAX_EVENTS = 100;
+
 export function useAgentActivity({ articleId, enabled = true }: UseAgentActivityOptions) {
     const [events, setEvents] = useState<AgentEvent[]>([]);
     const [isConnected, setIsConnected] = useState(false);
     const [activeAgents, setActiveAgents] = useState<string[]>([]);
+    const [error, setError] = useState<Error | null>(null);
 
     useEffect(() => {
         if (!enabled || !articleId || !window.Echo) {
@@ -32,7 +35,10 @@ export function useAgentActivity({ articleId, enabled = true }: UseAgentActivity
 
         channel
             .listen('.agent.activity', (event: AgentEvent) => {
-                setEvents(prev => [...prev, event]);
+                setEvents(prev => {
+                    const updated = [...prev, event];
+                    return updated.length > MAX_EVENTS ? updated.slice(-MAX_EVENTS) : updated;
+                });
 
                 // Track active agents
                 if (event.event_type === 'started') {
@@ -44,8 +50,9 @@ export function useAgentActivity({ articleId, enabled = true }: UseAgentActivity
             .subscribed(() => {
                 setIsConnected(true);
             })
-            .error(() => {
+            .error((err: unknown) => {
                 setIsConnected(false);
+                setError(err instanceof Error ? err : new Error('Connection failed'));
             });
 
         return () => {
@@ -71,6 +78,7 @@ export function useAgentActivity({ articleId, enabled = true }: UseAgentActivity
         events,
         isConnected,
         activeAgents,
+        error,
         clearEvents,
         getEventsByAgent,
         getLatestEventByAgent,

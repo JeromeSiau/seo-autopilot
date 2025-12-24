@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Article;
 use App\Models\AutopilotLog;
+use App\Services\Category\CategoryMappingService;
 use App\Services\Notification\NotificationService;
 use App\Services\Publisher\PublisherManager;
 use Illuminate\Bus\Queueable;
@@ -20,8 +21,11 @@ class AutopilotPublishJob implements ShouldQueue
     public int $tries = 1;
     public int $timeout = 120;
 
-    public function handle(PublisherManager $publisher, NotificationService $notifications): void
-    {
+    public function handle(
+        PublisherManager $publisher,
+        NotificationService $notifications,
+        CategoryMappingService $categoryMapping
+    ): void {
         Log::info('AutopilotPublishJob: Checking for articles to publish');
 
         $articles = Article::where('status', 'ready')
@@ -30,7 +34,7 @@ class AutopilotPublishJob implements ShouldQueue
 
         foreach ($articles as $article) {
             try {
-                $this->publishArticle($article, $publisher, $notifications);
+                $this->publishArticle($article, $publisher, $notifications, $categoryMapping);
             } catch (\Exception $e) {
                 Log::error("AutopilotPublishJob: Failed for article {$article->id}", [
                     'error' => $e->getMessage(),
@@ -44,7 +48,8 @@ class AutopilotPublishJob implements ShouldQueue
     private function publishArticle(
         Article $article,
         PublisherManager $publisher,
-        NotificationService $notifications
+        NotificationService $notifications,
+        CategoryMappingService $categoryMapping
     ): void {
         $site = $article->site;
         $integration = $site->integration;
@@ -54,12 +59,23 @@ class AutopilotPublishJob implements ShouldQueue
             return;
         }
 
-        // Dispatch the existing PublishArticleJob
-        PublishArticleJob::dispatch($article, $integration);
+        // Map article to best matching category
+        $categories = $categoryMapping->mapArticleToCategories($article, $integration);
+
+        Log::info("AutopilotPublishJob: Mapped categories for article", [
+            'article_id' => $article->id,
+            'categories' => $categories,
+        ]);
+
+        // Dispatch the existing PublishArticleJob with categories
+        PublishArticleJob::dispatch($article, $integration, [
+            'categories' => $categories,
+        ]);
 
         AutopilotLog::log($site->id, AutopilotLog::TYPE_ARTICLE_PUBLISHED, [
             'article_id' => $article->id,
             'title' => $article->title,
+            'categories' => $categories,
         ]);
     }
 

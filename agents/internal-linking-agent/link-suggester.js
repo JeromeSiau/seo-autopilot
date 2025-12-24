@@ -14,6 +14,9 @@ function escapeHtml(text) {
 
 // Validate URL is safe (http/https only)
 function isValidUrl(url) {
+    if (typeof url !== 'string' || !url.trim()) return false;
+    if (url.startsWith('//')) return false;
+
     try {
         const parsed = new URL(url);
         return parsed.protocol === 'http:' || parsed.protocol === 'https:';
@@ -89,6 +92,11 @@ export async function insertLinks(content, opportunities, options = {}) {
     const linkPositions = [];
 
     for (const opp of opportunities) {
+        if (/<[^>]*>/.test(opp.anchor_text)) {
+            linksSkipped.push({ ...opp, reason: 'Anchor contains HTML' });
+            continue;
+        }
+
         const anchorIndex = linkedContent.indexOf(opp.anchor_text);
 
         if (anchorIndex === -1) {
@@ -125,7 +133,7 @@ export async function insertLinks(content, opportunities, options = {}) {
         const safeAnchor = escapeHtml(opp.anchor_text);
         const linkHtml = `<a href="${safeUrl}">${safeAnchor}</a>`;
 
-        // Replace only the first occurrence of exact anchor text
+        // Search for unescaped anchor text in content, replace with properly escaped link HTML
         linkedContent = linkedContent.replace(opp.anchor_text, linkHtml);
 
         linkPositions.push(anchorIndex);

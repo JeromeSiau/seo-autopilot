@@ -21,7 +21,7 @@ class ResearchData
             keyPointsToCover: $data['key_points_to_cover'] ?? [],
             contentGaps: $data['content_gaps'] ?? [],
             suggestedAngles: $data['suggested_angles'] ?? [],
-            suggestedWordCount: $data['suggested_word_count'] ?? null,
+            suggestedWordCount: isset($data['suggested_word_count']) ? (int) $data['suggested_word_count'] : null,
         );
     }
 
