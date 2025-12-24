@@ -76,6 +76,11 @@ class Article extends Model
         return $this->hasMany(ArticleAnalytic::class);
     }
 
+    public function agentEvents(): HasMany
+    {
+        return $this->hasMany(AgentEvent::class);
+    }
+
     public function scopeDraft($query)
     {
         return $query->where('status', 'draft');
