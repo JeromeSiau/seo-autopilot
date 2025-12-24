@@ -2,18 +2,7 @@ import { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { X, Activity } from 'lucide-react';
 import { ActivityFeed } from './ActivityFeed';
-
-interface AgentEvent {
-    id: number;
-    agent_type: string;
-    event_type: string;
-    message: string;
-    reasoning: string | null;
-    progress_current: number | null;
-    progress_total: number | null;
-    progress_percent: number | null;
-    created_at: string;
-}
+import { AgentEvent } from './types';
 
 interface ActivityDrawerProps {
     isOpen: boolean;
@@ -75,6 +64,7 @@ export function ActivityDrawer({
                                                     type="button"
                                                     className="text-gray-400 hover:text-white"
                                                     onClick={onClose}
+                                                    aria-label="Fermer le panneau d'activité"
                                                 >
                                                     <X size={24} />
                                                 </button>

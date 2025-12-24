@@ -3,19 +3,10 @@ import { fr } from 'date-fns/locale';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 import { clsx } from 'clsx';
+import { AgentEvent } from './types';
 
 interface ActivityItemProps {
-    event: {
-        id: number;
-        agent_type: string;
-        event_type: string;
-        message: string;
-        reasoning: string | null;
-        progress_current: number | null;
-        progress_total: number | null;
-        progress_percent: number | null;
-        created_at: string;
-    };
+    event: AgentEvent;
 }
 
 export function ActivityItem({ event }: ActivityItemProps) {
@@ -64,6 +55,8 @@ export function ActivityItem({ event }: ActivityItemProps) {
                         <button
                             onClick={() => setExpanded(!expanded)}
                             className="flex items-center gap-1 mt-1 text-xs text-gray-500 hover:text-gray-700"
+                            aria-label={expanded ? "Masquer les détails" : "Afficher les détails"}
+                            aria-expanded={expanded}
                         >
                             {expanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
                             Détails

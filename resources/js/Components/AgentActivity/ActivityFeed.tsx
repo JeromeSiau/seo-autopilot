@@ -1,18 +1,7 @@
 import { useRef, useEffect } from 'react';
 import { ActivityItem } from './ActivityItem';
 import { AgentBadge } from './AgentBadge';
-
-interface AgentEvent {
-    id: number;
-    agent_type: string;
-    event_type: string;
-    message: string;
-    reasoning: string | null;
-    progress_current: number | null;
-    progress_total: number | null;
-    progress_percent: number | null;
-    created_at: string;
-}
+import { AgentEvent } from './types';
 
 interface ActivityFeedProps {
     events: AgentEvent[];
