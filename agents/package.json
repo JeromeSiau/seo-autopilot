@@ -9,14 +9,15 @@
     "internal-linking": "node internal-linking-agent/index.js"
   },
   "dependencies": {
+    "commander": "^12.1.0",
     "crawlee": "^3.11.0",
+    "dotenv": "^16.4.5",
+    "ioredis": "^5.4.0",
+    "mysql2": "^3.16.0",
+    "openai": "^4.70.0",
     "puppeteer": "^23.0.0",
     "puppeteer-extra": "^3.3.6",
-    "puppeteer-extra-plugin-stealth": "^2.11.2",
-    "ioredis": "^5.4.0",
-    "openai": "^4.70.0",
-    "commander": "^12.1.0",
-    "dotenv": "^16.4.5"
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
   },
   "engines": {
     "node": ">=20.0.0"
