@@ -60,6 +60,16 @@ async function main() {
         });
 
         const validContent = scrapedContent.filter(c => c.content && c.content.length > 200);
+
+        if (validContent.length === 0) {
+            await emitCompleted(articleId, AGENT_TYPE,
+                'Aucune source exploitable trouvée',
+                { reasoning: 'Les pages trouvées n\'avaient pas assez de contenu.' }
+            );
+            console.log(JSON.stringify({ success: true, sources: [], key_topics: [], entities: [], facts: [], suggested_angles: [], competitor_urls: uniqueUrls.slice(0, 10) }));
+            return;
+        }
+
         await emitProgress(articleId, AGENT_TYPE,
             `Extraction terminée, ${validContent.length} pages exploitables`
         );
@@ -114,6 +124,10 @@ async function generateSearchQueries(keyword) {
 
         Retourne un JSON: { "queries": ["query1", "query2", ...] }
     `);
+
+    if (!result.queries || !Array.isArray(result.queries)) {
+        throw new Error('Invalid LLM response: missing queries array');
+    }
     return result.queries;
 }
 
@@ -137,7 +151,14 @@ async function analyzeContent(keyword, sources) {
         Retourne un JSON avec ces 5 clés.
     `, '', { model: 'gpt-4o', maxTokens: 4096 });
 
-    return result;
+    // Validate and provide defaults for missing fields
+    return {
+        topics: result.topics || [],
+        entities: result.entities || [],
+        facts: result.facts || [],
+        angles: result.angles || [],
+        summary: result.summary || '',
+    };
 }
 
 main();
