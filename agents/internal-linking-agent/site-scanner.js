@@ -2,16 +2,17 @@ import mysql from 'mysql2/promise';
 import { config } from '../shared/config.js';
 
 export async function loadSiteIndex(siteId) {
-    const connection = await mysql.createConnection({
-        host: config.database.host,
-        port: config.database.port,
-        user: config.database.user,
-        password: config.database.password,
-        database: config.database.database,
-    });
+    let connection;
 
     try {
-        // Query published articles from the site as linkable pages
+        connection = await mysql.createConnection({
+            host: config.database.host,
+            port: config.database.port,
+            user: config.database.user,
+            password: config.database.password,
+            database: config.database.database,
+        });
+
         const [rows] = await connection.execute(`
             SELECT
                 id,
@@ -34,11 +35,26 @@ export async function loadSiteIndex(siteId) {
             title: row.title || '',
             description: row.meta_description || '',
             h1: row.h1 || '',
-            keywords: row.keywords ? JSON.parse(row.keywords) : [],
+            keywords: parseKeywordsSafely(row.keywords),
             inbound_links: row.inbound_links_count || 0,
         }));
 
+    } catch (error) {
+        console.error('Database error in loadSiteIndex:', error.message);
+        throw new Error(`Failed to load site index: ${error.message}`);
     } finally {
-        await connection.end();
+        if (connection) {
+            await connection.end();
+        }
+    }
+}
+
+function parseKeywordsSafely(keywords) {
+    if (!keywords) return [];
+    try {
+        const parsed = JSON.parse(keywords);
+        return Array.isArray(parsed) ? parsed : [];
+    } catch {
+        return [];
     }
 }
