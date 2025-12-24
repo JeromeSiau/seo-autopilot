@@ -2,6 +2,12 @@ import mysql from 'mysql2/promise';
 import { config } from '../shared/config.js';
 
 export async function loadSiteIndex(siteId) {
+    // Validate siteId
+    const parsedSiteId = parseInt(siteId, 10);
+    if (!parsedSiteId || isNaN(parsedSiteId) || parsedSiteId <= 0) {
+        throw new Error('Invalid siteId parameter');
+    }
+
     let connection;
 
     try {

@@ -50,19 +50,11 @@ class ProcessAgentEvents extends Command
 
     private function processEvent(string $eventJson): void
     {
-        $data = json_decode($eventJson, true);
-
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            $this->error("Invalid JSON: " . json_last_error_msg());
+        try {
+            $data = json_decode($eventJson, true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
+            $this->error("Invalid JSON event: {$e->getMessage()}");
             return;
-        }
-
-        $requiredFields = ['article_id', 'agent_type', 'event_type', 'message'];
-        foreach ($requiredFields as $field) {
-            if (!isset($data[$field])) {
-                $this->error("Missing required field: {$field}");
-                return;
-            }
         }
 
         try {
@@ -81,9 +73,12 @@ class ProcessAgentEvents extends Command
 
             broadcast(new AgentActivityEvent($agentEvent))->toOthers();
 
-            $this->line("[{$data['agent_type']}] {$data['message']}");
+            $this->info("Processed event: {$agentEvent->id} - {$agentEvent->message}");
         } catch (\Exception $e) {
             $this->error("Failed to process event: {$e->getMessage()}");
+            // Re-queue the event for retry
+            Redis::rpush('agent-events-queue', $eventJson);
+            sleep(1);
         }
     }
 }

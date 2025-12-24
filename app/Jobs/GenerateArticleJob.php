@@ -101,7 +101,7 @@ class GenerateArticleJob implements ShouldQueue
                 $competitorData = $agentRunner->runCompetitorAgent(
                     $article,
                     $this->keyword->keyword,
-                    $researchData['top_urls'] ?? []
+                    $researchData['competitor_urls'] ?? []
                 );
                 $eventService->completed($article, 'competitor', 'Analyse concurrentielle terminée', 'Insights extraits', $competitorData);
             } catch (\Exception $e) {
@@ -133,7 +133,9 @@ class GenerateArticleJob implements ShouldQueue
                 $linkingResult = $agentRunner->runInternalLinkingAgent($article, $generated->content);
 
                 // Use the linked content if available
-                $finalContent = $linkingResult['linked_content'] ?? $generated->content;
+                $finalContent = is_array($linkingResult) && isset($linkingResult['content'])
+                    ? $linkingResult['content']
+                    : $generated->content;
 
                 $eventService->completed($article, 'internal_linking', 'Liens internes ajoutés', 'Maillage interne optimisé', $linkingResult);
             } catch (\Exception $e) {
