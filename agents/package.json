@@ -1,0 +1,24 @@
+{
+  "name": "seo-autopilot-agents",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "research": "node research-agent/index.js",
+    "competitor": "node competitor-agent/index.js",
+    "fact-checker": "node fact-checker-agent/index.js",
+    "internal-linking": "node internal-linking-agent/index.js"
+  },
+  "dependencies": {
+    "crawlee": "^3.11.0",
+    "puppeteer": "^23.0.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "ioredis": "^5.4.0",
+    "openai": "^4.70.0",
+    "commander": "^12.1.0",
+    "dotenv": "^16.4.5"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
