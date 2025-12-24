@@ -131,7 +131,11 @@ async function main() {
         console.log(JSON.stringify({ success: false, error: error.message }));
         process.exit(1);
     } finally {
-        await closeRedis();
+        try {
+            await closeRedis();
+        } catch (redisError) {
+            console.error('Failed to close Redis:', redisError.message);
+        }
     }
 }
 

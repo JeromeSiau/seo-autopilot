@@ -22,5 +22,14 @@ export async function extractClaims(content) {
         Retourne un JSON: { "claims": [{ "text": "...", "type": "statistic|date|comparison|technical|citation", "context": "phrase complète contenant l'affirmation" }] }
     `, '', { model: 'gpt-4o' });
 
-    return result.claims || [];
+    // Validate response structure
+    if (!result.claims || !Array.isArray(result.claims)) {
+        console.warn('LLM returned invalid claims structure, returning empty array');
+        return [];
+    }
+
+    // Validate each claim has required fields
+    return result.claims.filter(claim =>
+        claim && typeof claim.text === 'string' && claim.text.length > 0
+    );
 }

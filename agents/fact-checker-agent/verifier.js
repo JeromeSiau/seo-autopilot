@@ -70,7 +70,14 @@ async function verifySingleClaim(claim) {
             }
         `, '', { model: 'gpt-4o' });
 
-        return result;
+        // Validate and provide defaults for required fields
+        return {
+            status: result.status || 'unverifiable',
+            reason: result.reason || 'Résultat de vérification incomplet',
+            source_url: result.source_url || null,
+            source_title: result.source_title || null,
+            corrected_text: result.corrected_text || null,
+        };
 
     } catch (error) {
         return {
