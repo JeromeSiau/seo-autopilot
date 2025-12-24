@@ -8,9 +8,9 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 });
 
 Broadcast::channel('article.{articleId}', function ($user, $articleId) {
-    $article = Article::find($articleId);
-    if (!$article) {
-        return false;
-    }
-    return $user->team_id === $article->site->team_id;
+    return Article::where('id', $articleId)
+        ->whereHas('site', function ($query) use ($user) {
+            $query->where('team_id', $user->team_id);
+        })
+        ->exists();
 });
