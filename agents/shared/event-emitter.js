@@ -6,6 +6,14 @@ let redis = null;
 function getRedis() {
     if (!redis) {
         redis = new Redis(config.redis);
+
+        redis.on('error', (err) => {
+            console.error('Redis connection error:', err.message);
+        });
+
+        redis.on('connect', () => {
+            console.log('Redis connected');
+        });
     }
     return redis;
 }
@@ -23,15 +31,20 @@ export async function emitEvent(articleId, agentType, eventType, message, option
         timestamp: Date.now(),
     };
 
-    const redis = getRedis();
+    try {
+        const redisClient = getRedis();
 
-    // Publish for real-time listeners
-    await redis.publish(`agent-events:${articleId}`, JSON.stringify(event));
+        // Publish for real-time listeners
+        await redisClient.publish(`agent-events:${articleId}`, JSON.stringify(event));
 
-    // Also store in a queue for Laravel to process
-    await redis.rpush('agent-events-queue', JSON.stringify(event));
+        // Also store in a queue for Laravel to process
+        await redisClient.rpush('agent-events-queue', JSON.stringify(event));
 
-    console.log(`[${agentType}] ${eventType}: ${message}`);
+        console.log(`[${agentType}] ${eventType}: ${message}`);
+    } catch (error) {
+        console.error(`Failed to emit event: ${error.message}`);
+        // Don't throw - event emission failure shouldn't crash the agent
+    }
 
     return event;
 }
