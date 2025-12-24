@@ -15,7 +15,18 @@ const options = program.opts();
 
 async function main() {
     const { articleId, keyword, urls: urlsJson } = options;
-    const urls = JSON.parse(urlsJson);
+
+    let urls;
+    try {
+        urls = JSON.parse(urlsJson);
+        if (!Array.isArray(urls) || urls.length === 0) {
+            throw new Error('URLs must be a non-empty array');
+        }
+    } catch (parseError) {
+        await emitError(articleId, AGENT_TYPE, `Invalid URLs JSON: ${parseError.message}`);
+        console.log(JSON.stringify({ success: false, error: `Invalid URLs: ${parseError.message}` }));
+        process.exit(1);
+    }
 
     try {
         await emitStarted(articleId, AGENT_TYPE,
