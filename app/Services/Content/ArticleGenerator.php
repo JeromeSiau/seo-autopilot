@@ -3,7 +3,6 @@
 namespace App\Services\Content;
 
 use App\Models\Article;
-use App\Models\BrandVoice;
 use App\Models\Keyword;
 use App\Services\LLM\DTOs\ArticleOutline;
 use App\Services\LLM\DTOs\GeneratedArticle;
@@ -24,7 +23,7 @@ class ArticleGenerator
     /**
      * Generate a complete article from a keyword.
      */
-    public function generate(Keyword $keyword, ?BrandVoice $brandVoice = null): GeneratedArticle
+    public function generate(Keyword $keyword): GeneratedArticle
     {
         $this->startTime = time();
         $this->totalCost = 0;
@@ -40,7 +39,7 @@ class ArticleGenerator
         $outline = $this->generateOutline($keyword, $research);
 
         // Step 3: Write Content (section by section)
-        $content = $this->writeContent($outline, $research, $brandVoice);
+        $content = $this->writeContent($outline, $research, $keyword->site);
 
         // Step 4: Polish & Generate Meta
         $polished = $this->polishArticle($content, $outline, $keyword);
@@ -141,11 +140,11 @@ PROMPT;
     private function writeContent(
         ArticleOutline $outline,
         ResearchData $research,
-        ?BrandVoice $brandVoice
+        \App\Models\Site $site
     ): string {
         Log::info("Step 3: Writing content sections");
 
-        $brandContext = $brandVoice?->toPromptContext() ?? 'Write in a professional, engaging tone.';
+        $brandContext = $site->toBrandVoiceContext();
         $content = "<h1>{$outline->title}</h1>\n\n";
 
         foreach ($outline->sections as $index => $section) {
@@ -233,17 +232,16 @@ PROMPT;
     /**
      * Generate article and save to database.
      */
-    public function generateAndSave(Keyword $keyword, ?BrandVoice $brandVoice = null): Article
+    public function generateAndSave(Keyword $keyword): Article
     {
         $keyword->markAsGenerating();
 
         try {
-            $generated = $this->generate($keyword, $brandVoice);
+            $generated = $this->generate($keyword);
 
             $article = Article::create([
                 'site_id' => $keyword->site_id,
                 'keyword_id' => $keyword->id,
-                'brand_voice_id' => $brandVoice?->id,
                 'title' => $generated->title,
                 'content' => $generated->content,
                 'meta_title' => $generated->metaTitle,

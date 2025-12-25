@@ -8,6 +8,13 @@ export interface AgentEvent {
     progress_total: number | null;
     progress_percent: number | null;
     created_at: string;
+    article_id?: number;
+}
+
+export interface GeneratingArticle {
+    id: number;
+    title: string;
+    site_name: string;
 }
 
 export type AgentType = 'research' | 'competitor' | 'fact_checker' | 'internal_linking' | 'writing' | 'outline' | 'polish';

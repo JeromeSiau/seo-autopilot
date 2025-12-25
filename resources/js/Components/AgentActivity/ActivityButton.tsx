@@ -12,11 +12,11 @@ export function ActivityButton({ activeAgents, hasNewEvents, onClick }: Activity
         <button
             onClick={onClick}
             className={clsx(
-                'fixed bottom-6 right-6 flex items-center gap-2 px-4 py-3 rounded-full shadow-lg transition-all',
-                'hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2',
+                'fixed bottom-6 right-6 flex items-center gap-2 px-4 py-3 rounded-full shadow-lg transition-all z-40',
+                'hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-surface-900',
                 activeAgents > 0
-                    ? 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500'
-                    : 'bg-gray-900 text-white hover:bg-gray-800 focus:ring-gray-500'
+                    ? 'bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500'
+                    : 'bg-surface-900 dark:bg-surface-800 text-white hover:bg-surface-800 dark:hover:bg-surface-700 focus:ring-surface-500'
             )}
             aria-label={activeAgents > 0 ? `${activeAgents} agent${activeAgents > 1 ? 's' : ''} actif${activeAgents > 1 ? 's' : ''}` : "Voir l'activité des agents"}
         >
@@ -31,7 +31,7 @@ export function ActivityButton({ activeAgents, hasNewEvents, onClick }: Activity
             )}
 
             {hasNewEvents && (
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full" />
+                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse" />
             )}
         </button>
     );

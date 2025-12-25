@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Article;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -59,6 +60,7 @@ class HandleInertiaRequests extends Middleware
             'translations' => [
                 'app' => $this->loadTranslations($locale, 'app'),
             ],
+            'generatingArticles' => $this->getGeneratingArticles($user),
         ];
     }
 
@@ -72,6 +74,30 @@ class HandleInertiaRequests extends Middleware
         }
 
         return $request->cookie('theme', 'system');
+    }
+
+    /**
+     * Get articles currently being generated for the user's team.
+     */
+    private function getGeneratingArticles($user): array
+    {
+        if (!$user || !$user->currentTeam) {
+            return [];
+        }
+
+        return Article::whereHas('site', function ($query) use ($user) {
+            $query->where('team_id', $user->currentTeam->id);
+        })
+            ->where('status', 'generating')
+            ->select('id', 'title', 'site_id')
+            ->with('site:id,name,domain')
+            ->get()
+            ->map(fn ($article) => [
+                'id' => $article->id,
+                'title' => $article->title,
+                'site_name' => $article->site?->name,
+            ])
+            ->toArray();
     }
 
     /**

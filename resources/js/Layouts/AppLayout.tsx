@@ -1,5 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
 import { PropsWithChildren, ReactNode, useState, useRef, useEffect } from 'react';
+import { ActivityButton, ActivityDrawer } from '@/Components/AgentActivity';
+import { useGlobalAgentActivity } from '@/hooks/useGlobalAgentActivity';
 import {
     LayoutDashboard,
     Globe,
@@ -67,7 +69,18 @@ export default function AppLayout({
     const { t } = useTranslations();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
+    const [activityDrawerOpen, setActivityDrawerOpen] = useState(false);
     const userMenuRef = useRef<HTMLDivElement>(null);
+
+    // Agent activity tracking
+    const {
+        events,
+        generatingArticles,
+        activeAgents,
+        totalActiveAgents,
+        hasNewEvents,
+        hasActiveGeneration,
+    } = useGlobalAgentActivity();
 
     const currentPath = window.location.pathname;
 
@@ -350,6 +363,24 @@ export default function AppLayout({
                     <div className="px-4 sm:px-6 lg:px-8">{children}</div>
                 </main>
             </div>
+
+            {/* Agent Activity Button - shows when there are generating articles */}
+            {hasActiveGeneration && (
+                <ActivityButton
+                    activeAgents={totalActiveAgents}
+                    hasNewEvents={hasNewEvents}
+                    onClick={() => setActivityDrawerOpen(true)}
+                />
+            )}
+
+            {/* Agent Activity Drawer */}
+            <ActivityDrawer
+                isOpen={activityDrawerOpen}
+                onClose={() => setActivityDrawerOpen(false)}
+                events={events}
+                activeAgents={activeAgents}
+                generatingArticles={generatingArticles}
+            />
         </div>
     );
 }

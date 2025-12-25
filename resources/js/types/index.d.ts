@@ -147,6 +147,12 @@ export interface PaginatedData<T> {
     };
 }
 
+export interface GeneratingArticle {
+    id: number;
+    title: string;
+    site_name: string;
+}
+
 export type PageProps<
     T extends Record<string, unknown> = Record<string, unknown>,
 > = T & {
@@ -163,4 +169,5 @@ export type PageProps<
     translations?: {
         app: Record<string, any>;
     };
+    generatingArticles?: GeneratingArticle[];
 };
