@@ -31,6 +31,9 @@ Schedule::call(function () {
         });
 })->dailyAt('03:00')->name('sync-all-site-analytics');
 
+// Weekly site re-crawl - Sundays at 2 AM (delta mode)
+Schedule::command('sites:schedule-crawls')->weeklyOn(0, '02:00')->name('weekly-site-crawls');
+
 // Artisan command for manual sync
 Artisan::command('analytics:sync {site?}', function (?int $site = null) {
     if ($site) {
