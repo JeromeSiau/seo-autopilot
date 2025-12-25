@@ -7,6 +7,7 @@ use App\Services\Publisher\Contracts\PublisherInterface;
 use App\Services\Publisher\Providers\ShopifyPublisher;
 use App\Services\Publisher\Providers\WebflowPublisher;
 use App\Services\Publisher\Providers\WordPressPublisher;
+use App\Services\Publisher\Providers\GhostPublisher;
 
 class PublisherManager
 {
@@ -19,6 +20,7 @@ class PublisherManager
             'wordpress' => new WordPressPublisher($integration),
             'webflow' => new WebflowPublisher($integration),
             'shopify' => new ShopifyPublisher($integration),
+            'ghost' => new GhostPublisher($integration),
             default => throw new \InvalidArgumentException("Unknown integration type: {$integration->type}"),
         };
     }
@@ -28,7 +30,7 @@ class PublisherManager
      */
     public function getSupportedTypes(): array
     {
-        return ['wordpress', 'webflow', 'shopify'];
+        return ['wordpress', 'webflow', 'shopify', 'ghost'];
     }
 
     /**
@@ -40,6 +42,7 @@ class PublisherManager
             'wordpress' => ['site_url', 'username', 'app_password'],
             'webflow' => ['api_token', 'site_id', 'collection_id'],
             'shopify' => ['shop_domain', 'access_token', 'blog_id'],
+            'ghost' => ['blog_url', 'admin_api_key'],
             default => [],
         };
     }
@@ -60,6 +63,13 @@ class PublisherManager
 
             if (empty($credentials[$field])) {
                 $errors[$field] = "The {$field} field is required.";
+            }
+        }
+
+        // Validate Ghost API key format
+        if ($type === 'ghost' && !empty($credentials['admin_api_key'])) {
+            if (!preg_match('/^[a-f0-9]{24}:[a-f0-9]{64}$/', $credentials['admin_api_key'])) {
+                $errors['admin_api_key'] = 'Invalid API key format. Expected: {24 hex chars}:{64 hex chars}';
             }
         }
 
