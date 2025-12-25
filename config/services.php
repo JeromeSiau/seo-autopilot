@@ -56,6 +56,10 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI'),
     ],
 
+    'voyage' => [
+        'api_key' => env('VOYAGE_API_KEY'),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Image Generation (Replicate - FLUX models)
