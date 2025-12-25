@@ -217,14 +217,54 @@ class GhostPublisher implements PublisherInterface
 
     public function update(string $remoteId, PublishRequest $request): PublishResult
     {
-        // Placeholder - implemented in Task 6
-        return PublishResult::failure('Not implemented');
+        try {
+            // Upload new featured image if provided
+            $featureImage = $this->uploadImage($request);
+
+            // Match/create tags
+            $tags = $this->matchTags($request->tags);
+
+            $postData = [
+                'posts' => [[
+                    'title' => $request->title,
+                    'html' => $request->content,
+                    'slug' => $request->slug,
+                    'custom_excerpt' => $request->excerpt,
+                    'meta_title' => $request->metaTitle,
+                    'meta_description' => $request->metaDescription,
+                    'tags' => $tags,
+                    'updated_at' => now()->toIso8601String(),
+                ]],
+            ];
+
+            // Only update feature_image if we have a new one
+            if ($featureImage) {
+                $postData['posts'][0]['feature_image'] = $featureImage;
+            }
+
+            $response = $this->request('PUT', "/ghost/api/admin/posts/{$remoteId}/", $postData);
+
+            $post = $response['posts'][0] ?? null;
+            if (!$post) {
+                return PublishResult::failure('Failed to update Ghost post');
+            }
+
+            return PublishResult::success($post['url'] ?? '', $remoteId);
+        } catch (\Exception $e) {
+            Log::error('Ghost update failed', ['error' => $e->getMessage()]);
+            return PublishResult::failure($e->getMessage());
+        }
     }
 
     public function delete(string $remoteId): bool
     {
-        // Placeholder - implemented in Task 6
-        return false;
+        try {
+            $this->request('DELETE', "/ghost/api/admin/posts/{$remoteId}/");
+            return true;
+        } catch (\Exception $e) {
+            Log::warning('Ghost delete failed', ['error' => $e->getMessage()]);
+            return false;
+        }
     }
 
     private function request(string $method, string $endpoint, array $data = []): array
