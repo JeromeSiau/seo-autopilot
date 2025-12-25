@@ -3,17 +3,24 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\SiteIndexJob;
 use App\Models\Site;
 use App\Models\SiteSetting;
 use App\Jobs\DiscoverKeywordsJob;
+use App\Services\Crawler\SiteCrawlerService;
 use App\Services\Google\GoogleAuthService;
 use App\Services\Google\SearchConsoleService;
 use App\Services\Google\GA4Service;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class OnboardingController extends Controller
 {
+    public function __construct(
+        private readonly SiteCrawlerService $crawler,
+    ) {}
+
     public function create()
     {
         return Inertia::render('Onboarding/Wizard', [
@@ -68,10 +75,30 @@ class OnboardingController extends Controller
             'language' => 'required|string|size:2',
         ]);
 
+        // Créer le site avec status running
         $site = Site::create([
             'team_id' => auth()->user()->team_id,
+            'crawl_status' => 'running',
             ...$validated,
         ]);
+
+        // Crawl rapide du sitemap (sync) - stocke dans site_pages MySQL
+        try {
+            $this->crawler->crawl($site);
+            $this->crawler->extractTitlesForPages($site, 50);
+
+            $pagesCount = $site->pages()->count();
+            $site->update([
+                'crawl_status' => 'partial',
+                'crawl_pages_count' => $pagesCount,
+            ]);
+        } catch (\Exception $e) {
+            // Le crawl sitemap a échoué, on continue quand même
+            Log::warning('Sitemap crawl failed', ['site_id' => $site->id, 'error' => $e->getMessage()]);
+        }
+
+        // Lancer le crawl profond avec embeddings (async)
+        SiteIndexJob::dispatch($site, delta: false)->onQueue('crawl');
 
         return response()->json(['site_id' => $site->id]);
     }
