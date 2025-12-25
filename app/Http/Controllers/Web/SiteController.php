@@ -90,11 +90,22 @@ class SiteController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'language' => ['required', 'string', 'size:2'],
+            'business_description' => ['nullable', 'string', 'max:2000'],
+            'target_audience' => ['nullable', 'string', 'max:500'],
+            'tone' => ['nullable', 'string', 'in:professional,casual,expert,friendly,neutral'],
+            'writing_style' => ['nullable', 'string', 'max:1000'],
+            'vocabulary' => ['nullable', 'array'],
+            'vocabulary.use' => ['nullable', 'array'],
+            'vocabulary.use.*' => ['string', 'max:100'],
+            'vocabulary.avoid' => ['nullable', 'array'],
+            'vocabulary.avoid.*' => ['string', 'max:100'],
+            'brand_examples' => ['nullable', 'array', 'max:5'],
+            'brand_examples.*' => ['string', 'max:2000'],
         ]);
 
         $site->update($validated);
 
-        return redirect()->route('sites.index')
+        return redirect()->route('sites.show', $site)
             ->with('success', 'Site updated successfully.');
     }
 
