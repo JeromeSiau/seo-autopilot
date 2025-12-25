@@ -9,6 +9,14 @@ interface Props {
     onBack: () => void;
 }
 
+const TONES = [
+    { value: 'professional', label: 'Professionnel', description: 'Formel et crédible' },
+    { value: 'casual', label: 'Décontracté', description: 'Accessible et convivial' },
+    { value: 'expert', label: 'Expert', description: 'Technique et approfondi' },
+    { value: 'friendly', label: 'Amical', description: 'Chaleureux et engageant' },
+    { value: 'neutral', label: 'Neutre', description: 'Objectif et factuel' },
+];
+
 export default function Step3Business({ siteId, onNext, onBack }: Props) {
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -16,6 +24,8 @@ export default function Step3Business({ siteId, onNext, onBack }: Props) {
         business_description: '',
         target_audience: '',
         topics: [] as string[],
+        tone: '',
+        writing_style: '',
     });
     const [topicInput, setTopicInput] = useState('');
 
@@ -161,6 +171,74 @@ export default function Step3Business({ siteId, onNext, onBack }: Props) {
                 <p className="mt-2 text-xs text-surface-500 dark:text-surface-400">
                     {data.topics.length}/10 thématiques ajoutées
                 </p>
+            </div>
+
+            {/* Brand Voice Section - Optional */}
+            <div className="pt-4 border-t border-surface-100 dark:border-surface-800">
+                <div className="mb-4">
+                    <h3 className="text-sm font-medium text-surface-700 dark:text-surface-300">
+                        Style d'écriture <span className="text-surface-400 font-normal">(optionnel)</span>
+                    </h3>
+                    <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
+                        Personnalisez le ton de vos articles. Vous pourrez affiner ces paramètres plus tard.
+                    </p>
+                </div>
+
+                {/* Tone */}
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-xs font-medium text-surface-600 dark:text-surface-400 mb-2">
+                            Ton
+                        </label>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                            {TONES.map((tone) => (
+                                <button
+                                    key={tone.value}
+                                    type="button"
+                                    onClick={() => setData({ ...data, tone: data.tone === tone.value ? '' : tone.value })}
+                                    className={clsx(
+                                        'rounded-lg border p-2 text-left transition-all',
+                                        data.tone === tone.value
+                                            ? 'border-primary-500 bg-primary-50 dark:bg-primary-500/15'
+                                            : 'border-surface-200 dark:border-surface-700 hover:border-surface-300 dark:hover:border-surface-600'
+                                    )}
+                                >
+                                    <p className={clsx(
+                                        'font-medium text-xs',
+                                        data.tone === tone.value ? 'text-primary-700 dark:text-primary-400' : 'text-surface-900 dark:text-white'
+                                    )}>
+                                        {tone.label}
+                                    </p>
+                                    <p className="text-xs text-surface-500 dark:text-surface-400 mt-0.5">
+                                        {tone.description}
+                                    </p>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Writing Style */}
+                    <div>
+                        <label className="block text-xs font-medium text-surface-600 dark:text-surface-400 mb-1.5">
+                            Consignes de style
+                        </label>
+                        <textarea
+                            value={data.writing_style}
+                            onChange={(e) => setData({ ...data, writing_style: e.target.value })}
+                            placeholder="Ex: Utilisez des phrases courtes et directes. Privilégiez les exemples concrets..."
+                            rows={3}
+                            className={clsx(
+                                'block w-full rounded-xl border bg-white dark:bg-surface-800 px-4 py-2.5 text-surface-900 dark:text-white placeholder:text-surface-400',
+                                'focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500',
+                                'transition-colors resize-none text-sm',
+                                errors.writing_style ? 'border-red-300 dark:border-red-500/50' : 'border-surface-200 dark:border-surface-700'
+                            )}
+                        />
+                        {errors.writing_style && (
+                            <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">{errors.writing_style}</p>
+                        )}
+                    </div>
+                </div>
             </div>
 
             {/* Actions */}

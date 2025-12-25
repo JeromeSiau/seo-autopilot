@@ -215,11 +215,17 @@ class OnboardingController extends Controller
 
     public function storeStep3(Request $request, Site $site)
     {
+        if ($site->team_id !== auth()->user()->team_id) {
+            abort(403);
+        }
+
         $validated = $request->validate([
             'business_description' => 'required|string|max:2000',
             'target_audience' => 'nullable|string|max:500',
-            'topics' => 'nullable|array',
+            'topics' => 'nullable|array|max:10',
             'topics.*' => 'string|max:100',
+            'tone' => 'nullable|string|in:professional,casual,expert,friendly,neutral',
+            'writing_style' => 'nullable|string|max:500',
         ]);
 
         $site->update($validated);
