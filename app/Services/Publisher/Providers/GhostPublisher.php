@@ -85,10 +85,134 @@ class GhostPublisher implements PublisherInterface
         }
     }
 
+    private function matchTags(array $requestTags): array
+    {
+        if (empty($requestTags)) {
+            return [];
+        }
+
+        // Fetch existing tags from Ghost
+        $existingTags = $this->getCategories();
+        $existingBySlug = [];
+        foreach ($existingTags as $tag) {
+            $existingBySlug[$tag['slug']] = $tag;
+        }
+
+        $matchedTags = [];
+        foreach ($requestTags as $tagName) {
+            $slug = \Illuminate\Support\Str::slug($tagName);
+
+            if (isset($existingBySlug[$slug])) {
+                // Use existing tag
+                $matchedTags[] = ['id' => $existingBySlug[$slug]['id']];
+            } else {
+                // Create new tag
+                try {
+                    $response = $this->request('POST', '/ghost/api/admin/tags/', [
+                        'tags' => [['name' => $tagName, 'slug' => $slug]],
+                    ]);
+                    if (!empty($response['tags'][0]['id'])) {
+                        $matchedTags[] = ['id' => $response['tags'][0]['id']];
+                        // Add to cache for subsequent tags
+                        $existingBySlug[$slug] = $response['tags'][0];
+                    }
+                } catch (\Exception $e) {
+                    Log::warning('Ghost tag creation failed', ['tag' => $tagName, 'error' => $e->getMessage()]);
+                }
+            }
+        }
+
+        return $matchedTags;
+    }
+
+    private function uploadImage(PublishRequest $request): ?string
+    {
+        try {
+            $imageUrl = $request->featuredImageUrl;
+            $imagePath = $request->featuredImagePath;
+
+            if (!$imageUrl && !$imagePath) {
+                return null;
+            }
+
+            // Get image content
+            if ($imagePath && \Illuminate\Support\Facades\Storage::disk('public')->exists($imagePath)) {
+                $imageContent = \Illuminate\Support\Facades\Storage::disk('public')->get($imagePath);
+                $filename = basename($imagePath);
+            } elseif ($imageUrl) {
+                $response = Http::timeout(30)->get($imageUrl);
+                if (!$response->successful()) {
+                    return null;
+                }
+                $imageContent = $response->body();
+                $filename = basename(parse_url($imageUrl, PHP_URL_PATH)) ?: 'image.jpg';
+            } else {
+                return null;
+            }
+
+            // Upload to Ghost
+            $jwt = $this->generateJwt();
+            $response = Http::withHeaders([
+                'Authorization' => "Ghost {$jwt}",
+            ])->attach('file', $imageContent, $filename)
+              ->post("{$this->blogUrl}/ghost/api/admin/images/upload/");
+
+            if (!$response->successful()) {
+                Log::warning('Ghost image upload failed', ['status' => $response->status()]);
+                return null;
+            }
+
+            return $response->json()['images'][0]['url'] ?? null;
+        } catch (\Exception $e) {
+            Log::warning('Ghost image upload error', ['error' => $e->getMessage()]);
+            return null;
+        }
+    }
+
     public function publish(PublishRequest $request): PublishResult
     {
-        // Placeholder - implemented in Task 5
-        return PublishResult::failure('Not implemented');
+        try {
+            // Upload featured image first
+            $featureImage = $this->uploadImage($request);
+
+            // Match/create tags
+            $tags = $this->matchTags($request->tags);
+
+            // Create post
+            $postData = [
+                'posts' => [[
+                    'title' => $request->title,
+                    'html' => $request->content,
+                    'slug' => $request->slug,
+                    'custom_excerpt' => $request->excerpt,
+                    'meta_title' => $request->metaTitle,
+                    'meta_description' => $request->metaDescription,
+                    'status' => $request->status === 'publish' ? 'published' : 'draft',
+                    'tags' => $tags,
+                    'feature_image' => $featureImage,
+                ]],
+            ];
+
+            $response = $this->request('POST', '/ghost/api/admin/posts/', $postData);
+
+            $post = $response['posts'][0] ?? null;
+            if (!$post || !isset($post['id'])) {
+                return PublishResult::failure('Failed to create Ghost post');
+            }
+
+            Log::info('Ghost article published', [
+                'post_id' => $post['id'],
+                'url' => $post['url'] ?? null,
+            ]);
+
+            return PublishResult::success($post['url'] ?? '', $post['id'], [
+                'feature_image' => $featureImage,
+                'tags_count' => count($tags),
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Ghost publish failed', ['error' => $e->getMessage()]);
+            return PublishResult::failure($e->getMessage());
+        }
     }
 
     public function update(string $remoteId, PublishRequest $request): PublishResult
