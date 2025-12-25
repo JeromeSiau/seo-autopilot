@@ -79,4 +79,31 @@ class SiteIndexService
         }
         return true;
     }
+
+    /**
+     * Récupère toutes les pages depuis l'index SQLite.
+     */
+    public function getAllPages(Site $site): array
+    {
+        $path = $this->getIndexPath($site);
+        if (!file_exists($path)) {
+            return [];
+        }
+
+        try {
+            $db = new \SQLite3($path, SQLITE3_OPEN_READONLY);
+            $result = $db->query('SELECT url, title, h1, meta_description, category, tags, inbound_links_count FROM pages ORDER BY crawled_at DESC');
+
+            $pages = [];
+            while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
+                $pages[] = $row;
+            }
+
+            $db->close();
+            return $pages;
+        } catch (\Exception $e) {
+            Log::error('SiteIndexService: Failed to read SQLite', ['error' => $e->getMessage()]);
+            return [];
+        }
+    }
 }
