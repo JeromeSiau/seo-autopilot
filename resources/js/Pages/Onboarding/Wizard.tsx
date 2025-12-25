@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import { PageProps } from '@/types';
 import { Check, X } from 'lucide-react';
@@ -9,6 +9,7 @@ import Step3Business from './Steps/Step3Business';
 import Step4Config from './Steps/Step4Config';
 import Step5Integration from './Steps/Step5Integration';
 import Step6Launch from './Steps/Step6Launch';
+import { CrawlStatusIndicator } from '@/Components/Onboarding/CrawlStatusIndicator';
 
 interface Team {
     id: number;
@@ -26,6 +27,8 @@ interface Site {
     gsc_property_id?: string;
     ga4_connected?: boolean;
     ga4_property_id?: string;
+    crawl_status?: 'pending' | 'running' | 'partial' | 'completed' | 'failed';
+    crawl_pages_count?: number;
     settings?: {
         articles_per_week: number;
         publish_days: string[];
@@ -48,14 +51,35 @@ const STEPS = [
     { number: 6, title: 'Lancement', description: 'Activer l\'autopilot' },
 ];
 
-export default function Wizard({ team, site, resumeStep }: WizardProps) {
+export default function Wizard({ team, site: initialSite, resumeStep }: WizardProps) {
     const [currentStep, setCurrentStep] = useState(resumeStep || 1);
-    const [siteId, setSiteId] = useState<number | null>(site?.id || null);
+    const [siteId, setSiteId] = useState<number | null>(initialSite?.id || null);
     const [siteData, setSiteData] = useState({
-        domain: site?.domain || '',
-        name: site?.name || '',
-        language: site?.language || 'fr',
+        domain: initialSite?.domain || '',
+        name: initialSite?.name || '',
+        language: initialSite?.language || 'fr',
     });
+    const [crawlStatus, setCrawlStatus] = useState<Site['crawl_status']>(initialSite?.crawl_status || 'pending');
+    const [crawlPagesCount, setCrawlPagesCount] = useState(initialSite?.crawl_pages_count || 0);
+
+    // Écouter les updates de crawl en temps réel
+    useEffect(() => {
+        if (!siteId) return;
+
+        const channel = (window as any).Echo?.private(`site.${siteId}`);
+        if (!channel) return;
+
+        const handler = (e: { status: string; pagesCount: number }) => {
+            setCrawlStatus(e.status as Site['crawl_status']);
+            setCrawlPagesCount(e.pagesCount);
+        };
+
+        channel.listen('.SiteCrawlProgress', handler);
+
+        return () => {
+            channel.stopListening('.SiteCrawlProgress', handler);
+        };
+    }, [siteId]);
 
     const nextStep = () => setCurrentStep((s) => Math.min(s + 1, 6));
     const prevStep = () => setCurrentStep((s) => Math.max(s - 1, 1));
@@ -143,6 +167,16 @@ export default function Wizard({ team, site, resumeStep }: WizardProps) {
                             />
                         </div>
                     </div>
+
+                    {/* Crawl Status Indicator */}
+                    {siteId && crawlStatus && crawlStatus !== 'pending' && (
+                        <div className="mt-4 flex justify-center">
+                            <CrawlStatusIndicator
+                                status={crawlStatus}
+                                pagesCount={crawlPagesCount}
+                            />
+                        </div>
+                    )}
                 </div>
 
                 {/* Step Content */}
@@ -154,6 +188,7 @@ export default function Wizard({ team, site, resumeStep }: WizardProps) {
                                 setData={setSiteData}
                                 onNext={(id) => {
                                     setSiteId(id);
+                                    setCrawlStatus('running');
                                     nextStep();
                                 }}
                             />
@@ -161,10 +196,10 @@ export default function Wizard({ team, site, resumeStep }: WizardProps) {
                         {currentStep === 2 && siteId && (
                             <Step2GSC
                                 siteId={siteId}
-                                gscConnected={site?.gsc_connected || false}
-                                gscPropertyId={site?.gsc_property_id}
-                                ga4Connected={site?.ga4_connected || false}
-                                ga4PropertyId={site?.ga4_property_id}
+                                gscConnected={initialSite?.gsc_connected || false}
+                                gscPropertyId={initialSite?.gsc_property_id}
+                                ga4Connected={initialSite?.ga4_connected || false}
+                                ga4PropertyId={initialSite?.ga4_property_id}
                                 onNext={nextStep}
                                 onBack={prevStep}
                             />
