@@ -2,6 +2,7 @@
 
 namespace App\Services\ContentPlan;
 
+use App\Jobs\SiteIndexJob;
 use App\Models\ContentPlanGeneration;
 use App\Models\Site;
 use App\Services\Crawler\SiteCrawlerService;
@@ -42,6 +43,11 @@ class ContentPlanGeneratorService
             $generation->markStepRunning($stepIndex);
             $this->crawler->crawl($site);
             $this->crawler->extractTitlesForPages($site, 30);
+
+            // Trigger deep indexation with embeddings for internal linking
+            dispatch(new SiteIndexJob($site, delta: false))
+                ->onQueue('crawl');
+
             $generation->markStepCompleted($stepIndex);
             $stepIndex++;
 
