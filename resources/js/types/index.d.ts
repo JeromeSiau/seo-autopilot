@@ -98,17 +98,6 @@ export interface Integration {
     created_at: string;
 }
 
-export interface BrandVoice {
-    id: number;
-    team_id: number;
-    name: string;
-    tone: string;
-    style: string;
-    target_audience: string;
-    vocabulary_preferences: string[];
-    is_default: boolean;
-}
-
 export interface AnalyticsData {
     date: string;
     clicks: number;

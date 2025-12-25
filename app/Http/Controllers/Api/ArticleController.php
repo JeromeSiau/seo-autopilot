@@ -39,7 +39,7 @@ class ArticleController extends Controller
     {
         $this->authorize('view', $article->site);
 
-        $article->load(['keyword', 'site', 'brandVoice']);
+        $article->load(['keyword', 'site']);
 
         return new ArticleResource($article);
     }

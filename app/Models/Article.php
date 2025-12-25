@@ -66,11 +66,6 @@ class Article extends Model
         return $this->belongsTo(Keyword::class);
     }
 
-    public function brandVoice(): BelongsTo
-    {
-        return $this->belongsTo(BrandVoice::class);
-    }
-
     public function analytics(): HasMany
     {
         return $this->hasMany(ArticleAnalytic::class);

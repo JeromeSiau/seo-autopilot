@@ -43,11 +43,6 @@ class Team extends Model
         return $this->hasMany(Integration::class);
     }
 
-    public function brandVoices(): HasMany
-    {
-        return $this->hasMany(BrandVoice::class);
-    }
-
     public function getArticlesUsedThisMonthAttribute(): int
     {
         return Article::whereIn('site_id', $this->sites->pluck('id'))

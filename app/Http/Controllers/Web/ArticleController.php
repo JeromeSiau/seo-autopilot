@@ -76,7 +76,6 @@ class ArticleController extends Controller
         return Inertia::render('Articles/Create', [
             'sites' => SiteResource::collection($team->sites()->get())->resolve(),
             'keywords' => KeywordResource::collection($pendingKeywords)->resolve(),
-            'brandVoices' => $team->brandVoices()->get(),
         ]);
     }
 
