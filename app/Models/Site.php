@@ -30,6 +30,10 @@ class Site extends Model
         'topics',
         'last_crawled_at',
         'onboarding_completed_at',
+        'tone',
+        'writing_style',
+        'vocabulary',
+        'brand_examples',
     ];
 
     protected $hidden = [
@@ -49,6 +53,8 @@ class Site extends Model
         'topics' => 'array',
         'last_crawled_at' => 'datetime',
         'onboarding_completed_at' => 'datetime',
+        'vocabulary' => 'array',
+        'brand_examples' => 'array',
     ];
 
     protected $appends = [
@@ -161,5 +167,41 @@ class Site extends Model
     public function isOnboardingComplete(): bool
     {
         return $this->onboarding_completed_at !== null;
+    }
+
+    public function toBrandVoiceContext(): string
+    {
+        if (!$this->tone && !$this->writing_style) {
+            return 'Write in a professional, engaging tone.';
+        }
+
+        $context = '';
+
+        if ($this->writing_style) {
+            $context .= "Writing Style: {$this->writing_style}\n";
+        }
+
+        if ($this->tone) {
+            $context .= "Tone: {$this->tone}\n";
+        }
+
+        if (!empty($this->vocabulary)) {
+            $context .= "Vocabulary preferences:\n";
+            if (!empty($this->vocabulary['use'])) {
+                $context .= "- Words to use: " . implode(', ', $this->vocabulary['use']) . "\n";
+            }
+            if (!empty($this->vocabulary['avoid'])) {
+                $context .= "- Words to avoid: " . implode(', ', $this->vocabulary['avoid']) . "\n";
+            }
+        }
+
+        if (!empty($this->brand_examples)) {
+            $context .= "\nExample excerpts from existing content:\n";
+            foreach (array_slice($this->brand_examples, 0, 3) as $example) {
+                $context .= "---\n{$example}\n";
+            }
+        }
+
+        return $context ?: 'Write in a professional, engaging tone.';
     }
 }
