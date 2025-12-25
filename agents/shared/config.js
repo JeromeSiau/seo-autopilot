@@ -9,6 +9,9 @@ export const config = {
     openai: {
         apiKey: process.env.OPENAI_API_KEY,
     },
+    voyage: {
+        apiKey: process.env.VOYAGE_API_KEY,
+    },
     database: {
         host: process.env.DB_HOST || 'localhost',
         port: parseInt(process.env.DB_PORT || '3306'),
