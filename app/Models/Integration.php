@@ -60,4 +60,9 @@ class Integration extends Model
     {
         return $this->type === 'shopify';
     }
+
+    public function isGhost(): bool
+    {
+        return $this->type === 'ghost';
+    }
 }
