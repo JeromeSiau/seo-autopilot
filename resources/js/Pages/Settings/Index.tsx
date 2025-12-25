@@ -1,6 +1,6 @@
 import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link } from '@inertiajs/react';
-import { CreditCard, Users, Key, Bell, Palette, ChevronRight, Zap, Sparkles } from 'lucide-react';
+import { CreditCard, Users, Key, Bell, ChevronRight, Zap, Sparkles } from 'lucide-react';
 import clsx from 'clsx';
 import { PageProps, Team } from '@/types';
 import { useTranslations } from '@/hooks/useTranslations';
@@ -42,13 +42,6 @@ export default function SettingsIndex({ team }: SettingsIndexProps) {
             href: 'settings.api-keys',
             icon: Key,
             color: 'purple',
-        },
-        {
-            name: t?.settings?.brandVoices ?? 'Voix de marque',
-            description: t?.settings?.brandVoicesDescription ?? 'Configurez le ton et le style de votre contenu',
-            href: 'settings.brand-voices',
-            icon: Palette,
-            color: 'amber',
         },
         {
             name: t?.settings?.notifications ?? 'Notifications',

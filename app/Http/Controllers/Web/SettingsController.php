@@ -53,15 +53,6 @@ class SettingsController extends Controller
         ]);
     }
 
-    public function brandVoices(Request $request): Response
-    {
-        $team = $request->user()->currentTeam;
-
-        return Inertia::render('Settings/BrandVoices', [
-            'brandVoices' => $team->brandVoices()->get(),
-        ]);
-    }
-
     public function notifications(Request $request): Response
     {
         return Inertia::render('Settings/Notifications', [

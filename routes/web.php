@@ -102,7 +102,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/settings/billing', [SettingsController::class, 'billing'])->name('settings.billing');
     Route::get('/settings/team', [SettingsController::class, 'team'])->name('settings.team');
     Route::get('/settings/api-keys', [SettingsController::class, 'apiKeys'])->name('settings.api-keys');
-    Route::get('/settings/brand-voices', [SettingsController::class, 'brandVoices'])->name('settings.brand-voices');
     Route::get('/settings/notifications', [SettingsController::class, 'notifications'])->name('settings.notifications');
 
     // Notifications
