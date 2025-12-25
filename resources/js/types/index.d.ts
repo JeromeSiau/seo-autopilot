@@ -31,6 +31,8 @@ export interface Site {
     brand_examples?: string[] | null;
     gsc_connected: boolean;
     ga4_connected: boolean;
+    crawl_status: 'pending' | 'running' | 'partial' | 'completed' | 'failed';
+    crawl_pages_count: number;
     keywords_count?: number;
     articles_count?: number;
     integrations_count?: number;
