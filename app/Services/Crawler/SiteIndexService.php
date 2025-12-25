@@ -92,7 +92,7 @@ class SiteIndexService
 
         try {
             $db = new \SQLite3($path, SQLITE3_OPEN_READONLY);
-            $result = $db->query('SELECT url, title, h1, meta_description, category, tags, inbound_links_count FROM pages ORDER BY crawled_at DESC');
+            $result = $db->query('SELECT url, title, h1, meta_description, category, tags, internal_links FROM pages ORDER BY updated_at DESC');
 
             $pages = [];
             while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
