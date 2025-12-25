@@ -23,6 +23,7 @@ interface Props {
     gscPropertyId?: string;
     ga4Connected: boolean;
     ga4PropertyId?: string;
+    onboardingComplete?: boolean;
     onNext: () => void;
     onBack: () => void;
 }
@@ -31,7 +32,7 @@ const SKIP_VALUE = '__skip__';
 
 type Step = 'connect' | 'select-gsc' | 'select-ga4' | 'summary';
 
-export default function Step2GSC({ siteId, gscConnected, gscPropertyId, ga4Connected, ga4PropertyId, onNext, onBack }: Props) {
+export default function Step2GSC({ siteId, gscConnected, gscPropertyId, ga4Connected, ga4PropertyId, onboardingComplete, onNext, onBack }: Props) {
     const { t } = useTranslations();
     const step2 = t?.onboarding?.step2;
 
@@ -200,6 +201,11 @@ export default function Step2GSC({ siteId, gscConnected, gscPropertyId, ga4Conne
     };
 
     const handleContinue = () => {
+        // If onboarding is already complete, redirect back to site instead of continuing wizard
+        if (onboardingComplete) {
+            window.location.href = route('sites.show', { site: siteId });
+            return;
+        }
         onNext();
     };
 
@@ -338,7 +344,9 @@ export default function Step2GSC({ siteId, gscConnected, gscPropertyId, ga4Conne
                         'hover:-translate-y-0.5 transition-all'
                     )}
                 >
-                    {t?.onboarding?.continue ?? 'Continue'}
+                    {onboardingComplete
+                        ? (step2?.summary?.backToSite ?? 'Retour au site')
+                        : (t?.onboarding?.continue ?? 'Continue')}
                     <ArrowRight className="h-5 w-5" />
                 </button>
 

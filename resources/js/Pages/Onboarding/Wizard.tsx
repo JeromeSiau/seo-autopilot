@@ -29,6 +29,7 @@ interface Site {
     ga4_property_id?: string;
     crawl_status?: 'pending' | 'running' | 'partial' | 'completed' | 'failed';
     crawl_pages_count?: number;
+    onboarding_completed_at?: string;
     settings?: {
         articles_per_week: number;
         publish_days: string[];
@@ -200,6 +201,7 @@ export default function Wizard({ team, site: initialSite, resumeStep }: WizardPr
                                 gscPropertyId={initialSite?.gsc_property_id}
                                 ga4Connected={initialSite?.ga4_connected || false}
                                 ga4PropertyId={initialSite?.ga4_property_id}
+                                onboardingComplete={!!initialSite?.onboarding_completed_at}
                                 onNext={nextStep}
                                 onBack={prevStep}
                             />

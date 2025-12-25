@@ -57,9 +57,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('integrations/{integration}/categories', [IntegrationController::class, 'categories']);
 
     // Analytics
-    Route::get('sites/{site}/analytics', [AnalyticsController::class, 'dashboard']);
-    Route::get('articles/{article}/analytics', [AnalyticsController::class, 'article']);
-    Route::post('sites/{site}/analytics/sync', [AnalyticsController::class, 'sync']);
+    Route::get('sites/{site}/analytics', [AnalyticsController::class, 'dashboard'])->name('api.analytics.dashboard');
+    Route::get('articles/{article}/analytics', [AnalyticsController::class, 'article'])->name('api.analytics.article');
+    Route::post('sites/{site}/analytics/sync', [AnalyticsController::class, 'sync'])->name('api.analytics.sync');
 
     // Content Plan
     Route::get('sites/{site}/generation-status', [\App\Http\Controllers\Api\ContentPlanController::class, 'generationStatus']);

@@ -80,9 +80,9 @@ class Site extends Model
         return $this->hasMany(Article::class);
     }
 
-    public function integration(): HasOne
+    public function integrations(): HasMany
     {
-        return $this->hasOne(Integration::class);
+        return $this->hasMany(Integration::class);
     }
 
     public function analytics(): HasManyThrough

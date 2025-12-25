@@ -39,25 +39,46 @@ class OnboardingController extends Controller
         // Determine which step to resume from
         $step = 2; // Site already exists, skip step 1
 
-        // If GSC is connected AND property is selected, move to step 3
-        // If only connected but no property selected, stay at step 2 to select property
-        if ($site->isGscConnected() && $site->gsc_property_id) {
+        // PRIORITY: If GSC is connected but no property selected, force step 2 for property selection
+        // This happens when user (re)connects Google account
+        if ($site->isGscConnected() && !$site->gsc_property_id) {
+            $step = 2;
+        }
+        // If GSC is connected AND property is selected, continue with normal flow
+        elseif ($site->isGscConnected() && $site->gsc_property_id) {
             $step = 3;
-        }
 
-        // If business description is filled, move to step 4
-        if ($site->business_description) {
-            $step = 4;
-        }
+            // If business description is filled, move to step 4
+            if ($site->business_description) {
+                $step = 4;
+            }
 
-        // If settings exist, move to step 5
-        if ($site->settings) {
-            $step = 5;
-        }
+            // If settings exist, move to step 5
+            if ($site->settings) {
+                $step = 5;
+            }
 
-        // If has integration OR step 5 was visited (settings exist), move to step 6
-        if ($site->settings && $site->integration) {
-            $step = 6;
+            // If has integration OR step 5 was visited (settings exist), move to step 6
+            if ($site->settings && $site->integrations()->exists()) {
+                $step = 6;
+            }
+        }
+        // If GSC not connected, still check if other steps were completed
+        else {
+            // If business description is filled, move to step 4
+            if ($site->business_description) {
+                $step = 4;
+            }
+
+            // If settings exist, move to step 5
+            if ($site->settings) {
+                $step = 5;
+            }
+
+            // If has integration, move to step 6
+            if ($site->settings && $site->integrations()->exists()) {
+                $step = 6;
+            }
         }
 
         return Inertia::render('Onboarding/Wizard', [

@@ -198,19 +198,31 @@ export default function Dashboard({ stats, sites, actionsRequired }: DashboardPr
                         {t?.dashboard?.actionsRequired ?? 'Actions required'}
                     </h3>
                     <div className="mt-4 space-y-2">
-                        {actionsRequired.map((action, i) => (
-                            <Link
-                                key={i}
-                                href={action.action_url}
-                                className="flex items-center justify-between rounded-xl bg-white dark:bg-surface-900/50 p-4 border border-amber-100 dark:border-amber-500/15 hover:border-amber-300 dark:hover:border-amber-500/30 hover:shadow-sm transition-all"
-                            >
-                                <div>
-                                    <p className="font-medium text-surface-900 dark:text-white">{action.message}</p>
-                                    <p className="text-sm text-surface-500 dark:text-surface-400">{action.site_domain}</p>
-                                </div>
-                                <ArrowRight className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-                            </Link>
-                        ))}
+                        {actionsRequired.map((action, i) => {
+                            // Use <a> for external redirects (like Google OAuth), Link for internal navigation
+                            const isExternalRedirect = action.type === 'recommendation';
+                            const className = "flex items-center justify-between rounded-xl bg-white dark:bg-surface-900/50 p-4 border border-amber-100 dark:border-amber-500/15 hover:border-amber-300 dark:hover:border-amber-500/30 hover:shadow-sm transition-all";
+
+                            const content = (
+                                <>
+                                    <div>
+                                        <p className="font-medium text-surface-900 dark:text-white">{action.message}</p>
+                                        <p className="text-sm text-surface-500 dark:text-surface-400">{action.site_domain}</p>
+                                    </div>
+                                    <ArrowRight className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                                </>
+                            );
+
+                            return isExternalRedirect ? (
+                                <a key={i} href={action.action_url} className={className}>
+                                    {content}
+                                </a>
+                            ) : (
+                                <Link key={i} href={action.action_url} className={className}>
+                                    {content}
+                                </Link>
+                            );
+                        })}
                     </div>
                 </div>
             )}
