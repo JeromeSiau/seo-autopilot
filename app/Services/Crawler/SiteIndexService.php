@@ -32,7 +32,7 @@ class SiteIndexService
 
         $result = Process::path(base_path('agents'))
             ->timeout(600) // 10 minutes
-            ->run(implode(' ', $command));
+            ->run($command);
 
         if (!$result->successful()) {
             Log::error('SiteIndexService: Indexation failed', [
@@ -43,6 +43,13 @@ class SiteIndexService
         }
 
         $output = json_decode($result->output(), true);
+        if (!is_array($output)) {
+            Log::error('SiteIndexService: Invalid JSON output', [
+                'site_id' => $site->id,
+                'output' => $result->output(),
+            ]);
+            throw new \RuntimeException('Invalid JSON output from site-indexer');
+        }
 
         $site->update(['last_crawled_at' => now()]);
 
