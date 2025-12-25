@@ -3,6 +3,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import {
     BarChart3,
     TrendingUp,
+    TrendingDown,
     MousePointer,
     Eye,
     Target,
@@ -442,6 +443,26 @@ export default function AnalyticsIndex({
                             )}
                         </div>
                     </div>
+
+                    {/* Declining Articles */}
+                    {selectedSite && (
+                        <div className="mt-6 bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 overflow-hidden">
+                            <div className="border-b border-surface-100 dark:border-surface-800 px-6 py-4 flex items-center justify-between">
+                                <div>
+                                    <h3 className="font-display font-semibold text-surface-900 dark:text-white flex items-center gap-2">
+                                        <TrendingDown className="h-5 w-5 text-amber-500" />
+                                        Articles nécessitant une attention
+                                    </h3>
+                                    <p className="text-sm text-surface-500 dark:text-surface-400 mt-0.5">
+                                        Articles dont la position a chuté de plus de 5 places
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="px-6 py-8 text-center text-sm text-surface-500 dark:text-surface-400">
+                                Données disponibles prochainement.
+                            </div>
+                        </div>
+                    )}
                 </>
             )}
         </AppLayout>
