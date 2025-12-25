@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Events\SiteCrawlProgress;
 use App\Models\Site;
 use App\Services\Crawler\SiteIndexService;
 use Illuminate\Bus\Queueable;
@@ -17,7 +18,7 @@ class SiteIndexJob implements ShouldQueue, ShouldBeUnique
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public int $tries = 2;
-    public int $timeout = 900; // 15 minutes
+    public int $timeout = 900;
     public int $backoff = 120;
 
     public function __construct(
@@ -33,8 +34,19 @@ class SiteIndexJob implements ShouldQueue, ShouldBeUnique
             'delta' => $this->delta,
         ]);
 
+        $this->site->update(['crawl_status' => 'running']);
+        broadcast(new SiteCrawlProgress($this->site, 'running', $this->site->crawl_pages_count));
+
         try {
             $result = $indexService->indexSite($this->site, $this->delta);
+
+            $this->site->update([
+                'crawl_status' => 'completed',
+                'crawl_pages_count' => $result['pages_indexed'] ?? 0,
+                'last_crawled_at' => now(),
+            ]);
+
+            broadcast(new SiteCrawlProgress($this->site, 'completed', $result['pages_indexed'] ?? 0));
 
             Log::info('SiteIndexJob: Completed', [
                 'site_id' => $this->site->id,
@@ -45,6 +57,10 @@ class SiteIndexJob implements ShouldQueue, ShouldBeUnique
                 'site_id' => $this->site->id,
                 'error' => $e->getMessage(),
             ]);
+
+            $this->site->update(['crawl_status' => 'failed']);
+            broadcast(new SiteCrawlProgress($this->site, 'failed', $this->site->crawl_pages_count));
+
             throw $e;
         }
     }
@@ -56,7 +72,7 @@ class SiteIndexJob implements ShouldQueue, ShouldBeUnique
 
     public function uniqueFor(): int
     {
-        return 3600; // 1 hour lock
+        return 3600;
     }
 
     public function failed(\Throwable $exception): void
@@ -66,6 +82,9 @@ class SiteIndexJob implements ShouldQueue, ShouldBeUnique
             'domain' => $this->site->domain,
             'error' => $exception->getMessage(),
         ]);
+
+        $this->site->update(['crawl_status' => 'failed']);
+        broadcast(new SiteCrawlProgress($this->site, 'failed', $this->site->crawl_pages_count));
     }
 
     public function tags(): array
