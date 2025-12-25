@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\Models\Article;
-use App\Models\BrandVoice;
 use App\Models\Keyword;
 use App\Models\ScheduledArticle;
 use App\Services\Agent\AgentEventService;
@@ -39,7 +38,6 @@ class GenerateArticleJob implements ShouldQueue
 
     public function __construct(
         public readonly Keyword $keyword,
-        public readonly ?int $brandVoiceId = null,
         public readonly bool $generateImages = true,
         public readonly int $sectionImageCount = 2,
     ) {}
@@ -64,15 +62,10 @@ class GenerateArticleJob implements ShouldQueue
             return;
         }
 
-        $brandVoice = $this->brandVoiceId
-            ? BrandVoice::find($this->brandVoiceId)
-            : $team->brandVoices()->where('is_default', true)->first();
-
         // Create draft article to track events
         $article = Article::create([
             'site_id' => $this->keyword->site_id,
             'keyword_id' => $this->keyword->id,
-            'brand_voice_id' => $brandVoice?->id,
             'title' => $this->keyword->keyword,
             'slug' => 'draft-' . time(),
             'status' => 'generating',
@@ -112,7 +105,7 @@ class GenerateArticleJob implements ShouldQueue
             // Phase 2: Content Generation with LLM
             $eventService->started($article, 'writing', 'Rédaction de l\'article', 'Génération du contenu via LLM');
 
-            $generated = $generator->generate($this->keyword, $brandVoice);
+            $generated = $generator->generate($this->keyword);
 
             $eventService->completed($article, 'writing', 'Rédaction terminée', 'Article généré avec succès');
 
