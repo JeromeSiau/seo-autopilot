@@ -1,0 +1,75 @@
+// agents/internal-linking-agent/index-loader.js
+import Database from 'better-sqlite3';
+import * as sqliteVec from 'sqlite-vec';
+import path from 'path';
+import { existsSync } from 'fs';
+
+const INDEXES_DIR = path.join(process.cwd(), '..', 'storage', 'indexes');
+
+export function loadSiteIndex(siteId) {
+    const dbPath = path.join(INDEXES_DIR, `site_${siteId}.sqlite`);
+
+    if (!existsSync(dbPath)) {
+        return { pages: [], hasIndex: false };
+    }
+
+    const db = new Database(dbPath, { readonly: true });
+    sqliteVec.load(db);
+
+    const pages = db.prepare(`
+        SELECT
+            id,
+            url,
+            title,
+            meta_description as description,
+            h1,
+            category,
+            tags,
+            inbound_links_count as inbound_links
+        FROM pages
+        WHERE content_text IS NOT NULL
+        ORDER BY inbound_links_count ASC
+    `).all();
+
+    db.close();
+
+    return {
+        pages: pages.map(p => ({
+            ...p,
+            tags: JSON.parse(p.tags || '[]'),
+        })),
+        hasIndex: true,
+    };
+}
+
+export function searchSimilarPages(siteId, embedding, limit = 20) {
+    const dbPath = path.join(INDEXES_DIR, `site_${siteId}.sqlite`);
+
+    if (!existsSync(dbPath)) {
+        return [];
+    }
+
+    const db = new Database(dbPath, { readonly: true });
+    sqliteVec.load(db);
+
+    const results = db.prepare(`
+        SELECT
+            p.id,
+            p.url,
+            p.title,
+            p.meta_description as description,
+            p.h1,
+            p.category,
+            p.inbound_links_count as inbound_links,
+            vec_distance_cosine(pv.embedding, ?) as distance
+        FROM pages_vec pv
+        JOIN pages p ON p.id = pv.page_id
+        WHERE p.content_text IS NOT NULL
+        ORDER BY distance ASC
+        LIMIT ?
+    `).all(new Float32Array(embedding), limit);
+
+    db.close();
+
+    return results;
+}

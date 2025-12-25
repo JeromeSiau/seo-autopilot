@@ -1,7 +1,7 @@
 import { program } from 'commander';
 import { readFileSync } from 'fs';
 import { emitStarted, emitProgress, emitCompleted, emitError, closeRedis } from '../shared/event-emitter.js';
-import { loadSiteIndex } from './site-scanner.js';
+import { loadSitePages } from './site-scanner.js';
 import { findLinkOpportunities, insertLinks } from './link-suggester.js';
 
 const AGENT_TYPE = 'internal_linking';
@@ -34,7 +34,7 @@ async function main() {
         // Step 1: Load site index
         await emitProgress(articleId, AGENT_TYPE, 'Chargement de l\'index du site...');
 
-        const sitePages = await loadSiteIndex(siteId);
+        const sitePages = await loadSitePages(siteId);
 
         await emitProgress(articleId, AGENT_TYPE,
             `Index chargé: ${sitePages.length} pages existantes`
