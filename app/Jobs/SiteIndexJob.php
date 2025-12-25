@@ -5,13 +5,14 @@ namespace App\Jobs;
 use App\Models\Site;
 use App\Services\Crawler\SiteIndexService;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
-class SiteIndexJob implements ShouldQueue
+class SiteIndexJob implements ShouldQueue, ShouldBeUnique
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -46,6 +47,25 @@ class SiteIndexJob implements ShouldQueue
             ]);
             throw $e;
         }
+    }
+
+    public function uniqueId(): string
+    {
+        return 'site-index-' . $this->site->id;
+    }
+
+    public function uniqueFor(): int
+    {
+        return 3600; // 1 hour lock
+    }
+
+    public function failed(\Throwable $exception): void
+    {
+        Log::error('SiteIndexJob: Permanently failed', [
+            'site_id' => $this->site->id,
+            'domain' => $this->site->domain,
+            'error' => $exception->getMessage(),
+        ]);
     }
 
     public function tags(): array
