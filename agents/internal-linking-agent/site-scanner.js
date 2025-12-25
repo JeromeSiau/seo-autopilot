@@ -96,6 +96,9 @@ async function loadPublishedArticles(siteId) {
             inbound_links: row.inbound_links_count || 0,
         }));
 
+    } catch (error) {
+        console.error('Database error in loadPublishedArticles:', error.message);
+        throw new Error(`Failed to load published articles: ${error.message}`);
     } finally {
         if (connection) {
             await connection.end();
