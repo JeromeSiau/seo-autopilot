@@ -1,5 +1,6 @@
 import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
 import {
     Globe,
     Settings,
@@ -13,6 +14,8 @@ import {
     Calendar,
     Target,
     Users,
+    AlertTriangle,
+    TrendingDown,
 } from 'lucide-react';
 import { Button } from '@/Components/ui/Button';
 import { Card } from '@/Components/ui/Card';
@@ -45,6 +48,27 @@ export default function SiteShow({ site }: SiteShowProps) {
         sat: 'Sam',
         sun: 'Dim',
     };
+
+    const [decliningArticles, setDecliningArticles] = useState<Array<{
+        article: { id: number; title: string };
+        position_change: number;
+        current_position: number;
+    }>>([]);
+    const [loadingDeclining, setLoadingDeclining] = useState(true);
+
+    useEffect(() => {
+        if (site.gsc_connected) {
+            fetch(route('api.analytics.dashboard', { site: site.id }))
+                .then(res => res.json())
+                .then(data => {
+                    setDecliningArticles(data.data?.needs_attention || []);
+                    setLoadingDeclining(false);
+                })
+                .catch(() => setLoadingDeclining(false));
+        } else {
+            setLoadingDeclining(false);
+        }
+    }, [site.id, site.gsc_connected]);
 
     return (
         <AppLayout
@@ -287,6 +311,65 @@ export default function SiteShow({ site }: SiteShowProps) {
                                 <ArrowRight className="h-4 w-4" />
                             </Link>
                         </div>
+                    </Card>
+
+                    {/* Articles à surveiller */}
+                    <Card>
+                        <div className="mb-4 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <AlertTriangle className="h-5 w-5 text-orange-500" />
+                                <h2 className="font-semibold text-surface-900 dark:text-white">Articles à surveiller</h2>
+                                {!loadingDeclining && decliningArticles.length > 0 && (
+                                    <Badge variant="warning">{decliningArticles.length}</Badge>
+                                )}
+                            </div>
+                        </div>
+                        {loadingDeclining ? (
+                            <div className="py-8 text-center">
+                                <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-surface-200 border-t-primary-600 dark:border-surface-700 dark:border-t-primary-400"></div>
+                            </div>
+                        ) : decliningArticles.length > 0 ? (
+                            <>
+                                <div className="space-y-3">
+                                    {decliningArticles.slice(0, 5).map((item) => (
+                                        <div
+                                            key={item.article.id}
+                                            className="rounded-lg border border-orange-100 bg-orange-50 dark:border-orange-900/20 dark:bg-orange-900/10 p-3"
+                                        >
+                                            <Link
+                                                href={route('articles.show', { article: item.article.id })}
+                                                className="font-medium text-surface-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400 line-clamp-2 text-sm"
+                                            >
+                                                {item.article.title}
+                                            </Link>
+                                            <div className="mt-2 flex items-center gap-3 text-xs">
+                                                <span className="text-surface-600 dark:text-surface-400">
+                                                    Position actuelle: {item.current_position}
+                                                </span>
+                                                <span className="flex items-center gap-1 text-red-600 dark:text-red-400">
+                                                    <TrendingDown className="h-3 w-3" />
+                                                    {Math.abs(item.position_change)} places
+                                                </span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                                {decliningArticles.length > 5 && (
+                                    <div className="mt-4 border-t border-surface-100 dark:border-surface-800 pt-4">
+                                        <Link
+                                            href={route('analytics.index', { site_id: site.id })}
+                                            className="flex items-center justify-center gap-1 text-sm text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300"
+                                        >
+                                            Voir les {decliningArticles.length - 5} autres →
+                                        </Link>
+                                    </div>
+                                )}
+                            </>
+                        ) : (
+                            <p className="py-8 text-center text-sm text-surface-500 dark:text-surface-400">
+                                Tous vos articles performent bien 🎉
+                            </p>
+                        )}
                     </Card>
 
                     {/* Quick Links */}
