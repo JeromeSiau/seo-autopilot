@@ -12,17 +12,38 @@ const AGENT_TYPE = 'site-indexer';
 const MAX_CONTENT_LENGTH = 8000;
 
 /**
+ * Validates URL format.
+ * @param {string} url - The URL to validate
+ * @returns {string} Validated URL
+ */
+function validateUrl(url) {
+    try {
+        const parsed = new URL(url);
+        if (!['http:', 'https:'].includes(parsed.protocol)) {
+            throw new Error('URL must use http or https protocol');
+        }
+        return parsed.href;
+    } catch {
+        throw new Error('Invalid URL format');
+    }
+}
+
+/**
  * Main indexing function.
  */
 async function indexSite(siteId, siteUrl, options) {
     const { maxPages, delta } = options;
 
+    // Validate siteUrl
+    const validatedUrl = validateUrl(siteUrl);
+
+    let db;
     try {
         // Emit started event
-        await emitStarted(siteId, AGENT_TYPE, 'Starting site indexing', `Indexing ${siteUrl}`);
+        await emitStarted(siteId, AGENT_TYPE, 'Starting site indexing', `Indexing ${validatedUrl}`);
 
         // Get database
-        const db = getDatabase(siteId);
+        db = getDatabase(siteId);
 
         // Get known URLs if in delta mode
         let knownUrls = new Set();
@@ -38,7 +59,7 @@ async function indexSite(siteId, siteUrl, options) {
         const discoveredUrls = new Set();
 
         // Try sitemap first
-        const sitemapUrl = new URL('/sitemap.xml', siteUrl).href;
+        const sitemapUrl = new URL('/sitemap.xml', validatedUrl).href;
         console.log(`Checking for sitemap at: ${sitemapUrl}`);
         const sitemapUrls = await crawlSitemap(sitemapUrl);
 
@@ -54,7 +75,7 @@ async function indexSite(siteId, siteUrl, options) {
         console.log('Crawling site for additional URLs...');
 
         const crawlLimit = maxPages || 100;
-        const crawledPages = await crawlSite(siteUrl, {
+        const crawledPages = await crawlSite(validatedUrl, {
             maxPages: crawlLimit,
             rateLimit: 500,
         });
@@ -188,14 +209,12 @@ async function indexSite(siteId, siteUrl, options) {
             metadata: summary,
         });
 
-        // Close database
-        db.close();
-
     } catch (error) {
         console.error('Fatal error:', error);
         await emitError(siteId, AGENT_TYPE, 'Site indexing failed', error);
         throw error;
     } finally {
+        if (db) db.close();
         await closeRedis();
     }
 }

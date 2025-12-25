@@ -9,6 +9,12 @@ import fs from 'fs';
  * @returns {Database} The database instance
  */
 export function getDatabase(siteId) {
+    // Sanitize siteId to prevent directory traversal
+    const sanitizedSiteId = String(siteId).replace(/[^a-zA-Z0-9_-]/g, '');
+    if (!sanitizedSiteId || sanitizedSiteId !== String(siteId)) {
+        throw new Error('Invalid siteId: must be alphanumeric');
+    }
+
     // Database path: storage/indexes/site_{siteId}.sqlite
     const dbDir = path.join(process.cwd(), '..', 'storage', 'indexes');
 
@@ -17,7 +23,7 @@ export function getDatabase(siteId) {
         fs.mkdirSync(dbDir, { recursive: true });
     }
 
-    const dbPath = path.join(dbDir, `site_${siteId}.sqlite`);
+    const dbPath = path.join(dbDir, `site_${sanitizedSiteId}.sqlite`);
     const db = new Database(dbPath);
 
     // Load sqlite-vec extension

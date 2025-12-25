@@ -32,9 +32,16 @@ export function normalizeUrl(url) {
 /**
  * Crawls a sitemap XML file recursively.
  * @param {string} sitemapUrl - The sitemap URL
+ * @param {number} depth - Current recursion depth
+ * @param {number} maxDepth - Maximum recursion depth
  * @returns {Promise<string[]>} Array of URLs found in sitemap
  */
-export async function crawlSitemap(sitemapUrl) {
+export async function crawlSitemap(sitemapUrl, depth = 0, maxDepth = 5) {
+    if (depth >= maxDepth) {
+        console.log(`Max sitemap depth reached: ${sitemapUrl}`);
+        return [];
+    }
+
     const urls = new Set();
 
     try {
@@ -55,7 +62,7 @@ export async function crawlSitemap(sitemapUrl) {
             // Check if this is a nested sitemap
             if (url.endsWith('.xml')) {
                 console.log(`Found nested sitemap: ${url}`);
-                const nestedUrls = await crawlSitemap(url);
+                const nestedUrls = await crawlSitemap(url, depth + 1, maxDepth);
                 nestedUrls.forEach(u => urls.add(normalizeUrl(u)));
             } else {
                 urls.add(normalizeUrl(url));
