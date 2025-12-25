@@ -25,6 +25,10 @@ export interface Site {
     business_description?: string;
     target_audience?: string;
     topics?: string[];
+    tone?: string | null;
+    writing_style?: string | null;
+    vocabulary?: { use?: string[]; avoid?: string[] } | null;
+    brand_examples?: string[] | null;
     gsc_connected: boolean;
     ga4_connected: boolean;
     keywords_count?: number;

@@ -1,9 +1,9 @@
 import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Plus, X } from 'lucide-react';
 import clsx from 'clsx';
 import { Site, PageProps } from '@/types';
-import { FormEvent } from 'react';
+import { FormEvent, useState } from 'react';
 
 interface SiteEditProps extends PageProps {
     site: Site;
@@ -18,17 +18,109 @@ const LANGUAGES = [
     { code: 'pt', label: 'Português' },
 ];
 
+const TONES = [
+    { value: 'professional', label: 'Professionnel', description: 'Formel et crédible' },
+    { value: 'casual', label: 'Décontracté', description: 'Accessible et convivial' },
+    { value: 'expert', label: 'Expert', description: 'Technique et approfondi' },
+    { value: 'friendly', label: 'Amical', description: 'Chaleureux et engageant' },
+    { value: 'neutral', label: 'Neutre', description: 'Objectif et factuel' },
+];
+
+function TagInput({
+    value,
+    onChange,
+    placeholder
+}: {
+    value: string[];
+    onChange: (tags: string[]) => void;
+    placeholder: string;
+}) {
+    const [input, setInput] = useState('');
+
+    const addTag = () => {
+        const tag = input.trim();
+        if (tag && !value.includes(tag)) {
+            onChange([...value, tag]);
+            setInput('');
+        }
+    };
+
+    const removeTag = (index: number) => {
+        onChange(value.filter((_, i) => i !== index));
+    };
+
+    return (
+        <div className="space-y-2">
+            <div className="flex gap-2">
+                <input
+                    type="text"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
+                    placeholder={placeholder}
+                    className={clsx(
+                        'flex-1 rounded-xl border-surface-300 dark:border-surface-700 shadow-sm',
+                        'bg-white dark:bg-surface-800 text-surface-900 dark:text-white',
+                        'focus:border-primary-500 focus:ring-primary-500 sm:text-sm',
+                        'placeholder:text-surface-400'
+                    )}
+                />
+                <button
+                    type="button"
+                    onClick={addTag}
+                    className="rounded-xl bg-surface-100 dark:bg-surface-800 px-3 py-2 text-surface-600 dark:text-surface-400 hover:bg-surface-200 dark:hover:bg-surface-700"
+                >
+                    <Plus className="h-4 w-4" />
+                </button>
+            </div>
+            {value.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                    {value.map((tag, index) => (
+                        <span
+                            key={index}
+                            className="inline-flex items-center gap-1 rounded-lg bg-primary-50 dark:bg-primary-500/15 px-2.5 py-1 text-sm text-primary-700 dark:text-primary-400"
+                        >
+                            {tag}
+                            <button type="button" onClick={() => removeTag(index)} className="hover:text-primary-900 dark:hover:text-primary-200">
+                                <X className="h-3 w-3" />
+                            </button>
+                        </span>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+}
+
 export default function SiteEdit({ site }: SiteEditProps) {
     const { data, setData, put, processing, errors } = useForm({
         name: site.name,
         language: site.language,
         business_description: site.business_description || '',
         target_audience: site.target_audience || '',
+        tone: site.tone || '',
+        writing_style: site.writing_style || '',
+        vocabulary: site.vocabulary || { use: [], avoid: [] },
+        brand_examples: site.brand_examples || [],
     });
+
+    const [exampleInput, setExampleInput] = useState('');
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
         put(route('sites.update', { site: site.id }));
+    };
+
+    const addExample = () => {
+        const example = exampleInput.trim();
+        if (example && data.brand_examples.length < 5) {
+            setData('brand_examples', [...data.brand_examples, example]);
+            setExampleInput('');
+        }
+    };
+
+    const removeExample = (index: number) => {
+        setData('brand_examples', data.brand_examples.filter((_, i) => i !== index));
     };
 
     return (
@@ -54,15 +146,16 @@ export default function SiteEdit({ site }: SiteEditProps) {
         >
             <Head title={`Modifier ${site.name}`} />
 
-            <div className="mx-auto max-w-2xl">
+            <div className="mx-auto max-w-2xl space-y-6">
+                {/* General Settings */}
                 <div className="bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 p-6">
+                    <h2 className="font-display text-lg font-semibold text-surface-900 dark:text-white mb-6">
+                        Informations générales
+                    </h2>
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {/* Site Name */}
                         <div>
-                            <label
-                                htmlFor="name"
-                                className="block text-sm font-medium text-surface-700 dark:text-surface-300"
-                            >
+                            <label htmlFor="name" className="block text-sm font-medium text-surface-700 dark:text-surface-300">
                                 Nom du site
                             </label>
                             <input
@@ -73,21 +166,15 @@ export default function SiteEdit({ site }: SiteEditProps) {
                                 className={clsx(
                                     'mt-1.5 block w-full rounded-xl border-surface-300 dark:border-surface-700 shadow-sm',
                                     'bg-white dark:bg-surface-800 text-surface-900 dark:text-white',
-                                    'focus:border-primary-500 focus:ring-primary-500 sm:text-sm',
-                                    'placeholder:text-surface-400'
+                                    'focus:border-primary-500 focus:ring-primary-500 sm:text-sm'
                                 )}
                             />
-                            {errors.name && (
-                                <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">{errors.name}</p>
-                            )}
+                            {errors.name && <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">{errors.name}</p>}
                         </div>
 
                         {/* Language */}
                         <div>
-                            <label
-                                htmlFor="language"
-                                className="block text-sm font-medium text-surface-700 dark:text-surface-300"
-                            >
+                            <label htmlFor="language" className="block text-sm font-medium text-surface-700 dark:text-surface-300">
                                 Langue du contenu
                             </label>
                             <select
@@ -101,22 +188,14 @@ export default function SiteEdit({ site }: SiteEditProps) {
                                 )}
                             >
                                 {LANGUAGES.map((lang) => (
-                                    <option key={lang.code} value={lang.code}>
-                                        {lang.label}
-                                    </option>
+                                    <option key={lang.code} value={lang.code}>{lang.label}</option>
                                 ))}
                             </select>
-                            {errors.language && (
-                                <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">{errors.language}</p>
-                            )}
                         </div>
 
                         {/* Business Description */}
                         <div>
-                            <label
-                                htmlFor="business_description"
-                                className="block text-sm font-medium text-surface-700 dark:text-surface-300"
-                            >
+                            <label htmlFor="business_description" className="block text-sm font-medium text-surface-700 dark:text-surface-300">
                                 Description de l'activité
                             </label>
                             <textarea
@@ -132,17 +211,11 @@ export default function SiteEdit({ site }: SiteEditProps) {
                                     'placeholder:text-surface-400'
                                 )}
                             />
-                            {errors.business_description && (
-                                <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">{errors.business_description}</p>
-                            )}
                         </div>
 
                         {/* Target Audience */}
                         <div>
-                            <label
-                                htmlFor="target_audience"
-                                className="block text-sm font-medium text-surface-700 dark:text-surface-300"
-                            >
+                            <label htmlFor="target_audience" className="block text-sm font-medium text-surface-700 dark:text-surface-300">
                                 Audience cible
                             </label>
                             <input
@@ -158,9 +231,153 @@ export default function SiteEdit({ site }: SiteEditProps) {
                                     'placeholder:text-surface-400'
                                 )}
                             />
-                            {errors.target_audience && (
-                                <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">{errors.target_audience}</p>
-                            )}
+                        </div>
+
+                        {/* Divider */}
+                        <div className="border-t border-surface-100 dark:border-surface-800 pt-6">
+                            <h2 className="font-display text-lg font-semibold text-surface-900 dark:text-white mb-4">
+                                Voix de marque
+                            </h2>
+                            <p className="text-sm text-surface-500 dark:text-surface-400 mb-6">
+                                Personnalisez le ton et le style de vos articles générés.
+                            </p>
+                        </div>
+
+                        {/* Tone */}
+                        <div>
+                            <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-3">
+                                Ton
+                            </label>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                {TONES.map((tone) => (
+                                    <button
+                                        key={tone.value}
+                                        type="button"
+                                        onClick={() => setData('tone', data.tone === tone.value ? '' : tone.value)}
+                                        className={clsx(
+                                            'rounded-xl border p-3 text-left transition-all',
+                                            data.tone === tone.value
+                                                ? 'border-primary-500 bg-primary-50 dark:bg-primary-500/15'
+                                                : 'border-surface-200 dark:border-surface-700 hover:border-surface-300 dark:hover:border-surface-600'
+                                        )}
+                                    >
+                                        <p className={clsx(
+                                            'font-medium text-sm',
+                                            data.tone === tone.value ? 'text-primary-700 dark:text-primary-400' : 'text-surface-900 dark:text-white'
+                                        )}>
+                                            {tone.label}
+                                        </p>
+                                        <p className="text-xs text-surface-500 dark:text-surface-400 mt-0.5">
+                                            {tone.description}
+                                        </p>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Writing Style */}
+                        <div>
+                            <label htmlFor="writing_style" className="block text-sm font-medium text-surface-700 dark:text-surface-300">
+                                Style d'écriture
+                            </label>
+                            <textarea
+                                id="writing_style"
+                                rows={3}
+                                value={data.writing_style}
+                                onChange={(e) => setData('writing_style', e.target.value)}
+                                placeholder="Ex: Phrases courtes et percutantes. Utiliser des exemples concrets. Éviter le jargon technique..."
+                                className={clsx(
+                                    'mt-1.5 block w-full rounded-xl border-surface-300 dark:border-surface-700 shadow-sm',
+                                    'bg-white dark:bg-surface-800 text-surface-900 dark:text-white',
+                                    'focus:border-primary-500 focus:ring-primary-500 sm:text-sm',
+                                    'placeholder:text-surface-400'
+                                )}
+                            />
+                        </div>
+
+                        {/* Vocabulary Use */}
+                        <div>
+                            <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
+                                Vocabulaire à utiliser
+                            </label>
+                            <p className="text-xs text-surface-500 dark:text-surface-400 mb-2">
+                                Mots et expressions à privilégier dans vos articles.
+                            </p>
+                            <TagInput
+                                value={data.vocabulary.use || []}
+                                onChange={(tags) => setData('vocabulary', { ...data.vocabulary, use: tags })}
+                                placeholder="Ajouter un mot ou expression..."
+                            />
+                        </div>
+
+                        {/* Vocabulary Avoid */}
+                        <div>
+                            <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
+                                Vocabulaire à éviter
+                            </label>
+                            <p className="text-xs text-surface-500 dark:text-surface-400 mb-2">
+                                Mots et expressions à ne pas utiliser.
+                            </p>
+                            <TagInput
+                                value={data.vocabulary.avoid || []}
+                                onChange={(tags) => setData('vocabulary', { ...data.vocabulary, avoid: tags })}
+                                placeholder="Ajouter un mot à éviter..."
+                            />
+                        </div>
+
+                        {/* Brand Examples */}
+                        <div>
+                            <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
+                                Exemples de contenu ({data.brand_examples.length}/5)
+                            </label>
+                            <p className="text-xs text-surface-500 dark:text-surface-400 mb-2">
+                                Collez des extraits représentatifs de votre style d'écriture.
+                            </p>
+                            <div className="space-y-3">
+                                {data.brand_examples.map((example, index) => (
+                                    <div key={index} className="relative">
+                                        <div className="rounded-xl bg-surface-50 dark:bg-surface-800 p-3 pr-10 text-sm text-surface-700 dark:text-surface-300">
+                                            {example.substring(0, 200)}{example.length > 200 ? '...' : ''}
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => removeExample(index)}
+                                            className="absolute top-2 right-2 rounded-lg p-1 text-surface-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/15"
+                                        >
+                                            <X className="h-4 w-4" />
+                                        </button>
+                                    </div>
+                                ))}
+                                {data.brand_examples.length < 5 && (
+                                    <div className="space-y-2">
+                                        <textarea
+                                            rows={3}
+                                            value={exampleInput}
+                                            onChange={(e) => setExampleInput(e.target.value)}
+                                            placeholder="Collez un extrait de texte représentatif de votre style..."
+                                            className={clsx(
+                                                'block w-full rounded-xl border-surface-300 dark:border-surface-700 shadow-sm',
+                                                'bg-white dark:bg-surface-800 text-surface-900 dark:text-white',
+                                                'focus:border-primary-500 focus:ring-primary-500 sm:text-sm',
+                                                'placeholder:text-surface-400'
+                                            )}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={addExample}
+                                            disabled={!exampleInput.trim()}
+                                            className={clsx(
+                                                'inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium',
+                                                'bg-surface-100 dark:bg-surface-800 text-surface-700 dark:text-surface-300',
+                                                'hover:bg-surface-200 dark:hover:bg-surface-700 disabled:opacity-50'
+                                            )}
+                                        >
+                                            <Plus className="h-4 w-4" />
+                                            Ajouter cet exemple
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
                         {/* Submit Buttons */}
