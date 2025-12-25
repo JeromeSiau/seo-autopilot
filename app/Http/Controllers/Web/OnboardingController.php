@@ -79,6 +79,7 @@ class OnboardingController extends Controller
         $site = Site::create([
             'team_id' => auth()->user()->team_id,
             'crawl_status' => 'running',
+            'crawl_pages_count' => 0,
             ...$validated,
         ]);
 

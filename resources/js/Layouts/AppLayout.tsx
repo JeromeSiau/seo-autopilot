@@ -109,7 +109,7 @@ export default function AppLayout({
                     name: t?.nav?.sites ?? 'Sites',
                     href: route('sites.index'),
                     icon: Globe,
-                    current: currentPath.startsWith('/sites'),
+                    current: currentPath.startsWith('/sites') && !currentPath.includes('/content-plan'),
                 },
                 {
                     name: t?.nav?.articles ?? 'Articles',
@@ -127,7 +127,7 @@ export default function AppLayout({
                     name: t?.nav?.contentPlans ?? 'Content Plans',
                     href: route('content-plans.index'),
                     icon: Calendar,
-                    current: currentPath.startsWith('/content-plans'),
+                    current: currentPath.startsWith('/content-plans') || currentPath.includes('/content-plan'),
                 },
             ],
         },

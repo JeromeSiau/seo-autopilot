@@ -21,11 +21,23 @@ interface Props {
 export default function ContentCalendar({ siteId, initialMonth }: Props) {
     const [month, setMonth] = useState(initialMonth || new Date().toISOString().slice(0, 7));
     const [articles, setArticles] = useState<ScheduledArticle[]>([]);
+    const [availableMonths, setAvailableMonths] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
+    const [initialized, setInitialized] = useState(false);
 
     useEffect(() => {
         fetchCalendar();
     }, [month]);
+
+    // Jump to first available month on initial load if current month has no articles
+    useEffect(() => {
+        if (!initialized && availableMonths.length > 0 && !availableMonths.includes(month)) {
+            setMonth(availableMonths[0]);
+            setInitialized(true);
+        } else if (availableMonths.length > 0) {
+            setInitialized(true);
+        }
+    }, [availableMonths, month, initialized]);
 
     const fetchCalendar = async () => {
         setLoading(true);
@@ -44,22 +56,58 @@ export default function ContentCalendar({ siteId, initialMonth }: Props) {
 
             const data = await res.json();
             setArticles(data.articles || []);
+            if (data.available_months) {
+                setAvailableMonths(data.available_months);
+            }
         } catch (e) {
             console.error('Failed to fetch calendar', e);
         }
         setLoading(false);
     };
 
+    // Find navigation bounds based on available months
+    const currentMonthIndex = availableMonths.indexOf(month);
+    const hasAvailableMonths = availableMonths.length > 0;
+
+    // If we have available months, only navigate within those
+    // If current month is not in list, find nearest available month
+    const canGoPrev = hasAvailableMonths
+        ? (currentMonthIndex > 0 || (currentMonthIndex === -1 && month > availableMonths[0]))
+        : true;
+    const canGoNext = hasAvailableMonths
+        ? (currentMonthIndex < availableMonths.length - 1 || (currentMonthIndex === -1 && month < availableMonths[availableMonths.length - 1]))
+        : true;
+
     const prevMonth = () => {
-        const d = new Date(month + '-01');
-        d.setMonth(d.getMonth() - 1);
-        setMonth(d.toISOString().slice(0, 7));
+        if (hasAvailableMonths) {
+            if (currentMonthIndex > 0) {
+                setMonth(availableMonths[currentMonthIndex - 1]);
+            } else if (currentMonthIndex === -1) {
+                // Current month not in list, find previous available
+                const prev = availableMonths.filter(m => m < month).pop();
+                if (prev) setMonth(prev);
+            }
+        } else {
+            const d = new Date(month + '-01');
+            d.setMonth(d.getMonth() - 1);
+            setMonth(d.toISOString().slice(0, 7));
+        }
     };
 
     const nextMonth = () => {
-        const d = new Date(month + '-01');
-        d.setMonth(d.getMonth() + 1);
-        setMonth(d.toISOString().slice(0, 7));
+        if (hasAvailableMonths) {
+            if (currentMonthIndex >= 0 && currentMonthIndex < availableMonths.length - 1) {
+                setMonth(availableMonths[currentMonthIndex + 1]);
+            } else if (currentMonthIndex === -1) {
+                // Current month not in list, find next available
+                const next = availableMonths.find(m => m > month);
+                if (next) setMonth(next);
+            }
+        } else {
+            const d = new Date(month + '-01');
+            d.setMonth(d.getMonth() + 1);
+            setMonth(d.toISOString().slice(0, 7));
+        }
     };
 
     // Generate calendar grid
@@ -90,7 +138,13 @@ export default function ContentCalendar({ siteId, initialMonth }: Props) {
             <div className="flex items-center justify-between p-4 border-b border-surface-200 dark:border-surface-800">
                 <button
                     onClick={prevMonth}
-                    className="p-2 hover:bg-surface-100 dark:hover:bg-surface-800 rounded-lg transition-colors"
+                    disabled={!canGoPrev}
+                    className={clsx(
+                        'p-2 rounded-lg transition-colors',
+                        canGoPrev
+                            ? 'hover:bg-surface-100 dark:hover:bg-surface-800 text-surface-700 dark:text-surface-300'
+                            : 'text-surface-300 dark:text-surface-600 cursor-not-allowed'
+                    )}
                 >
                     <ChevronLeft className="h-5 w-5" />
                 </button>
@@ -99,7 +153,13 @@ export default function ContentCalendar({ siteId, initialMonth }: Props) {
                 </h3>
                 <button
                     onClick={nextMonth}
-                    className="p-2 hover:bg-surface-100 dark:hover:bg-surface-800 rounded-lg transition-colors"
+                    disabled={!canGoNext}
+                    className={clsx(
+                        'p-2 rounded-lg transition-colors',
+                        canGoNext
+                            ? 'hover:bg-surface-100 dark:hover:bg-surface-800 text-surface-700 dark:text-surface-300'
+                            : 'text-surface-300 dark:text-surface-600 cursor-not-allowed'
+                    )}
                 >
                     <ChevronRight className="h-5 w-5" />
                 </button>

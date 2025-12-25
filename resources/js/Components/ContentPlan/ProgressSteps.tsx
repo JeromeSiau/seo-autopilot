@@ -59,6 +59,38 @@ export default function ProgressSteps({ status }: Props) {
         );
     }
 
+    // Show waiting message when job is pending (in queue but not started)
+    const isWaiting = status.status === 'pending' || status.status === 'not_started' || !status.steps?.length;
+
+    if (isWaiting) {
+        return (
+            <div className="space-y-8">
+                {/* Header */}
+                <div className="text-center">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary-100 dark:bg-primary-500/20 mb-4">
+                        <Loader2 className="h-8 w-8 text-primary-600 dark:text-primary-400 animate-spin" />
+                    </div>
+                    <h1 className="text-2xl font-bold text-surface-900 dark:text-white">
+                        Préparation en cours...
+                    </h1>
+                    <p className="mt-2 text-surface-500 dark:text-surface-400">
+                        Votre Content Plan est en file d'attente. L'analyse démarrera dans quelques instants.
+                    </p>
+                </div>
+
+                {/* Animated waiting indicator */}
+                <div className="max-w-md mx-auto">
+                    <div className="h-2 bg-surface-200 dark:bg-surface-700 rounded-full overflow-hidden">
+                        <div className="h-full w-1/3 bg-primary-500/50 rounded-full animate-pulse" />
+                    </div>
+                    <p className="mt-4 text-center text-sm text-surface-500 dark:text-surface-400">
+                        💡 {TIPS[tipIndex]}
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
     const progress = status.steps
         ? (status.steps.filter(s => s.status === 'completed').length / status.steps.length) * 100
         : 0;

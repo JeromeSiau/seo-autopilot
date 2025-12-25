@@ -150,22 +150,7 @@ async function indexSite(siteId, siteUrl, options) {
                 console.log('  Detecting tags...');
                 const tags = detectTags(document);
 
-                // Prepare content for embedding (limit to 8000 chars)
-                const contentForEmbedding = [
-                    extracted.title,
-                    extracted.h1,
-                    extracted.metaDescription,
-                    extracted.content,
-                ]
-                    .filter(Boolean)
-                    .join('\n\n')
-                    .substring(0, MAX_CONTENT_LENGTH);
-
-                // Generate embedding
-                console.log('  Generating embedding...');
-                const embedding = await generateEmbedding(contentForEmbedding, 'document');
-
-                // Store in database
+                // Store in database first (before embedding, so page is saved even if embedding fails)
                 console.log('  Storing in database...');
                 const pageId = upsertPage(db, {
                     url,
@@ -178,10 +163,28 @@ async function indexSite(siteId, siteUrl, options) {
                     internalLinks: extracted.internalLinks,
                 });
 
-                upsertEmbedding(db, pageId, embedding);
-
                 indexedCount++;
-                console.log(`  ✓ Indexed successfully (ID: ${pageId})`);
+                console.log(`  ✓ Page saved (ID: ${pageId})`);
+
+                // Try to generate embedding (optional - don't fail if it doesn't work)
+                try {
+                    const contentForEmbedding = [
+                        extracted.title,
+                        extracted.h1,
+                        extracted.metaDescription,
+                        extracted.content,
+                    ]
+                        .filter(Boolean)
+                        .join('\n\n')
+                        .substring(0, MAX_CONTENT_LENGTH);
+
+                    console.log('  Generating embedding...');
+                    const embedding = await generateEmbedding(contentForEmbedding, 'document');
+                    upsertEmbedding(db, pageId, embedding);
+                    console.log('  ✓ Embedding saved');
+                } catch (embeddingError) {
+                    console.log(`  ⚠ Embedding skipped: ${embeddingError.message}`);
+                }
 
                 // Rate limiting between pages
                 await new Promise(resolve => setTimeout(resolve, 500));

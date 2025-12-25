@@ -104,6 +104,7 @@ export function upsertPage(db, pageData) {
 
 /**
  * Inserts or updates an embedding for a page.
+ * Virtual tables (vec0) don't support ON CONFLICT, so we delete then insert.
  * @param {Database} db - The database instance
  * @param {number} pageId - The page ID
  * @param {number[]} embedding - The embedding vector
@@ -112,14 +113,9 @@ export function upsertEmbedding(db, pageId, embedding) {
     // Convert embedding array to JSON string for storage
     const embeddingJson = JSON.stringify(embedding);
 
-    const stmt = db.prepare(`
-        INSERT INTO embeddings (page_id, embedding)
-        VALUES (?, ?)
-        ON CONFLICT(page_id) DO UPDATE SET
-            embedding = excluded.embedding
-    `);
-
-    stmt.run(pageId, embeddingJson);
+    // Virtual tables don't support UPSERT, so delete first then insert
+    db.prepare('DELETE FROM embeddings WHERE page_id = ?').run(pageId);
+    db.prepare('INSERT INTO embeddings (page_id, embedding) VALUES (?, ?)').run(pageId, embeddingJson);
 }
 
 /**

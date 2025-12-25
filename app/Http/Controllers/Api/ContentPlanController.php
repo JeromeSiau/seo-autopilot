@@ -50,9 +50,18 @@ class ContentPlanController extends Controller
         $month = $request->get('month', now()->format('Y-m'));
         $articles = $this->planService->getCalendarData($site, $month);
 
+        // Get all months that have scheduled articles
+        $availableMonths = $site->scheduledArticles()
+            ->selectRaw("DATE_FORMAT(scheduled_date, '%Y-%m') as month")
+            ->distinct()
+            ->orderBy('month')
+            ->pluck('month')
+            ->toArray();
+
         return response()->json([
             'month' => $month,
             'articles' => $articles,
+            'available_months' => $availableMonths,
         ]);
     }
 }
