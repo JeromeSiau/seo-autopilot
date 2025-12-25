@@ -2,7 +2,6 @@
 
 namespace App\Services\ContentPlan;
 
-use App\Jobs\SiteIndexJob;
 use App\Models\ContentPlanGeneration;
 use App\Models\Site;
 use App\Services\Crawler\SiteCrawlerService;
@@ -19,6 +18,7 @@ class ContentPlanGeneratorService
         private readonly KeywordScoringService $keywordScoring,
         private readonly DuplicateCheckerService $duplicateChecker,
         private readonly ContentPlanService $planService,
+        private readonly TopicAnalyzerService $topicAnalyzer,
     ) {}
 
     public function generate(Site $site): ContentPlanGeneration
@@ -39,24 +39,22 @@ class ContentPlanGeneratorService
             $keywords = collect();
             $stepIndex = 0;
 
-            // Step 1: Crawl site (always)
+            // Step 1: Extraction de topics depuis pages crawlées
             $generation->markStepRunning($stepIndex);
-            $this->crawler->crawl($site);
-            $this->crawler->extractTitlesForPages($site, 30);
-
-            // Trigger deep indexation with embeddings for internal linking
-            dispatch(new SiteIndexJob($site, delta: false))
-                ->onQueue('crawl');
-
+            $topics = $this->topicAnalyzer->extractTopics($site);
+            Log::info("Extracted topics", ['count' => count($topics)]);
             $generation->markStepCompleted($stepIndex);
             $stepIndex++;
 
-            // Step 2: Analyze GSC (if connected)
+            // Step 2: Gap Analysis GSC (si connecté)
+            $gaps = [];
             if ($site->isGscConnected()) {
                 $generation->markStepRunning($stepIndex);
                 try {
                     $gscKeywords = $this->keywordDiscovery->mineFromSearchConsole($site);
                     $keywords = $keywords->merge($gscKeywords);
+                    $gaps = $this->topicAnalyzer->findGaps($site);
+                    Log::info("Found GSC gaps", ['count' => count($gaps)]);
                 } catch (\Exception $e) {
                     Log::warning("GSC analysis failed, continuing without", [
                         'site_id' => $site->id,
@@ -67,12 +65,14 @@ class ContentPlanGeneratorService
                 $stepIndex++;
             }
 
-            // Step 3: Generate AI ideas (if business description OR no keywords yet)
+            // Step 3: Génération d'idées avec contexte enrichi
             if ($site->business_description || $keywords->isEmpty()) {
                 $generation->markStepRunning($stepIndex);
                 $aiKeywords = $this->keywordDiscovery->generateTopicIdeas($site, [
                     'count' => 50,
                     'existing_keywords' => $keywords->pluck('keyword')->toArray(),
+                    'topics' => $topics,
+                    'gaps' => $gaps,
                 ]);
                 $keywords = $keywords->merge($aiKeywords);
                 Log::info("Generated keywords via AI", ['count' => $aiKeywords->count()]);
@@ -80,14 +80,14 @@ class ContentPlanGeneratorService
                 $stepIndex++;
             }
 
-            // Step 4: Check duplicates (always)
+            // Step 4: Check duplicates (toujours)
             $generation->markStepRunning($stepIndex);
             $sitePages = $site->pages()->pluck('title', 'url');
             $keywords = $this->duplicateChecker->filterDuplicates($keywords, $sitePages);
             $generation->markStepCompleted($stepIndex);
             $stepIndex++;
 
-            // Step 5: Enrich with SEO data (always)
+            // Step 5: Enrich with SEO data (toujours)
             $generation->markStepRunning($stepIndex);
             $keywords = $this->keywordDiscovery->enrichWithSeoData($keywords, $site->language ?? 'en');
             $keywords = $keywords->map(function ($kw) {
@@ -107,7 +107,7 @@ class ContentPlanGeneratorService
             $generation->markStepCompleted($stepIndex);
             $stepIndex++;
 
-            // Step 6: Create plan (always)
+            // Step 6: Create plan (toujours)
             $generation->markStepRunning($stepIndex);
             $scheduled = $this->planService->createPlan($site, $keywords);
             $generation->markStepCompleted($stepIndex);
@@ -138,19 +138,19 @@ class ContentPlanGeneratorService
     {
         $steps = [];
 
-        $steps[] = ['name' => 'Analyse de votre site existant', 'status' => 'pending', 'icon' => 'globe'];
+        $steps[] = ['name' => 'Analyse des thématiques du site', 'status' => 'pending', 'icon' => 'sparkles'];
 
         if ($site->isGscConnected()) {
-            $steps[] = ['name' => 'Analyse de vos performances', 'status' => 'pending', 'icon' => 'chart'];
+            $steps[] = ['name' => 'Analyse de vos performances GSC', 'status' => 'pending', 'icon' => 'chart'];
         }
 
         if ($site->business_description) {
-            $steps[] = ['name' => "Génération d'idées avec l'IA", 'status' => 'pending', 'icon' => 'sparkles'];
+            $steps[] = ['name' => "Génération d'idées avec l'IA", 'status' => 'pending', 'icon' => 'lightbulb'];
         }
 
         $steps[] = ['name' => 'Vérification des sujets existants', 'status' => 'pending', 'icon' => 'search'];
-        $steps[] = ['name' => 'Analyse du potentiel de chaque sujet', 'status' => 'pending', 'icon' => 'trending'];
-        $steps[] = ['name' => 'Création de votre Content Plan', 'status' => 'pending', 'icon' => 'calendar'];
+        $steps[] = ['name' => 'Analyse du potentiel SEO', 'status' => 'pending', 'icon' => 'trending'];
+        $steps[] = ['name' => 'Création du calendrier éditorial', 'status' => 'pending', 'icon' => 'calendar'];
 
         return $steps;
     }
