@@ -14,3 +14,8 @@ Broadcast::channel('article.{articleId}', function ($user, $articleId) {
         })
         ->exists();
 });
+
+Broadcast::channel('site.{siteId}', function ($user, $siteId) {
+    $site = \App\Models\Site::find($siteId);
+    return $site && $site->team_id === $user->team_id;
+});
