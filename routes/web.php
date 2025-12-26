@@ -16,6 +16,9 @@ use App\Http\Controllers\Web\SettingsController;
 use App\Http\Controllers\Web\SiteController;
 use App\Http\Controllers\Web\StripeWebhookController;
 use App\Http\Controllers\Web\ContentPlanController;
+use App\Http\Controllers\Web\TeamController;
+use App\Http\Controllers\Web\TeamInvitationController;
+use App\Http\Controllers\Web\TeamMemberController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -120,6 +123,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.readAll');
+
+    // Teams
+    Route::patch('/teams/{team}', [TeamController::class, 'update'])->name('teams.update');
+    Route::post('/teams/{team}/switch', [TeamController::class, 'switch'])->name('teams.switch');
+
+    // Team Members
+    Route::post('/teams/{team}/members/{user}', [TeamMemberController::class, 'update'])->name('teams.members.update');
+    Route::delete('/teams/{team}/members/{user}', [TeamMemberController::class, 'destroy'])->name('teams.members.destroy');
+
+    // Team Invitations
+    Route::post('/teams/{team}/invitations', [TeamInvitationController::class, 'store'])->name('teams.invitations.store');
+    Route::delete('/teams/{team}/invitations/{invitation}', [TeamInvitationController::class, 'destroy'])->name('teams.invitations.destroy');
 });
 
 Route::middleware('auth')->group(function () {
@@ -129,3 +144,6 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
+// Invitation accept - needs to work for non-authenticated users
+Route::get('/invitations/{token}/accept', [TeamInvitationController::class, 'accept'])->name('invitations.accept');
