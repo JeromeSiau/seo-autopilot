@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Cache;
 use Laravel\Cashier\Billable;
 
 class Team extends Model
@@ -109,10 +110,20 @@ class Team extends Model
 
     public function articlesUsedThisMonth(): int
     {
-        return Article::whereIn('site_id', $this->sites->pluck('id'))
-            ->whereMonth('created_at', now()->month)
-            ->whereYear('created_at', now()->year)
-            ->count();
+        $cacheKey = "team:{$this->id}:articles_month:" . now()->format('Y-m');
+
+        return Cache::remember($cacheKey, 300, function () {
+            return Article::whereIn('site_id', $this->sites->pluck('id'))
+                ->whereMonth('created_at', now()->month)
+                ->whereYear('created_at', now()->year)
+                ->count();
+        });
+    }
+
+    public function clearArticlesMonthCache(): void
+    {
+        $cacheKey = "team:{$this->id}:articles_month:" . now()->format('Y-m');
+        Cache::forget($cacheKey);
     }
 
     public function getArticlesUsedThisMonthAttribute(): int

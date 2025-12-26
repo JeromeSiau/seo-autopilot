@@ -54,6 +54,14 @@ class Article extends Model
                 $article->word_count = str_word_count(strip_tags($article->content));
             }
         });
+
+        static::created(function (Article $article) {
+            $article->site->team->clearArticlesMonthCache();
+        });
+
+        static::deleted(function (Article $article) {
+            $article->site->team->clearArticlesMonthCache();
+        });
     }
 
     public function site(): BelongsTo
