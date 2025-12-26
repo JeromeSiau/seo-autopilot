@@ -67,7 +67,18 @@
     "noSites": "No sites configured",
     "noSitesDescription": "Get started by adding your first website",
     "addFirstSite": "Add your first site",
-    "actionsRequired": "Actions required"
+    "actionsRequired": "Actions required",
+    "generationBanner": {
+      "title": "Content Plan being created",
+      "viewProgress": "View progress"
+    },
+    "usage": {
+      "percentUsed": "{percent}% used",
+      "remaining": "{count} remaining"
+    },
+    "trend": {
+      "vsLastMonth": "vs last month"
+    }
   },
   "sites": {
     "title": "Sites",
@@ -80,7 +91,77 @@
     "articlesCount": "{count} articles",
     "confirmDelete": "Are you sure you want to delete this site?",
     "gscConnected": "GSC connected",
-    "gscNotConnected": "GSC not connected"
+    "gscNotConnected": "GSC not connected",
+    "create": {
+      "title": "Add New Site",
+      "domain": "Domain",
+      "domainHelp": "Enter your domain without http:// or www.",
+      "name": "Site Name",
+      "namePlaceholder": "My Website",
+      "language": "Primary Language"
+    },
+    "show": {
+      "settings": "Settings",
+      "topKeywords": "Top 10 Keywords",
+      "sortedByScore": "Sorted by score",
+      "diff": "Diff:",
+      "pos": "Pos:",
+      "businessDescription": "Business description",
+      "targetAudience": "Target audience",
+      "autopilot": "Autopilot",
+      "active": "Active",
+      "connections": "Connections",
+      "gsc": "Google Search Console",
+      "ga4": "Google Analytics 4",
+      "cmsIntegrations": "CMS Integrations",
+      "articlesToWatch": "Articles to watch",
+      "quickActions": "Quick actions",
+      "language": "Language",
+      "createdAt": "Created on",
+      "configuredAt": "Configured on"
+    },
+    "edit": {
+      "title": "Edit",
+      "generalInfo": "General information",
+      "siteName": "Site name",
+      "contentLanguage": "Content language",
+      "businessDescription": "Business description",
+      "businessPlaceholder": "Describe your business in a few sentences...",
+      "targetAudience": "Target audience",
+      "audiencePlaceholder": "E.g.: entrepreneurs, athletes, developers...",
+      "brandVoice": "Brand voice",
+      "brandVoiceSubtitle": "Customize the tone and style of your generated articles.",
+      "tone": "Tone",
+      "writingStyle": "Writing style",
+      "stylePlaceholder": "E.g.: Short, punchy sentences. Use concrete examples...",
+      "vocabularyUse": "Vocabulary to use",
+      "vocabularyUseHelp": "Words and expressions to favor in your articles.",
+      "vocabularyAvoid": "Vocabulary to avoid",
+      "vocabularyAvoidHelp": "Words and expressions not to use.",
+      "addWord": "Add a word or expression...",
+      "addWordAvoid": "Add a word to avoid...",
+      "contentExamples": "Content examples",
+      "contentExamplesHelp": "Paste representative excerpts of your writing style.",
+      "examplePlaceholder": "Paste a representative text excerpt...",
+      "addExample": "Add this example",
+      "saving": "Saving..."
+    },
+    "tones": {
+      "professional": { "name": "Professional", "description": "Formal and credible" },
+      "casual": { "name": "Casual", "description": "Accessible and friendly" },
+      "expert": { "name": "Expert", "description": "Technical and in-depth" },
+      "friendly": { "name": "Friendly", "description": "Warm and engaging" },
+      "neutral": { "name": "Neutral", "description": "Objective and factual" }
+    },
+    "languages": {
+      "fr": "Français",
+      "en": "English",
+      "es": "Español",
+      "de": "Deutsch",
+      "it": "Italiano",
+      "pt": "Português",
+      "nl": "Dutch"
+    }
   },
   "articles": {
     "title": "Articles",
@@ -101,7 +182,31 @@
     "approve": "Approve",
     "publish": "Publish",
     "noArticles": "No articles found",
-    "noArticlesDescription": "Articles will appear here once generated"
+    "noArticlesDescription": "Articles will appear here once generated",
+    "show": {
+      "content": "Content",
+      "copy": "Copy",
+      "copied": "Copied!",
+      "edit": "Edit",
+      "noContent": "No content available.",
+      "seoMeta": "SEO Meta",
+      "metaTitle": "Meta Title",
+      "metaDescription": "Meta Description",
+      "noDescription": "No description",
+      "slug": "Slug",
+      "actions": "Actions",
+      "approveForPublishing": "Approve for Publishing",
+      "selectIntegration": "Select Integration",
+      "choose": "Choose...",
+      "publishArticle": "Publish Article",
+      "noIntegrations": "No integrations configured.",
+      "addOne": "Add one",
+      "toPublish": "to publish this article.",
+      "targetKeyword": "Target Keyword",
+      "volume": "Volume",
+      "difficulty": "Difficulty",
+      "characters": "characters"
+    }
   },
   "keywords": {
     "title": "Keywords",
@@ -241,7 +346,19 @@
     "back": "Back",
     "skip": "Skip",
     "finish": "Finish setup",
-    "continue": "Continue"
+    "continue": "Continue",
+    "wizard": {
+      "title": "Site configuration",
+      "exit": "Exit"
+    },
+    "steps": {
+      "site": { "name": "Site", "description": "Basic info" },
+      "searchConsole": { "name": "Search Console", "description": "GSC connection" },
+      "business": { "name": "Business", "description": "Your activity" },
+      "config": { "name": "Configuration", "description": "Publishing rhythm" },
+      "publication": { "name": "Publication", "description": "CMS integration" },
+      "launch": { "name": "Launch", "description": "Activate autopilot" }
+    }
   },
   "usage": {
     "title": "Usage",
@@ -295,5 +412,98 @@
       "logout": "Log Out"
     },
     "backToHome": "Back to home"
+  },
+  "profile": {
+    "title": "Profile",
+    "subtitle": "Manage your personal information and security preferences",
+    "info": {
+      "title": "Profile Information",
+      "subtitle": "Update your name and email address"
+    },
+    "password": {
+      "title": "Password",
+      "subtitle": "Use a long, secure password",
+      "current": "Current password",
+      "new": "New password",
+      "confirm": "Confirm password"
+    },
+    "delete": {
+      "title": "Delete Account",
+      "subtitle": "Permanently delete your account and all your data",
+      "warning": "Once your account is deleted, all its resources and data will be permanently erased. Before deleting your account, please download any data you wish to keep.",
+      "button": "Delete Account",
+      "confirmTitle": "Delete your account?",
+      "confirmWarning": "This action is irreversible. All your data will be permanently deleted.",
+      "confirmPassword": "Confirm your password",
+      "cancel": "Cancel",
+      "confirmButton": "Delete permanently"
+    },
+    "saved": "Saved",
+    "name": "Name",
+    "email": "Email address",
+    "emailNotVerified": "Your email address is not verified.",
+    "resendLink": "Click here to resend the verification link.",
+    "verificationSent": "A new verification link has been sent to your email address."
+  },
+  "integrations": {
+    "title": "Integrations",
+    "subtitle": "Connect your CMS to publish automatically",
+    "add": "Add",
+    "addIntegration": "Add an integration",
+    "connectedTo": "Connected to",
+    "available": "Available integrations",
+    "confirmDelete": "Are you sure you want to delete {name}?",
+    "site": "Site",
+    "createSiteFirst": "You must create a site before adding an integration.",
+    "createSite": "Create a site",
+    "types": {
+      "wordpress": { "name": "WordPress", "description": "Publishing via REST API" },
+      "webflow": { "name": "Webflow", "description": "Webflow CMS integration" },
+      "shopify": { "name": "Shopify", "description": "Shopify blog publishing" },
+      "ghost": { "name": "Ghost", "description": "Open-source publishing platform" }
+    }
+  },
+  "contentPlan": {
+    "title": "Content Plan",
+    "regenerate": "Regenerate",
+    "regenerating": "Regenerating...",
+    "confirmRegenerate": "This will regenerate your entire Content Plan. Continue?",
+    "settings": "Settings",
+    "tabs": { "keywords": "Keywords", "planned": "Planned", "generated": "Generated", "published": "Published" },
+    "status": { "planned": "Planned", "generating": "Generating", "ready": "Ready", "published": "Published" },
+    "progress": {
+      "queuedTitle": "Preparing...",
+      "queuedSubtitle": "Your Content Plan is queued. Analysis will start shortly.",
+      "generatingTitle": "Creating your Content Plan",
+      "generatingSubtitle": "We're analyzing your site and preparing your content calendar",
+      "completed": "% completed",
+      "backgroundNote": "You can close this page, generation continues in the background."
+    },
+    "tips": {
+      "tip1": "We analyze Google data to find your best SEO opportunities",
+      "tip2": "The more data your site has, the better the plan",
+      "tip3": "Articles will be optimized for your target audience",
+      "tip4": "Each topic is selected for its traffic potential",
+      "tip5": "Our AI avoids topics you've already covered"
+    }
+  },
+  "siteCard": {
+    "status": { "active": "Active", "paused": "Paused", "setupRequired": "Setup required", "error": "Error" },
+    "view": "View",
+    "setup": "Setup",
+    "perWeek": "per week",
+    "thisWeek": "this week",
+    "inReview": "in review",
+    "setupIncomplete": "Setup incomplete",
+    "continueSetup": "Continue setup"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "loading": "Loading...",
+    "empty": "No notifications"
+  },
+  "activity": {
+    "title": "Activity",
+    "empty": "No activity yet"
   }
 }
