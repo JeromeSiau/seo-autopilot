@@ -16,15 +16,27 @@ class ClientDistributionWidget extends ChartWidget
 
     protected function getData(): array
     {
+        // Active trial teams
         $trial = Team::where('is_trial', true)
             ->where(function ($q) {
                 $q->whereNull('trial_ends_at')
                   ->orWhere('trial_ends_at', '>', now());
             })->count();
 
-        $active = Team::whereHas('subscriptions', fn ($q) => $q->active())->count();
+        // Teams with a billing plan assigned (active subscribers)
+        $active = Team::whereNotNull('plan_id')
+            ->where('is_trial', false)
+            ->count();
 
-        $inactive = Team::count() - $trial - $active;
+        // Expired trials or no plan
+        $inactive = Team::where(function ($q) {
+            $q->where('is_trial', true)
+              ->whereNotNull('trial_ends_at')
+              ->where('trial_ends_at', '<=', now());
+        })->orWhere(function ($q) {
+            $q->where('is_trial', false)
+              ->whereNull('plan_id');
+        })->count();
 
         return [
             'datasets' => [
