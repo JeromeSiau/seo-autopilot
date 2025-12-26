@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\ScheduledArticles\Schemas;
 
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Select;
+use Filament\Schemas\Components\DatePicker;
+use Filament\Schemas\Components\Select;
 use Filament\Schemas\Schema;
 
 class ScheduledArticleForm
