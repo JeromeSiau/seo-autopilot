@@ -14,6 +14,7 @@ use App\Http\Controllers\Web\NotificationController;
 use App\Http\Controllers\Web\OnboardingController;
 use App\Http\Controllers\Web\SettingsController;
 use App\Http\Controllers\Web\SiteController;
+use App\Http\Controllers\Web\StripeWebhookController;
 use App\Http\Controllers\Web\ContentPlanController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -33,6 +34,10 @@ Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])->
 
 // User preferences (locale, theme) - accessible to all users
 Route::post('/preferences', [PreferencesController::class, 'update'])->name('preferences.update');
+
+// Stripe webhook (outside auth middleware)
+Route::post('/stripe/webhook', [StripeWebhookController::class, 'handleWebhook'])
+    ->name('stripe.webhook');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // Dashboard
