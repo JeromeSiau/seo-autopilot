@@ -3,6 +3,7 @@ import { Head } from '@inertiajs/react';
 import ProgressSteps from '@/Components/ContentPlan/ProgressSteps';
 import Celebration from '@/Components/ContentPlan/Celebration';
 import CalendarReveal from '@/Components/ContentPlan/CalendarReveal';
+import { useTranslations } from '@/hooks/useTranslations';
 
 interface Site {
     id: number;
@@ -33,6 +34,7 @@ interface Props {
 type Phase = 'progress' | 'celebration' | 'calendar';
 
 export default function Generating({ site }: Props) {
+    const { t } = useTranslations();
     const [status, setStatus] = useState<GenerationStatus | null>(null);
     const [phase, setPhase] = useState<Phase>('progress');
 
@@ -79,7 +81,7 @@ export default function Generating({ site }: Props) {
 
     return (
         <div className="min-h-screen bg-surface-50 dark:bg-surface-900 transition-colors">
-            <Head title="Création du Content Plan" />
+            <Head title={t?.contentPlan?.progress?.generatingTitle ?? 'Creating your Content Plan'} />
 
             <div className="max-w-3xl mx-auto px-4 py-12">
                 {phase === 'progress' && (
@@ -101,7 +103,7 @@ export default function Generating({ site }: Props) {
                 {status?.status === 'failed' && (
                     <div className="mt-8 p-4 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-xl">
                         <p className="text-red-700 dark:text-red-400">
-                            Une erreur est survenue : {status.error_message}
+                            {t?.contentPlan?.progress?.errorOccurred ?? 'An error occurred:'} {status.error_message}
                         </p>
                     </div>
                 )}

@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import { PageProps } from '@/types';
 import { Check, X } from 'lucide-react';
 import clsx from 'clsx';
+import { useTranslations } from '@/hooks/useTranslations';
 import Step1Site from './Steps/Step1Site';
 import Step2GSC from './Steps/Step2GSC';
 import Step3Business from './Steps/Step3Business';
@@ -43,16 +44,17 @@ interface WizardProps extends PageProps {
     resumeStep?: number;
 }
 
-const STEPS = [
-    { number: 1, title: 'Site', description: 'Infos de base' },
-    { number: 2, title: 'Search Console', description: 'Connexion GSC' },
-    { number: 3, title: 'Business', description: 'Votre activité' },
-    { number: 4, title: 'Configuration', description: 'Rythme de publication' },
-    { number: 5, title: 'Publication', description: 'Intégration CMS' },
-    { number: 6, title: 'Lancement', description: 'Activer l\'autopilot' },
-];
-
 export default function Wizard({ team, site: initialSite, resumeStep }: WizardProps) {
+    const { t } = useTranslations();
+
+    const STEPS = useMemo(() => [
+        { number: 1, title: t?.onboarding?.steps?.site?.name ?? 'Site', description: t?.onboarding?.steps?.site?.description ?? 'Basic info' },
+        { number: 2, title: t?.onboarding?.steps?.searchConsole?.name ?? 'Search Console', description: t?.onboarding?.steps?.searchConsole?.description ?? 'GSC connection' },
+        { number: 3, title: t?.onboarding?.steps?.business?.name ?? 'Business', description: t?.onboarding?.steps?.business?.description ?? 'Your activity' },
+        { number: 4, title: t?.onboarding?.steps?.config?.name ?? 'Configuration', description: t?.onboarding?.steps?.config?.description ?? 'Publishing rhythm' },
+        { number: 5, title: t?.onboarding?.steps?.publication?.name ?? 'Publication', description: t?.onboarding?.steps?.publication?.description ?? 'CMS integration' },
+        { number: 6, title: t?.onboarding?.steps?.launch?.name ?? 'Launch', description: t?.onboarding?.steps?.launch?.description ?? 'Activate autopilot' },
+    ], [t]);
     const [currentStep, setCurrentStep] = useState(resumeStep || 1);
     const [siteId, setSiteId] = useState<number | null>(initialSite?.id || null);
     const [siteData, setSiteData] = useState({
@@ -87,7 +89,7 @@ export default function Wizard({ team, site: initialSite, resumeStep }: WizardPr
 
     return (
         <div className="min-h-screen bg-surface-50 dark:bg-surface-900 transition-colors">
-            <Head title="Configuration du site" />
+            <Head title={t?.onboarding?.wizard?.title ?? 'Site configuration'} />
 
             {/* Header */}
             <header className="border-b border-surface-200 dark:border-surface-800 bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl">
@@ -103,7 +105,7 @@ export default function Wizard({ team, site: initialSite, resumeStep }: WizardPr
                         className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-surface-500 dark:text-surface-400 hover:text-surface-700 dark:hover:text-white hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors"
                     >
                         <X className="h-4 w-4" />
-                        <span className="hidden sm:inline">Quitter</span>
+                        <span className="hidden sm:inline">{t?.onboarding?.wizard?.exit ?? 'Exit'}</span>
                     </Link>
                 </div>
             </header>

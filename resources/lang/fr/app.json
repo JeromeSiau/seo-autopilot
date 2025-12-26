@@ -518,7 +518,8 @@
       "generatingTitle": "Création de votre Content Plan",
       "generatingSubtitle": "Nous analysons votre site et préparons votre calendrier de contenu",
       "completed": "% complété",
-      "backgroundNote": "Vous pouvez fermer cette page, la génération continue en arrière-plan."
+      "backgroundNote": "Vous pouvez fermer cette page, la génération continue en arrière-plan.",
+      "errorOccurred": "Une erreur est survenue :"
     },
     "tips": {
       "tip1": "Nous analysons les données de Google pour trouver vos meilleures opportunités SEO",
