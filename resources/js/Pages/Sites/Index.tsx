@@ -144,12 +144,14 @@ export default function SitesIndex({ sites }: SitesIndexProps) {
                                                 e.stopPropagation();
                                                 router.visit(route('sites.edit', { site: site.id }));
                                             }}
+                                            aria-label={`${t?.sites?.editSite ?? 'Edit site'} ${site.domain}`}
                                             className="rounded-lg p-2 text-surface-400 hover:bg-surface-100 dark:hover:bg-surface-800 hover:text-surface-600 dark:hover:text-white transition-colors"
                                         >
                                             <Settings className="h-4 w-4" />
                                         </button>
                                         <button
                                             onClick={(e) => handleDelete(e, site)}
+                                            aria-label={`${t?.sites?.deleteSite ?? 'Delete site'} ${site.domain}`}
                                             className="rounded-lg p-2 text-surface-400 hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-400 transition-colors"
                                         >
                                             <Trash2 className="h-4 w-4" />

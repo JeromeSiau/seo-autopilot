@@ -76,11 +76,21 @@ export default function TeamSwitcher() {
         );
     };
 
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Escape' && isOpen) {
+            setIsOpen(false);
+        }
+    };
+
     return (
         <div className="relative" ref={dropdownRef}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
+                onKeyDown={handleKeyDown}
                 disabled={isSwitching}
+                aria-expanded={isOpen}
+                aria-haspopup="listbox"
+                aria-label="Switch team"
                 className={clsx(
                     'flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all',
                     'bg-surface-50 dark:bg-surface-800/50',

@@ -320,12 +320,14 @@ export default function ArticlesIndex({ articles, sites, filters, stats }: Artic
                                                         )}
                                                         <Link
                                                             href={route('articles.edit', { article: article.id })}
+                                                            aria-label={`${t?.articles?.editArticle ?? 'Edit article'} ${article.title}`}
                                                             className="rounded-lg p-2 text-surface-400 hover:bg-surface-100 dark:hover:bg-surface-800 hover:text-surface-600 dark:hover:text-surface-300 transition-colors"
                                                         >
                                                             <Edit className="h-4 w-4" />
                                                         </Link>
                                                         <button
                                                             onClick={() => handleDelete(article)}
+                                                            aria-label={`${t?.articles?.deleteArticle ?? 'Delete article'} ${article.title}`}
                                                             className="rounded-lg p-2 text-surface-400 hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-400 transition-colors"
                                                         >
                                                             <Trash2 className="h-4 w-4" />

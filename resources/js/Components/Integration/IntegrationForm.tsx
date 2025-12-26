@@ -289,10 +289,11 @@ export default function IntegrationForm({
             <form onSubmit={handleSubmit} className="space-y-4">
                 {/* Name */}
                 <div>
-                    <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
+                    <label htmlFor="integration-name" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
                         Nom de l'intégration
                     </label>
                     <input
+                        id="integration-name"
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
@@ -305,10 +306,11 @@ export default function IntegrationForm({
                 {selectedPlatform === 'wordpress' && (
                     <>
                         <div>
-                            <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
+                            <label htmlFor="wordpress-url" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
                                 URL WordPress
                             </label>
                             <input
+                                id="wordpress-url"
                                 type="url"
                                 value={credentials.url || ''}
                                 onChange={(e) => handleCredentialChange('url', e.target.value)}
@@ -318,10 +320,11 @@ export default function IntegrationForm({
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
+                            <label htmlFor="wordpress-username" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
                                 Nom d'utilisateur
                             </label>
                             <input
+                                id="wordpress-username"
                                 type="text"
                                 value={credentials.username || ''}
                                 onChange={(e) => handleCredentialChange('username', e.target.value)}
@@ -330,11 +333,12 @@ export default function IntegrationForm({
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
+                            <label htmlFor="wordpress-password" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
                                 Mot de passe d'application
                             </label>
                             <div className="relative">
                                 <input
+                                    id="wordpress-password"
                                     type={showPassword ? 'text' : 'password'}
                                     value={credentials.password || ''}
                                     onChange={(e) => handleCredentialChange('password', e.target.value)}
@@ -344,6 +348,7 @@ export default function IntegrationForm({
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
+                                    aria-label={showPassword ? 'Hide password' : 'Show password'}
                                     className="absolute right-3 top-1/2 -translate-y-1/2 text-surface-400 hover:text-surface-600 dark:hover:text-surface-300"
                                 >
                                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -360,11 +365,12 @@ export default function IntegrationForm({
                 {selectedPlatform === 'webflow' && (
                     <>
                         <div>
-                            <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
+                            <label htmlFor="webflow-api-token" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
                                 Token API
                             </label>
                             <div className="relative">
                                 <input
+                                    id="webflow-api-token"
                                     type={showPassword ? 'text' : 'password'}
                                     value={credentials.api_token || ''}
                                     onChange={(e) => handleCredentialChange('api_token', e.target.value)}
@@ -374,6 +380,7 @@ export default function IntegrationForm({
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
+                                    aria-label={showPassword ? 'Hide token' : 'Show token'}
                                     className="absolute right-3 top-1/2 -translate-y-1/2 text-surface-400 hover:text-surface-600 dark:hover:text-surface-300"
                                 >
                                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -381,10 +388,11 @@ export default function IntegrationForm({
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
+                            <label htmlFor="webflow-collection-id" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
                                 Collection ID
                             </label>
                             <input
+                                id="webflow-collection-id"
                                 type="text"
                                 value={credentials.collection_id || ''}
                                 onChange={(e) => handleCredentialChange('collection_id', e.target.value)}
@@ -400,10 +408,11 @@ export default function IntegrationForm({
                 {selectedPlatform === 'shopify' && (
                     <>
                         <div>
-                            <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
+                            <label htmlFor="shopify-domain" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
                                 Domaine Shopify
                             </label>
                             <input
+                                id="shopify-domain"
                                 type="text"
                                 value={credentials.shop_domain || ''}
                                 onChange={(e) => handleCredentialChange('shop_domain', e.target.value)}
@@ -413,11 +422,12 @@ export default function IntegrationForm({
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
+                            <label htmlFor="shopify-api-token" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
                                 Token API Admin
                             </label>
                             <div className="relative">
                                 <input
+                                    id="shopify-api-token"
                                     type={showPassword ? 'text' : 'password'}
                                     value={credentials.api_token || ''}
                                     onChange={(e) => handleCredentialChange('api_token', e.target.value)}
@@ -427,6 +437,7 @@ export default function IntegrationForm({
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
+                                    aria-label={showPassword ? 'Hide token' : 'Show token'}
                                     className="absolute right-3 top-1/2 -translate-y-1/2 text-surface-400 hover:text-surface-600 dark:hover:text-surface-300"
                                 >
                                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -440,10 +451,11 @@ export default function IntegrationForm({
                 {selectedPlatform === 'ghost' && (
                     <>
                         <div>
-                            <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
+                            <label htmlFor="ghost-url" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
                                 URL Ghost
                             </label>
                             <input
+                                id="ghost-url"
                                 type="url"
                                 value={credentials.blog_url || ''}
                                 onChange={(e) => handleCredentialChange('blog_url', e.target.value)}
@@ -453,11 +465,12 @@ export default function IntegrationForm({
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
+                            <label htmlFor="ghost-api-key" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
                                 Admin API Key
                             </label>
                             <div className="relative">
                                 <input
+                                    id="ghost-api-key"
                                     type={showPassword ? 'text' : 'password'}
                                     value={credentials.admin_api_key || ''}
                                     onChange={(e) => handleCredentialChange('admin_api_key', e.target.value)}
@@ -468,6 +481,7 @@ export default function IntegrationForm({
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
+                                    aria-label={showPassword ? 'Hide API key' : 'Show API key'}
                                     className="absolute right-3 top-1/2 -translate-y-1/2 text-surface-400 hover:text-surface-600 dark:hover:text-surface-300"
                                 >
                                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}

@@ -36,9 +36,28 @@ const Dropdown = ({ children }: PropsWithChildren) => {
 const Trigger = ({ children }: PropsWithChildren) => {
     const { open, setOpen, toggleOpen } = useContext(DropDownContext);
 
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggleOpen();
+        }
+        if (e.key === 'Escape' && open) {
+            setOpen(false);
+        }
+    };
+
     return (
         <>
-            <div onClick={toggleOpen}>{children}</div>
+            <button
+                type="button"
+                onClick={toggleOpen}
+                onKeyDown={handleKeyDown}
+                aria-expanded={open}
+                aria-haspopup="true"
+                className="inline-flex items-center"
+            >
+                {children}
+            </button>
 
             {open && (
                 <div
