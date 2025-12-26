@@ -51,6 +51,12 @@ class AuthenticatedSessionController extends Controller
             $user->save();
         }
 
+        // Check for pending invitation
+        if ($token = session('pending_invitation')) {
+            session()->forget('pending_invitation');
+            return redirect()->route('invitations.accept', $token);
+        }
+
         return redirect()->intended(route('dashboard', absolute: false));
     }
 
