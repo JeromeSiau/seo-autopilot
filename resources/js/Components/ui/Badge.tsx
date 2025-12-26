@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { ReactNode } from 'react';
 
-type BadgeVariant = 'default' | 'success' | 'warning' | 'danger' | 'info' | 'secondary';
+type BadgeVariant = 'default' | 'success' | 'warning' | 'danger' | 'info' | 'secondary' | 'primary';
 
 interface BadgeProps {
     children: ReactNode;
@@ -10,12 +10,13 @@ interface BadgeProps {
 }
 
 const variantClasses: Record<BadgeVariant, string> = {
-    default: 'bg-gray-100 text-gray-700',
-    success: 'bg-green-100 text-green-700',
-    warning: 'bg-yellow-100 text-yellow-700',
-    danger: 'bg-red-100 text-red-700',
-    info: 'bg-blue-100 text-blue-700',
-    secondary: 'bg-purple-100 text-purple-700',
+    default: 'bg-surface-100 text-surface-700 dark:bg-surface-700 dark:text-surface-200',
+    success: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+    warning: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
+    danger: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+    info: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+    secondary: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+    primary: 'bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400',
 };
 
 export function Badge({ children, variant = 'default', size = 'sm' }: BadgeProps) {

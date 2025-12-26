@@ -27,6 +27,7 @@ import Logo from '@/Components/Logo';
 import ThemeToggle from '@/Components/ThemeToggle';
 import LanguageSwitcher from '@/Components/LanguageSwitcher';
 import { useTranslations } from '@/hooks/useTranslations';
+import { ToastContainer } from '@/Components/ui/Toast';
 
 interface NavItem {
     name: string;
@@ -391,6 +392,9 @@ export default function AppLayout({
                 activeAgents={activeAgents}
                 generatingArticles={generatingArticles}
             />
+
+            {/* Toast Notifications */}
+            <ToastContainer />
         </div>
     );
 }

@@ -9,6 +9,9 @@ import { Site, PaginatedData, PageProps } from '@/types';
 import { format, Locale } from 'date-fns';
 import { fr, enUS, es, de, it, pt, nl } from 'date-fns/locale';
 import { useTranslations } from '@/hooks/useTranslations';
+import { useState } from 'react';
+import Modal from '@/Components/Modal';
+import { Button } from '@/Components/ui/Button';
 
 const DATE_LOCALES: Record<string, Locale> = {
     fr,
@@ -27,6 +30,10 @@ interface SitesIndexProps extends PageProps {
 export default function SitesIndex({ sites }: SitesIndexProps) {
     const { t, locale } = useTranslations();
     const dateLocale = DATE_LOCALES[locale ?? 'en'] || enUS;
+    const [deleteModal, setDeleteModal] = useState<{ open: boolean; site: Site | null }>({
+        open: false,
+        site: null,
+    });
 
     const STATUS_CONFIG = {
         active: {
@@ -53,8 +60,14 @@ export default function SitesIndex({ sites }: SitesIndexProps) {
     const handleDelete = (e: React.MouseEvent, site: Site) => {
         e.preventDefault();
         e.stopPropagation();
-        if (confirm((t?.sites?.confirmDelete ?? 'Are you sure you want to delete this site?').replace('{domain}', site.domain))) {
-            router.delete(route('sites.destroy', { site: site.id }));
+        setDeleteModal({ open: true, site });
+    };
+
+    const confirmDelete = () => {
+        if (deleteModal.site) {
+            router.delete(route('sites.destroy', { site: deleteModal.site.id }), {
+                onSuccess: () => setDeleteModal({ open: false, site: null }),
+            });
         }
     };
 
@@ -225,6 +238,43 @@ export default function SitesIndex({ sites }: SitesIndexProps) {
                     })}
                 </div>
             )}
+
+            {/* Delete Confirmation Modal */}
+            <Modal
+                show={deleteModal.open}
+                onClose={() => setDeleteModal({ open: false, site: null })}
+                maxWidth="md"
+            >
+                <div className="p-6">
+                    <div className="flex items-center gap-4">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-500/10">
+                            <Trash2 className="h-6 w-6 text-red-600 dark:text-red-400" />
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-semibold text-surface-900 dark:text-white">
+                                {t?.sites?.deleteTitle ?? 'Delete Site'}
+                            </h3>
+                            <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
+                                {(t?.sites?.confirmDelete ?? 'Are you sure you want to delete {domain}?').replace('{domain}', deleteModal.site?.domain ?? '')}
+                            </p>
+                        </div>
+                    </div>
+                    <div className="mt-6 flex justify-end gap-3">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setDeleteModal({ open: false, site: null })}
+                        >
+                            {t?.common?.cancel ?? 'Cancel'}
+                        </Button>
+                        <Button
+                            variant="danger"
+                            onClick={confirmDelete}
+                        >
+                            {t?.common?.delete ?? 'Delete'}
+                        </Button>
+                    </div>
+                </div>
+            </Modal>
         </AppLayout>
     );
 }
