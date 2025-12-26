@@ -14,32 +14,50 @@ class TeamForm
     public static function configure(Schema $schema): Schema
     {
         return $schema
+            ->columns(1)
             ->components([
                 Section::make('Client Information')
+                    ->description('Basic information about the client team')
+                    ->icon('heroicon-o-user-group')
+                    ->columns(2)
                     ->schema([
                         TextInput::make('name')
+                            ->label('Team Name')
                             ->required()
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->placeholder('Enter team name'),
                         Select::make('owner_id')
+                            ->label('Owner')
                             ->relationship('owner', 'email')
                             ->searchable()
                             ->preload()
                             ->required(),
+                    ]),
+
+                Section::make('Subscription')
+                    ->description('Billing plan and subscription details')
+                    ->icon('heroicon-o-credit-card')
+                    ->columns(2)
+                    ->schema([
                         Select::make('plan_id')
+                            ->label('Billing Plan')
                             ->relationship('billingPlan', 'name')
                             ->searchable()
-                            ->preload(),
-                    ])->columns(2),
-
-                Section::make('Trial & Limits')
-                    ->schema([
+                            ->preload()
+                            ->placeholder('Select a plan'),
                         Toggle::make('is_trial')
-                            ->default(true),
-                        DateTimePicker::make('trial_ends_at'),
+                            ->label('Trial Mode')
+                            ->default(true)
+                            ->inline(false),
+                        DateTimePicker::make('trial_ends_at')
+                            ->label('Trial Ends At')
+                            ->native(false),
                         TextInput::make('articles_limit')
+                            ->label('Articles Limit')
                             ->numeric()
-                            ->default(10),
-                    ])->columns(3),
+                            ->default(10)
+                            ->suffix('/ month'),
+                    ]),
             ]);
     }
 }
