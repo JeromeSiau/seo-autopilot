@@ -7,6 +7,7 @@ use App\Http\Controllers\PreferencesController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Web\AnalyticsController;
 use App\Http\Controllers\Web\ArticleController;
+use App\Http\Controllers\Web\BillingController;
 use App\Http\Controllers\Web\IntegrationController;
 use App\Http\Controllers\Web\KeywordController;
 use App\Http\Controllers\Web\NotificationController;
@@ -99,10 +100,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Settings
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
-    Route::get('/settings/billing', [SettingsController::class, 'billing'])->name('settings.billing');
     Route::get('/settings/team', [SettingsController::class, 'team'])->name('settings.team');
     Route::get('/settings/api-keys', [SettingsController::class, 'apiKeys'])->name('settings.api-keys');
     Route::get('/settings/notifications', [SettingsController::class, 'notifications'])->name('settings.notifications');
+
+    // Billing
+    Route::get('/billing', [BillingController::class, 'index'])->name('settings.billing');
+    Route::post('/billing/checkout', [BillingController::class, 'checkout'])->name('billing.checkout');
+    Route::get('/billing/success', [BillingController::class, 'success'])->name('billing.success');
+    Route::get('/billing/cancel', [BillingController::class, 'cancel'])->name('billing.cancel');
+    Route::post('/billing/portal', [BillingController::class, 'portal'])->name('billing.portal');
 
     // Notifications
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
