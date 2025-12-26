@@ -93,14 +93,6 @@ class User extends Authenticatable implements FilamentUser
     }
 
     /**
-     * Get the user's current team (accessor for backward compatibility).
-     */
-    public function getCurrentTeamAttribute(): ?Team
-    {
-        return $this->currentTeam;
-    }
-
-    /**
      * Alias for backward compatibility.
      */
     public function team(): BelongsTo
