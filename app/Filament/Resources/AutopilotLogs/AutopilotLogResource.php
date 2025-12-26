@@ -18,7 +18,7 @@ class AutopilotLogResource extends Resource
 
     protected static \UnitEnum|string|null $navigationGroup = 'Logs';
 
-    protected static ?int $navigationSort = 9;
+    protected static ?int $navigationSort = 8;
 
     public static function table(Table $table): Table
     {

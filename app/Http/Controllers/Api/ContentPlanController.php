@@ -16,7 +16,7 @@ class ContentPlanController extends Controller
 
     public function generationStatus(Site $site): JsonResponse
     {
-        if ($site->team_id !== auth()->user()->team_id) {
+        if ($site->team_id !== auth()->user()->current_team_id) {
             abort(403);
         }
 
@@ -43,7 +43,7 @@ class ContentPlanController extends Controller
 
     public function contentPlan(Site $site, Request $request): JsonResponse
     {
-        if ($site->team_id !== auth()->user()->team_id) {
+        if ($site->team_id !== auth()->user()->current_team_id) {
             abort(403);
         }
 

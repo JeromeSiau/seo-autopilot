@@ -1,6 +1,7 @@
-import { useState, useRef, useEffect } from 'react';
-import { router, usePage } from '@inertiajs/react';
-import { ChevronDown, Check, Building2 } from 'lucide-react';
+import { useState, useRef, useEffect, FormEventHandler } from 'react';
+import { createPortal } from 'react-dom';
+import { router, usePage, useForm } from '@inertiajs/react';
+import { ChevronDown, Check, Building2, Plus, X, AlertCircle } from 'lucide-react';
 import clsx from 'clsx';
 import { PageProps, UserTeam } from '@/types';
 
@@ -14,7 +15,23 @@ export default function TeamSwitcher() {
     const { auth } = usePage<PageProps>().props;
     const [isOpen, setIsOpen] = useState(false);
     const [isSwitching, setIsSwitching] = useState(false);
+    const [showCreateModal, setShowCreateModal] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
+
+    const { data, setData, post, processing, errors, reset } = useForm({
+        name: '',
+    });
+
+    const handleCreateTeam: FormEventHandler = (e) => {
+        e.preventDefault();
+        post(route('teams.store'), {
+            preserveScroll: true,
+            onSuccess: () => {
+                setShowCreateModal(false);
+                reset();
+            },
+        });
+    };
 
     const currentTeam = auth.user.current_team;
     const teams = auth.user.teams;
@@ -161,7 +178,105 @@ export default function TeamSwitcher() {
                             );
                         })}
                     </div>
+                    <div className="border-t border-surface-100 dark:border-surface-800 px-3 py-2">
+                        <button
+                            onClick={() => {
+                                setIsOpen(false);
+                                setShowCreateModal(true);
+                            }}
+                            className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-sm font-medium text-surface-600 dark:text-surface-400 hover:bg-surface-50 dark:hover:bg-surface-800 hover:text-surface-900 dark:hover:text-surface-200 transition-colors"
+                        >
+                            <Plus className="h-4 w-4" />
+                            Create New Team
+                        </button>
+                    </div>
                 </div>
+            )}
+
+            {/* Create Team Modal - rendered via portal to escape sidebar z-index */}
+            {showCreateModal && createPortal(
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+                    <div
+                        className="fixed inset-0 bg-black/50"
+                        onClick={() => setShowCreateModal(false)}
+                    />
+                    <div className="relative w-full max-w-md rounded-2xl bg-white dark:bg-surface-900 p-6 shadow-xl">
+                        <button
+                            onClick={() => setShowCreateModal(false)}
+                            className="absolute right-4 top-4 rounded-lg p-1 text-surface-400 hover:bg-surface-100 dark:hover:bg-surface-800 hover:text-surface-600 dark:hover:text-surface-300"
+                        >
+                            <X className="h-5 w-5" />
+                        </button>
+
+                        <h2 className="text-xl font-semibold text-surface-900 dark:text-white mb-2">
+                            Create New Team
+                        </h2>
+
+                        <div className="mb-6 flex items-start gap-3 rounded-lg bg-amber-50 dark:bg-amber-500/10 p-3 text-sm text-amber-800 dark:text-amber-300">
+                            <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
+                            <p>
+                                Each team has its own dedicated billing. You will be able to select a plan after creating the team.
+                            </p>
+                        </div>
+
+                        <form onSubmit={handleCreateTeam}>
+                            <div className="mb-4">
+                                <label
+                                    htmlFor="team-name"
+                                    className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1"
+                                >
+                                    Team Name
+                                </label>
+                                <input
+                                    id="team-name"
+                                    type="text"
+                                    value={data.name}
+                                    onChange={(e) => setData('name', e.target.value)}
+                                    placeholder="My Awesome Team"
+                                    className={clsx(
+                                        'w-full rounded-lg border px-3 py-2 text-sm',
+                                        'bg-white dark:bg-surface-800',
+                                        'text-surface-900 dark:text-white',
+                                        'placeholder-surface-400 dark:placeholder-surface-500',
+                                        errors.name
+                                            ? 'border-red-300 dark:border-red-500 focus:border-red-500 focus:ring-red-500'
+                                            : 'border-surface-200 dark:border-surface-700 focus:border-primary-500 focus:ring-primary-500',
+                                        'focus:outline-none focus:ring-2 focus:ring-offset-0'
+                                    )}
+                                    autoFocus
+                                />
+                                {errors.name && (
+                                    <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                                        {errors.name}
+                                    </p>
+                                )}
+                            </div>
+
+                            <div className="flex gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowCreateModal(false)}
+                                    className="flex-1 rounded-lg border border-surface-200 dark:border-surface-700 px-4 py-2 text-sm font-medium text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={processing || !data.name.trim()}
+                                    className={clsx(
+                                        'flex-1 rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors',
+                                        processing || !data.name.trim()
+                                            ? 'bg-primary-400 cursor-not-allowed'
+                                            : 'bg-primary-600 hover:bg-primary-700'
+                                    )}
+                                >
+                                    {processing ? 'Creating...' : 'Create Team'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>,
+                document.body
             )}
         </div>
     );

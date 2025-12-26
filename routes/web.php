@@ -125,6 +125,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.readAll');
 
     // Teams
+    Route::post('/teams', [TeamController::class, 'store'])->name('teams.store');
     Route::patch('/teams/{team}', [TeamController::class, 'update'])->name('teams.update');
     Route::post('/teams/{team}/switch', [TeamController::class, 'switch'])->name('teams.switch');
 

@@ -24,7 +24,9 @@ class UserResource extends Resource
 
     protected static ?string $modelLabel = 'User';
 
-    protected static ?int $navigationSort = 2;
+    protected static \UnitEnum|string|null $navigationGroup = 'Configuration';
+
+    protected static ?int $navigationSort = 7;
 
     public static function form(Schema $schema): Schema
     {

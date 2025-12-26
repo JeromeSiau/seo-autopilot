@@ -2,11 +2,13 @@
 
 namespace App\Filament\Resources\Users\Schemas;
 
+use App\Models\Team;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Illuminate\Database\Eloquent\Model;
 
 class UserForm
 {
@@ -39,7 +41,13 @@ class UserForm
                             ->placeholder('••••••••'),
                         Select::make('current_team_id')
                             ->label('Current Team')
-                            ->relationship('currentTeam', 'name')
+                            ->options(function (?Model $record): array {
+                                if (! $record) {
+                                    return Team::pluck('name', 'id')->toArray();
+                                }
+
+                                return $record->teams->pluck('name', 'id')->toArray();
+                            })
                             ->searchable()
                             ->preload()
                             ->placeholder('Select active team'),
