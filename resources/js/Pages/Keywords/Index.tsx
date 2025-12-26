@@ -61,13 +61,13 @@ export default function KeywordsIndex({ keywords, sites, filters, stats }: Keywo
                     <div>
                         <h1 className="font-display text-2xl font-bold text-surface-900 dark:text-white">{t?.keywords?.title ?? 'Keywords'}</h1>
                         <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
-                            {t?.keywords?.subtitle ?? 'Découverts automatiquement par l\'Autopilot'}
+                            {t?.keywords?.subtitle ?? 'Automatically discovered by Autopilot'}
                         </p>
                     </div>
                     <div className="flex items-center gap-2">
                         <Target className="h-5 w-5 text-primary-500 dark:text-primary-400" />
                         <span className="text-sm font-medium text-surface-700 dark:text-surface-300">
-                            {stats.total} {t?.keywords?.tracked ?? 'keywords suivis'}
+                            {stats.total} {t?.keywords?.tracked ?? 'keywords tracked'}
                         </span>
                     </div>
                 </div>
@@ -123,7 +123,7 @@ export default function KeywordsIndex({ keywords, sites, filters, stats }: Keywo
                         'transition-colors'
                     )}
                 >
-                    <option value="">{t?.keywords?.allSites ?? 'Tous les sites'}</option>
+                    <option value="">{t?.keywords?.allSites ?? 'All sites'}</option>
                     {sites.map((site) => (
                         <option key={site.id} value={site.id}>
                             {site.name}
@@ -145,18 +145,18 @@ export default function KeywordsIndex({ keywords, sites, filters, stats }: Keywo
                         'transition-colors'
                     )}
                 >
-                    <option value="">{t?.keywords?.allStatuses ?? 'Tous les statuts'}</option>
-                    <option value="pending">{t?.status?.pending ?? 'En attente'}</option>
-                    <option value="queued">{t?.status?.queued ?? 'En queue'}</option>
-                    <option value="generating">{t?.status?.generating ?? 'En génération'}</option>
-                    <option value="completed">{t?.status?.completed ?? 'Complété'}</option>
+                    <option value="">{t?.keywords?.allStatuses ?? 'All statuses'}</option>
+                    <option value="pending">{t?.status?.pending ?? 'Pending'}</option>
+                    <option value="queued">{t?.status?.queued ?? 'Queued'}</option>
+                    <option value="generating">{t?.status?.generating ?? 'Generating'}</option>
+                    <option value="completed">{t?.status?.completed ?? 'Completed'}</option>
                 </select>
 
                 <div className="relative flex-1 min-w-[200px]">
                     <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-surface-400" />
                     <input
                         type="search"
-                        placeholder={t?.keywords?.searchPlaceholder ?? 'Rechercher un keyword...'}
+                        placeholder={t?.keywords?.searchPlaceholder ?? 'Search a keyword...'}
                         value={filters.search || ''}
                         onChange={(e) =>
                             router.get(
@@ -183,10 +183,10 @@ export default function KeywordsIndex({ keywords, sites, filters, stats }: Keywo
                             <Search className="h-7 w-7 text-surface-400" />
                         </div>
                         <h3 className="font-display font-semibold text-surface-900 dark:text-white mb-1">
-                            {t?.keywords?.noKeywords ?? 'Aucun keyword trouvé'}
+                            {t?.keywords?.noKeywords ?? 'No keywords found'}
                         </h3>
                         <p className="text-sm text-surface-500 dark:text-surface-400 max-w-sm mx-auto">
-                            {t?.keywords?.noKeywordsDescription ?? 'Les keywords seront découverts automatiquement par l\'Autopilot une fois vos sites configurés.'}
+                            {t?.keywords?.noKeywordsDescription ?? 'Keywords will appear here once discovered'}
                         </p>
                     </div>
                 ) : (
@@ -292,9 +292,9 @@ export default function KeywordsIndex({ keywords, sites, filters, stats }: Keywo
                             <div className="flex items-center justify-between border-t border-surface-100 dark:border-surface-800 px-6 py-4">
                                 <p className="text-sm text-surface-500 dark:text-surface-400">
                                     <span className="font-medium text-surface-700 dark:text-surface-300">{keywords.meta.from}</span>
-                                    {' '}{t?.common?.to ?? 'à'}{' '}
+                                    {' '}{t?.common?.to ?? 'to'}{' '}
                                     <span className="font-medium text-surface-700 dark:text-surface-300">{keywords.meta.to}</span>
-                                    {' '}{t?.common?.of ?? 'sur'}{' '}
+                                    {' '}{t?.common?.of ?? 'of'}{' '}
                                     <span className="font-medium text-surface-700 dark:text-surface-300">{keywords.meta.total}</span>
                                     {' '}{t?.common?.keywords ?? 'keywords'}
                                 </p>
@@ -305,12 +305,12 @@ export default function KeywordsIndex({ keywords, sites, filters, stats }: Keywo
                                             className="inline-flex items-center gap-1.5 rounded-lg border border-surface-200 dark:border-surface-700 px-3 py-2 text-sm font-medium text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-800 hover:border-surface-300 dark:hover:border-surface-600 transition-colors"
                                         >
                                             <ChevronLeft className="h-4 w-4" />
-                                            {t?.common?.previous ?? 'Précédent'}
+                                            {t?.common?.previous ?? 'Previous'}
                                         </Link>
                                     ) : (
                                         <span className="inline-flex items-center gap-1.5 rounded-lg border border-surface-100 dark:border-surface-800 px-3 py-2 text-sm font-medium text-surface-300 dark:text-surface-600 cursor-not-allowed">
                                             <ChevronLeft className="h-4 w-4" />
-                                            {t?.common?.previous ?? 'Précédent'}
+                                            {t?.common?.previous ?? 'Previous'}
                                         </span>
                                     )}
                                     {keywords.links.next ? (
@@ -318,12 +318,12 @@ export default function KeywordsIndex({ keywords, sites, filters, stats }: Keywo
                                             href={keywords.links.next}
                                             className="inline-flex items-center gap-1.5 rounded-lg border border-surface-200 dark:border-surface-700 px-3 py-2 text-sm font-medium text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-800 hover:border-surface-300 dark:hover:border-surface-600 transition-colors"
                                         >
-                                            {t?.common?.next ?? 'Suivant'}
+                                            {t?.common?.next ?? 'Next'}
                                             <ChevronRight className="h-4 w-4" />
                                         </Link>
                                     ) : (
                                         <span className="inline-flex items-center gap-1.5 rounded-lg border border-surface-100 dark:border-surface-800 px-3 py-2 text-sm font-medium text-surface-300 dark:text-surface-600 cursor-not-allowed">
-                                            {t?.common?.next ?? 'Suivant'}
+                                            {t?.common?.next ?? 'Next'}
                                             <ChevronRight className="h-4 w-4" />
                                         </span>
                                     )}
