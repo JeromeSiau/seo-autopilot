@@ -7,9 +7,12 @@ use Filament\Widgets\ChartWidget;
 
 class CostBreakdownWidget extends ChartWidget
 {
-    protected static ?string $heading = 'Cost Breakdown (This Month)';
-
     protected static ?int $sort = 4;
+
+    public function getHeading(): string
+    {
+        return 'Cost Breakdown (This Month)';
+    }
 
     protected function getData(): array
     {

@@ -8,9 +8,12 @@ use Illuminate\Support\Carbon;
 
 class ArticlesChartWidget extends ChartWidget
 {
-    protected static ?string $heading = 'Articles (30 days)';
-
     protected static ?int $sort = 2;
+
+    public function getHeading(): string
+    {
+        return 'Articles (30 days)';
+    }
 
     protected int|string|array $columnSpan = 'full';
 

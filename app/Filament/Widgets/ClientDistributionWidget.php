@@ -7,9 +7,12 @@ use Filament\Widgets\ChartWidget;
 
 class ClientDistributionWidget extends ChartWidget
 {
-    protected static ?string $heading = 'Client Distribution';
-
     protected static ?int $sort = 3;
+
+    public function getHeading(): string
+    {
+        return 'Client Distribution';
+    }
 
     protected function getData(): array
     {
