@@ -12,6 +12,21 @@ class Team extends Model
 {
     use Billable, HasFactory;
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function (Team $team) {
+            // Set trial for new teams if not explicitly set
+            if (!isset($team->is_trial)) {
+                $team->is_trial = true;
+            }
+            if (!isset($team->trial_ends_at) && $team->is_trial) {
+                $team->trial_ends_at = now()->addDays(7);
+            }
+        });
+    }
+
     protected $fillable = [
         'name',
         'owner_id',

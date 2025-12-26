@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -27,5 +28,23 @@ class RegistrationTest extends TestCase
 
         $this->assertAuthenticated();
         $response->assertRedirect(route('dashboard', absolute: false));
+    }
+
+    public function test_new_team_has_7_day_trial(): void
+    {
+        $response = $this->post('/register', [
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+        ]);
+
+        $user = User::where('email', 'test@example.com')->first();
+        $team = $user->currentTeam;
+
+        $this->assertTrue($team->is_trial);
+        $this->assertNotNull($team->trial_ends_at);
+        $this->assertTrue($team->trial_ends_at->isAfter(now()->addDays(6)));
+        $this->assertTrue($team->trial_ends_at->isBefore(now()->addDays(8)));
     }
 }
