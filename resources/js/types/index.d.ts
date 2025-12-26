@@ -93,7 +93,7 @@ export interface Article {
 export interface Integration {
     id: number;
     site_id: number;
-    type: 'wordpress' | 'webflow' | 'shopify';
+    type: 'wordpress' | 'webflow' | 'shopify' | 'ghost';
     name: string;
     is_active: boolean;
     site?: Site;

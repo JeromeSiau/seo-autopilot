@@ -452,10 +452,51 @@
     "addIntegration": "Añadir una integración",
     "connectedTo": "Conectado a",
     "available": "Integraciones disponibles",
+    "availableSubtitle": "Conecta estas plataformas para publicar automáticamente tu contenido.",
     "confirmDelete": "¿Estás seguro de que quieres eliminar {name}?",
     "site": "Sitio",
     "createSiteFirst": "Debes crear un sitio antes de añadir una integración.",
     "createSite": "Crear un sitio",
+    "noIntegrations": "Sin integraciones",
+    "noIntegrationsDescription": "Conecta tu CMS para publicar tus artículos directamente desde RankCruise.",
+    "addedOn": "Añadido el",
+    "edit": {
+      "title": "Editar integración",
+      "subtitle": "Actualiza los parámetros de conexión",
+      "integrationName": "Nombre de la integración",
+      "connectedSite": "Sitio conectado",
+      "cancel": "Cancelar",
+      "save": "Guardar",
+      "saving": "Guardando..."
+    },
+    "fields": {
+      "wordpress": {
+        "url": "URL de WordPress",
+        "urlPlaceholder": "https://tusitio.com",
+        "username": "Nombre de usuario",
+        "password": "Contraseña de aplicación",
+        "passwordPlaceholder": "Dejar vacío para mantener la actual",
+        "passwordHelp": "Genera una contraseña de aplicación en WordPress > Usuarios > Perfil > Contraseñas de aplicación"
+      },
+      "webflow": {
+        "apiToken": "Token API",
+        "apiTokenPlaceholder": "Dejar vacío para mantener el actual",
+        "collectionId": "ID de colección",
+        "collectionIdPlaceholder": "La colección CMS para publicar"
+      },
+      "shopify": {
+        "shopDomain": "Dominio de la tienda",
+        "shopDomainPlaceholder": "tutienda.myshopify.com",
+        "apiToken": "Token Admin API",
+        "apiTokenPlaceholder": "Dejar vacío para mantener el actual"
+      },
+      "ghost": {
+        "url": "URL de Ghost",
+        "urlPlaceholder": "https://tusitio.ghost.io",
+        "adminApiKey": "Clave API Admin",
+        "adminApiKeyPlaceholder": "Dejar vacío para mantener la actual"
+      }
+    },
     "types": {
       "wordpress": { "name": "WordPress", "description": "Publicación via REST API" },
       "webflow": { "name": "Webflow", "description": "Integración CMS Webflow" },

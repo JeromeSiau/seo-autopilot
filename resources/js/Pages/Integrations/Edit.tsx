@@ -4,6 +4,7 @@ import { ArrowLeft, Plug, Globe } from 'lucide-react';
 import clsx from 'clsx';
 import { Integration, PageProps } from '@/types';
 import { FormEvent } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
 
 interface IntegrationsEditProps extends PageProps {
     integration: Integration & {
@@ -14,25 +15,24 @@ interface IntegrationsEditProps extends PageProps {
 const integrationTypes = [
     {
         type: 'wordpress',
-        name: 'WordPress',
-        description: 'Connexion via REST API avec mot de passe application',
         fields: ['url', 'username', 'password'],
     },
     {
         type: 'webflow',
-        name: 'Webflow',
-        description: 'Connexion via token API Webflow',
         fields: ['api_token', 'collection_id'],
     },
     {
         type: 'shopify',
-        name: 'Shopify',
-        description: 'Connexion via Shopify Admin API',
         fields: ['shop_domain', 'api_token'],
+    },
+    {
+        type: 'ghost',
+        fields: ['url', 'admin_api_key'],
     },
 ];
 
 export default function IntegrationsEdit({ integration }: IntegrationsEditProps) {
+    const { t } = useTranslations();
     const integrationType = integrationTypes.find((i) => i.type === integration.type);
 
     const { data, setData, put, processing, errors } = useForm({
@@ -69,16 +69,16 @@ export default function IntegrationsEdit({ integration }: IntegrationsEditProps)
                     </Link>
                     <div>
                         <h1 className="font-display text-2xl font-bold text-surface-900 dark:text-white">
-                            Modifier l'intégration
+                            {t?.integrations?.edit?.title ?? 'Edit integration'}
                         </h1>
                         <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
-                            Mettez à jour les paramètres de connexion
+                            {t?.integrations?.edit?.subtitle ?? 'Update connection settings'}
                         </p>
                     </div>
                 </div>
             }
         >
-            <Head title={`Modifier ${integration.name}`} />
+            <Head title={`${t?.integrations?.edit?.title ?? 'Edit'} ${integration.name}`} />
 
             <div className="mx-auto max-w-2xl">
                 <div className="bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 p-6">
@@ -89,16 +89,17 @@ export default function IntegrationsEdit({ integration }: IntegrationsEditProps)
                             integration.type === 'wordpress' ? 'bg-[#21759b]' :
                             integration.type === 'webflow' ? 'bg-[#4353ff]' :
                             integration.type === 'shopify' ? 'bg-[#96bf48]' :
+                            integration.type === 'ghost' ? 'bg-[#15171a]' :
                             'bg-surface-200 dark:bg-surface-700'
                         )}>
                             <Plug className="h-6 w-6" />
                         </div>
                         <div>
                             <h2 className="font-display text-lg font-semibold text-surface-900 dark:text-white">
-                                {integrationType?.name || integration.type}
+                                {t?.integrations?.types?.[integration.type as keyof typeof t.integrations.types]?.name || integration.type}
                             </h2>
                             <p className="text-sm text-surface-500 dark:text-surface-400">
-                                {integrationType?.description}
+                                {t?.integrations?.types?.[integration.type as keyof typeof t.integrations.types]?.description}
                             </p>
                         </div>
                     </div>
@@ -108,7 +109,7 @@ export default function IntegrationsEdit({ integration }: IntegrationsEditProps)
                         {integration.site && (
                             <div>
                                 <label className="block text-sm font-medium text-surface-700 dark:text-surface-300">
-                                    Site connecté
+                                    {t?.integrations?.edit?.connectedSite ?? 'Connected site'}
                                 </label>
                                 <div className="mt-1.5 flex items-center gap-3 rounded-xl bg-surface-50 dark:bg-surface-800/50 border border-surface-200 dark:border-surface-700 px-4 py-3">
                                     <Globe className="h-5 w-5 text-surface-400" />
@@ -126,14 +127,14 @@ export default function IntegrationsEdit({ integration }: IntegrationsEditProps)
                                 htmlFor="name"
                                 className="block text-sm font-medium text-surface-700 dark:text-surface-300"
                             >
-                                Nom de l'intégration
+                                {t?.integrations?.edit?.integrationName ?? 'Integration name'}
                             </label>
                             <input
                                 type="text"
                                 id="name"
                                 value={data.name}
                                 onChange={(e) => setData('name', e.target.value)}
-                                placeholder={`Mon ${integrationType?.name}`}
+                                placeholder={`My ${t?.integrations?.types?.[integration.type as keyof typeof t.integrations.types]?.name || integration.type}`}
                                 className={inputClasses}
                             />
                             {errors.name && (
@@ -146,7 +147,7 @@ export default function IntegrationsEdit({ integration }: IntegrationsEditProps)
                             <>
                                 <div>
                                     <label className="block text-sm font-medium text-surface-700 dark:text-surface-300">
-                                        URL WordPress
+                                        {t?.integrations?.fields?.wordpress?.url ?? 'WordPress URL'}
                                     </label>
                                     <input
                                         type="url"
@@ -154,13 +155,13 @@ export default function IntegrationsEdit({ integration }: IntegrationsEditProps)
                                         onChange={(e) =>
                                             handleCredentialChange('url', e.target.value)
                                         }
-                                        placeholder="https://votresite.com"
+                                        placeholder={t?.integrations?.fields?.wordpress?.urlPlaceholder ?? 'https://yoursite.com'}
                                         className={inputClasses}
                                     />
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-surface-700 dark:text-surface-300">
-                                        Nom d'utilisateur
+                                        {t?.integrations?.fields?.wordpress?.username ?? 'Username'}
                                     </label>
                                     <input
                                         type="text"
@@ -173,7 +174,7 @@ export default function IntegrationsEdit({ integration }: IntegrationsEditProps)
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-surface-700 dark:text-surface-300">
-                                        Mot de passe application
+                                        {t?.integrations?.fields?.wordpress?.password ?? 'Application password'}
                                     </label>
                                     <input
                                         type="password"
@@ -181,12 +182,11 @@ export default function IntegrationsEdit({ integration }: IntegrationsEditProps)
                                         onChange={(e) =>
                                             handleCredentialChange('password', e.target.value)
                                         }
-                                        placeholder="Laisser vide pour conserver l'actuel"
+                                        placeholder={t?.integrations?.fields?.wordpress?.passwordPlaceholder ?? 'Leave empty to keep current'}
                                         className={inputClasses}
                                     />
                                     <p className="mt-1.5 text-xs text-surface-500 dark:text-surface-400">
-                                        Générez un mot de passe application dans WordPress → Utilisateurs →
-                                        Profil → Mots de passe application
+                                        {t?.integrations?.fields?.wordpress?.passwordHelp ?? 'Generate an application password in WordPress > Users > Profile > Application Passwords'}
                                     </p>
                                 </div>
                             </>
@@ -197,7 +197,7 @@ export default function IntegrationsEdit({ integration }: IntegrationsEditProps)
                             <>
                                 <div>
                                     <label className="block text-sm font-medium text-surface-700 dark:text-surface-300">
-                                        Token API
+                                        {t?.integrations?.fields?.webflow?.apiToken ?? 'API Token'}
                                     </label>
                                     <input
                                         type="password"
@@ -205,13 +205,13 @@ export default function IntegrationsEdit({ integration }: IntegrationsEditProps)
                                         onChange={(e) =>
                                             handleCredentialChange('api_token', e.target.value)
                                         }
-                                        placeholder="Laisser vide pour conserver l'actuel"
+                                        placeholder={t?.integrations?.fields?.webflow?.apiTokenPlaceholder ?? 'Leave empty to keep current'}
                                         className={inputClasses}
                                     />
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-surface-700 dark:text-surface-300">
-                                        ID de collection
+                                        {t?.integrations?.fields?.webflow?.collectionId ?? 'Collection ID'}
                                     </label>
                                     <input
                                         type="text"
@@ -219,7 +219,7 @@ export default function IntegrationsEdit({ integration }: IntegrationsEditProps)
                                         onChange={(e) =>
                                             handleCredentialChange('collection_id', e.target.value)
                                         }
-                                        placeholder="La collection CMS pour publier"
+                                        placeholder={t?.integrations?.fields?.webflow?.collectionIdPlaceholder ?? 'The CMS collection to publish to'}
                                         className={inputClasses}
                                     />
                                 </div>
@@ -231,7 +231,7 @@ export default function IntegrationsEdit({ integration }: IntegrationsEditProps)
                             <>
                                 <div>
                                     <label className="block text-sm font-medium text-surface-700 dark:text-surface-300">
-                                        Domaine boutique
+                                        {t?.integrations?.fields?.shopify?.shopDomain ?? 'Shop domain'}
                                     </label>
                                     <input
                                         type="text"
@@ -239,13 +239,13 @@ export default function IntegrationsEdit({ integration }: IntegrationsEditProps)
                                         onChange={(e) =>
                                             handleCredentialChange('shop_domain', e.target.value)
                                         }
-                                        placeholder="votreboutique.myshopify.com"
+                                        placeholder={t?.integrations?.fields?.shopify?.shopDomainPlaceholder ?? 'yourshop.myshopify.com'}
                                         className={inputClasses}
                                     />
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-surface-700 dark:text-surface-300">
-                                        Token Admin API
+                                        {t?.integrations?.fields?.shopify?.apiToken ?? 'Admin API Token'}
                                     </label>
                                     <input
                                         type="password"
@@ -253,7 +253,41 @@ export default function IntegrationsEdit({ integration }: IntegrationsEditProps)
                                         onChange={(e) =>
                                             handleCredentialChange('api_token', e.target.value)
                                         }
-                                        placeholder="Laisser vide pour conserver l'actuel"
+                                        placeholder={t?.integrations?.fields?.shopify?.apiTokenPlaceholder ?? 'Leave empty to keep current'}
+                                        className={inputClasses}
+                                    />
+                                </div>
+                            </>
+                        )}
+
+                        {/* Ghost Fields */}
+                        {integration.type === 'ghost' && (
+                            <>
+                                <div>
+                                    <label className="block text-sm font-medium text-surface-700 dark:text-surface-300">
+                                        {t?.integrations?.fields?.ghost?.url ?? 'Ghost URL'}
+                                    </label>
+                                    <input
+                                        type="url"
+                                        value={data.credentials.url || ''}
+                                        onChange={(e) =>
+                                            handleCredentialChange('url', e.target.value)
+                                        }
+                                        placeholder={t?.integrations?.fields?.ghost?.urlPlaceholder ?? 'https://yoursite.ghost.io'}
+                                        className={inputClasses}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-surface-700 dark:text-surface-300">
+                                        {t?.integrations?.fields?.ghost?.adminApiKey ?? 'Admin API Key'}
+                                    </label>
+                                    <input
+                                        type="password"
+                                        value={data.credentials.admin_api_key || ''}
+                                        onChange={(e) =>
+                                            handleCredentialChange('admin_api_key', e.target.value)
+                                        }
+                                        placeholder={t?.integrations?.fields?.ghost?.adminApiKeyPlaceholder ?? 'Leave empty to keep current'}
                                         className={inputClasses}
                                     />
                                 </div>
@@ -271,7 +305,7 @@ export default function IntegrationsEdit({ integration }: IntegrationsEditProps)
                                     'hover:bg-surface-50 dark:hover:bg-surface-700 transition-colors'
                                 )}
                             >
-                                Annuler
+                                {t?.integrations?.edit?.cancel ?? 'Cancel'}
                             </Link>
                             <button
                                 type="submit"
@@ -283,7 +317,7 @@ export default function IntegrationsEdit({ integration }: IntegrationsEditProps)
                                     'transition-all disabled:opacity-50 disabled:cursor-not-allowed'
                                 )}
                             >
-                                {processing ? 'Enregistrement...' : 'Enregistrer'}
+                                {processing ? (t?.integrations?.edit?.saving ?? 'Saving...') : (t?.integrations?.edit?.save ?? 'Save')}
                             </button>
                         </div>
                     </form>

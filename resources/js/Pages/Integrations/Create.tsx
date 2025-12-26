@@ -4,6 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 import { Link } from '@inertiajs/react';
 import { Site, PageProps } from '@/types';
 import IntegrationForm from '@/Components/Integration/IntegrationForm';
+import { useTranslations } from '@/hooks/useTranslations';
 
 interface IntegrationsCreateProps extends PageProps {
     sites: Site[];
@@ -11,6 +12,7 @@ interface IntegrationsCreateProps extends PageProps {
 }
 
 export default function IntegrationsCreate({ sites, selectedSiteId }: IntegrationsCreateProps) {
+    const { t } = useTranslations();
     // Use the selected site from query params or the first site
     const siteId = selectedSiteId || sites[0]?.id;
 
@@ -26,21 +28,21 @@ export default function IntegrationsCreate({ sites, selectedSiteId }: Integratio
                             <ArrowLeft className="h-5 w-5" />
                         </Link>
                         <h1 className="text-2xl font-bold text-surface-900 dark:text-white">
-                            Ajouter une intégration
+                            {t?.integrations?.addIntegration ?? 'Add an integration'}
                         </h1>
                     </div>
                 }
             >
-                <Head title="Ajouter une intégration" />
+                <Head title={t?.integrations?.addIntegration ?? 'Add an integration'} />
                 <div className="mx-auto max-w-lg text-center py-12">
                     <p className="text-surface-500 dark:text-surface-400">
-                        Vous devez d'abord créer un site avant d'ajouter une intégration.
+                        {t?.integrations?.createSiteFirst ?? 'You must create a site before adding an integration.'}
                     </p>
                     <Link
                         href={route('sites.create')}
                         className="mt-4 inline-flex items-center gap-2 text-primary-600 dark:text-primary-400 hover:underline"
                     >
-                        Créer un site
+                        {t?.integrations?.createSite ?? 'Create a site'}
                     </Link>
                 </div>
             </AppLayout>
@@ -72,19 +74,19 @@ export default function IntegrationsCreate({ sites, selectedSiteId }: Integratio
                         <ArrowLeft className="h-5 w-5" />
                     </Link>
                     <h1 className="text-2xl font-bold text-surface-900 dark:text-white">
-                        Ajouter une intégration
+                        {t?.integrations?.addIntegration ?? 'Add an integration'}
                     </h1>
                 </div>
             }
         >
-            <Head title="Ajouter une intégration" />
+            <Head title={t?.integrations?.addIntegration ?? 'Add an integration'} />
 
             <div className="mx-auto max-w-lg">
                 {/* Site selector if multiple sites */}
                 {sites.length > 1 && (
                     <div className="mb-6">
                         <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
-                            Site
+                            {t?.integrations?.site ?? 'Site'}
                         </label>
                         <select
                             value={siteId}

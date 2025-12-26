@@ -452,10 +452,51 @@
     "addIntegration": "Add an integration",
     "connectedTo": "Connected to",
     "available": "Available integrations",
+    "availableSubtitle": "Connect these platforms to automatically publish your content.",
     "confirmDelete": "Are you sure you want to delete {name}?",
     "site": "Site",
     "createSiteFirst": "You must create a site before adding an integration.",
     "createSite": "Create a site",
+    "noIntegrations": "No integrations",
+    "noIntegrationsDescription": "Connect your CMS to publish your articles directly from RankCruise.",
+    "addedOn": "Added on",
+    "edit": {
+      "title": "Edit integration",
+      "subtitle": "Update connection settings",
+      "integrationName": "Integration name",
+      "connectedSite": "Connected site",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving..."
+    },
+    "fields": {
+      "wordpress": {
+        "url": "WordPress URL",
+        "urlPlaceholder": "https://yoursite.com",
+        "username": "Username",
+        "password": "Application password",
+        "passwordPlaceholder": "Leave empty to keep current",
+        "passwordHelp": "Generate an application password in WordPress > Users > Profile > Application Passwords"
+      },
+      "webflow": {
+        "apiToken": "API Token",
+        "apiTokenPlaceholder": "Leave empty to keep current",
+        "collectionId": "Collection ID",
+        "collectionIdPlaceholder": "The CMS collection to publish to"
+      },
+      "shopify": {
+        "shopDomain": "Shop domain",
+        "shopDomainPlaceholder": "yourshop.myshopify.com",
+        "apiToken": "Admin API Token",
+        "apiTokenPlaceholder": "Leave empty to keep current"
+      },
+      "ghost": {
+        "url": "Ghost URL",
+        "urlPlaceholder": "https://yoursite.ghost.io",
+        "adminApiKey": "Admin API Key",
+        "adminApiKeyPlaceholder": "Leave empty to keep current"
+      }
+    },
     "types": {
       "wordpress": { "name": "WordPress", "description": "Publishing via REST API" },
       "webflow": { "name": "Webflow", "description": "Webflow CMS integration" },

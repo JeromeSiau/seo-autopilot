@@ -4,7 +4,8 @@ import { Plug, Plus, Settings, Trash2, CheckCircle, XCircle, Globe, ExternalLink
 import clsx from 'clsx';
 import { Integration, PageProps } from '@/types';
 import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { fr, enUS, es } from 'date-fns/locale';
+import { useTranslations } from '@/hooks/useTranslations';
 
 interface IntegrationsIndexProps extends PageProps {
     integrations: Integration[];
@@ -12,8 +13,6 @@ interface IntegrationsIndexProps extends PageProps {
 
 const PLATFORM_CONFIG = {
     wordpress: {
-        name: 'WordPress',
-        description: 'Publication via REST API',
         color: 'bg-[#21759b]',
         icon: (
             <svg className="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
@@ -22,8 +21,6 @@ const PLATFORM_CONFIG = {
         ),
     },
     webflow: {
-        name: 'Webflow',
-        description: 'Intégration CMS',
         color: 'bg-[#4353ff]',
         icon: (
             <svg className="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
@@ -32,8 +29,6 @@ const PLATFORM_CONFIG = {
         ),
     },
     shopify: {
-        name: 'Shopify',
-        description: 'Blog API',
         color: 'bg-[#96bf48]',
         icon: (
             <svg className="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
@@ -42,8 +37,6 @@ const PLATFORM_CONFIG = {
         ),
     },
     ghost: {
-        name: 'Ghost',
-        description: 'Publication open-source',
         color: 'bg-[#15171a]',
         icon: (
             <svg className="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
@@ -54,16 +47,26 @@ const PLATFORM_CONFIG = {
 };
 
 const AVAILABLE_PLATFORMS = [
-    { id: 'wordpress', name: 'WordPress', description: 'Publication via REST API', emoji: '📝', bgColor: 'bg-blue-50 dark:bg-blue-900/20' },
-    { id: 'webflow', name: 'Webflow', description: 'Intégration CMS Webflow', emoji: '🌐', bgColor: 'bg-indigo-50 dark:bg-indigo-900/20' },
-    { id: 'shopify', name: 'Shopify', description: 'Blog API Shopify', emoji: '🛒', bgColor: 'bg-green-50 dark:bg-green-900/20' },
-    { id: 'ghost', name: 'Ghost', description: 'Plateforme open-source', emoji: '👻', bgColor: 'bg-gray-50 dark:bg-gray-900/20' },
-];
+    { id: 'wordpress', emoji: '📝', bgColor: 'bg-blue-50 dark:bg-blue-900/20' },
+    { id: 'webflow', emoji: '🌐', bgColor: 'bg-indigo-50 dark:bg-indigo-900/20' },
+    { id: 'shopify', emoji: '🛒', bgColor: 'bg-green-50 dark:bg-green-900/20' },
+    { id: 'ghost', emoji: '👻', bgColor: 'bg-gray-50 dark:bg-gray-900/20' },
+] as const;
+
+const DATE_LOCALES = {
+    fr,
+    en: enUS,
+    es,
+};
 
 export default function IntegrationsIndex({ integrations }: IntegrationsIndexProps) {
+    const { t, locale } = useTranslations();
+    const dateLocale = DATE_LOCALES[locale as keyof typeof DATE_LOCALES] || enUS;
+
     const handleDelete = (e: React.MouseEvent, integration: Integration) => {
         e.preventDefault();
-        if (confirm(`Êtes-vous sûr de vouloir supprimer ${integration.name} ?`)) {
+        const confirmMessage = (t?.integrations?.confirmDelete ?? 'Are you sure you want to delete {name}?').replace('{name}', integration.name);
+        if (confirm(confirmMessage)) {
             router.delete(route('integrations.destroy', { integration: integration.id }));
         }
     };
@@ -78,9 +81,9 @@ export default function IntegrationsIndex({ integrations }: IntegrationsIndexPro
             header={
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="font-display text-2xl font-bold text-surface-900 dark:text-white">Intégrations</h1>
+                        <h1 className="font-display text-2xl font-bold text-surface-900 dark:text-white">{t?.integrations?.title ?? 'Integrations'}</h1>
                         <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
-                            Connectez vos CMS pour publier automatiquement
+                            {t?.integrations?.subtitle ?? 'Connect your CMS to publish automatically'}
                         </p>
                     </div>
                     <Link
@@ -93,12 +96,12 @@ export default function IntegrationsIndex({ integrations }: IntegrationsIndexPro
                         )}
                     >
                         <Plus className="h-4 w-4" />
-                        Ajouter
+                        {t?.integrations?.add ?? 'Add'}
                     </Link>
                 </div>
             }
         >
-            <Head title="Intégrations" />
+            <Head title={t?.integrations?.title ?? 'Integrations'} />
 
             {integrations.length === 0 ? (
                 <div className="bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 p-12 text-center">
@@ -106,10 +109,10 @@ export default function IntegrationsIndex({ integrations }: IntegrationsIndexPro
                         <Plug className="h-7 w-7 text-surface-400" />
                     </div>
                     <h3 className="font-display font-semibold text-surface-900 dark:text-white mb-1">
-                        Aucune intégration
+                        {t?.integrations?.noIntegrations ?? 'No integrations'}
                     </h3>
                     <p className="text-sm text-surface-500 dark:text-surface-400 max-w-sm mx-auto mb-6">
-                        Connectez votre CMS pour publier vos articles directement depuis RankCruise.
+                        {t?.integrations?.noIntegrationsDescription ?? 'Connect your CMS to publish your articles directly from RankCruise.'}
                     </p>
                     <Link
                         href={route('integrations.create')}
@@ -121,7 +124,7 @@ export default function IntegrationsIndex({ integrations }: IntegrationsIndexPro
                         )}
                     >
                         <Plus className="h-4 w-4" />
-                        Ajouter une intégration
+                        {t?.integrations?.addIntegration ?? 'Add an integration'}
                     </Link>
                 </div>
             ) : (
@@ -147,7 +150,7 @@ export default function IntegrationsIndex({ integrations }: IntegrationsIndexPro
                                                 {integration.name}
                                             </h3>
                                             <span className="inline-flex items-center rounded-lg bg-surface-100 dark:bg-surface-800 px-2 py-0.5 text-xs font-medium text-surface-600 dark:text-surface-400 mt-1">
-                                                {platform?.name || integration.type}
+                                                {t?.integrations?.types?.[integration.type as keyof typeof t.integrations.types]?.name || integration.type}
                                             </span>
                                         </div>
                                     </div>
@@ -173,12 +176,12 @@ export default function IntegrationsIndex({ integrations }: IntegrationsIndexPro
                                         {integration.is_active ? (
                                             <span className="inline-flex items-center gap-1.5 text-sm font-medium text-primary-600 dark:text-primary-400">
                                                 <CheckCircle className="h-4 w-4" />
-                                                Actif
+                                                {t?.status?.active ?? 'Active'}
                                             </span>
                                         ) : (
                                             <span className="inline-flex items-center gap-1.5 text-sm text-surface-400">
                                                 <XCircle className="h-4 w-4" />
-                                                Inactif
+                                                {t?.status?.paused ?? 'Inactive'}
                                             </span>
                                         )}
                                     </div>
@@ -206,7 +209,7 @@ export default function IntegrationsIndex({ integrations }: IntegrationsIndexPro
                                     <div className="mt-4 pt-4 border-t border-surface-100 dark:border-surface-800">
                                         <div className="flex items-center gap-2 text-sm">
                                             <Globe className="h-4 w-4 text-surface-400" />
-                                            <span className="text-surface-500 dark:text-surface-400">Connecté à</span>
+                                            <span className="text-surface-500 dark:text-surface-400">{t?.integrations?.connectedTo ?? 'Connected to'}</span>
                                             <span className="font-medium text-surface-700 dark:text-surface-300">{integration.site.domain}</span>
                                         </div>
                                     </div>
@@ -214,7 +217,7 @@ export default function IntegrationsIndex({ integrations }: IntegrationsIndexPro
 
                                 {/* Date */}
                                 <div className="mt-3 text-xs text-surface-400">
-                                    Ajouté le {format(new Date(integration.created_at), 'd MMM yyyy', { locale: fr })}
+                                    {t?.integrations?.addedOn ?? 'Added on'} {format(new Date(integration.created_at), 'd MMM yyyy', { locale: dateLocale })}
                                 </div>
                             </div>
                         );
@@ -224,31 +227,34 @@ export default function IntegrationsIndex({ integrations }: IntegrationsIndexPro
 
             {/* Available Integrations */}
             <div className="mt-12">
-                <h2 className="font-display text-lg font-semibold text-surface-900 dark:text-white">Intégrations disponibles</h2>
+                <h2 className="font-display text-lg font-semibold text-surface-900 dark:text-white">{t?.integrations?.available ?? 'Available integrations'}</h2>
                 <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
-                    Connectez ces plateformes pour publier automatiquement votre contenu.
+                    {t?.integrations?.availableSubtitle ?? 'Connect these platforms to automatically publish your content.'}
                 </p>
 
                 <div className="mt-6 grid gap-4 sm:grid-cols-3">
-                    {AVAILABLE_PLATFORMS.map((platform) => (
-                        <Link
-                            key={platform.id}
-                            href={route('integrations.create', { type: platform.id })}
-                            className="flex items-center gap-4 bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 p-5 hover:shadow-md hover:border-primary-200 dark:hover:border-primary-800 transition-all"
-                        >
-                            <div className={clsx(
-                                'flex h-12 w-12 items-center justify-center rounded-xl',
-                                platform.bgColor
-                            )}>
-                                <span className="text-2xl">{platform.emoji}</span>
-                            </div>
-                            <div className="flex-1">
-                                <h3 className="font-display font-semibold text-surface-900 dark:text-white">{platform.name}</h3>
-                                <p className="text-sm text-surface-500 dark:text-surface-400">{platform.description}</p>
-                            </div>
-                            <ExternalLink className="h-4 w-4 text-surface-400" />
-                        </Link>
-                    ))}
+                    {AVAILABLE_PLATFORMS.map((platform) => {
+                        const platformType = t?.integrations?.types?.[platform.id as keyof typeof t.integrations.types];
+                        return (
+                            <Link
+                                key={platform.id}
+                                href={route('integrations.create', { type: platform.id })}
+                                className="flex items-center gap-4 bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 p-5 hover:shadow-md hover:border-primary-200 dark:hover:border-primary-800 transition-all"
+                            >
+                                <div className={clsx(
+                                    'flex h-12 w-12 items-center justify-center rounded-xl',
+                                    platform.bgColor
+                                )}>
+                                    <span className="text-2xl">{platform.emoji}</span>
+                                </div>
+                                <div className="flex-1">
+                                    <h3 className="font-display font-semibold text-surface-900 dark:text-white">{platformType?.name || platform.id}</h3>
+                                    <p className="text-sm text-surface-500 dark:text-surface-400">{platformType?.description || ''}</p>
+                                </div>
+                                <ExternalLink className="h-4 w-4 text-surface-400" />
+                            </Link>
+                        );
+                    })}
                 </div>
             </div>
         </AppLayout>

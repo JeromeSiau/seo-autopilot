@@ -452,10 +452,51 @@
     "addIntegration": "Ajouter une intégration",
     "connectedTo": "Connecté à",
     "available": "Intégrations disponibles",
+    "availableSubtitle": "Connectez ces plateformes pour publier automatiquement votre contenu.",
     "confirmDelete": "Êtes-vous sûr de vouloir supprimer {name} ?",
     "site": "Site",
     "createSiteFirst": "Vous devez d'abord créer un site avant d'ajouter une intégration.",
     "createSite": "Créer un site",
+    "noIntegrations": "Aucune intégration",
+    "noIntegrationsDescription": "Connectez votre CMS pour publier vos articles directement depuis RankCruise.",
+    "addedOn": "Ajouté le",
+    "edit": {
+      "title": "Modifier l'intégration",
+      "subtitle": "Mettez à jour les paramètres de connexion",
+      "integrationName": "Nom de l'intégration",
+      "connectedSite": "Site connecté",
+      "cancel": "Annuler",
+      "save": "Enregistrer",
+      "saving": "Enregistrement..."
+    },
+    "fields": {
+      "wordpress": {
+        "url": "URL WordPress",
+        "urlPlaceholder": "https://votresite.com",
+        "username": "Nom d'utilisateur",
+        "password": "Mot de passe application",
+        "passwordPlaceholder": "Laisser vide pour conserver l'actuel",
+        "passwordHelp": "Générez un mot de passe application dans WordPress > Utilisateurs > Profil > Mots de passe application"
+      },
+      "webflow": {
+        "apiToken": "Token API",
+        "apiTokenPlaceholder": "Laisser vide pour conserver l'actuel",
+        "collectionId": "ID de collection",
+        "collectionIdPlaceholder": "La collection CMS pour publier"
+      },
+      "shopify": {
+        "shopDomain": "Domaine boutique",
+        "shopDomainPlaceholder": "votreboutique.myshopify.com",
+        "apiToken": "Token Admin API",
+        "apiTokenPlaceholder": "Laisser vide pour conserver l'actuel"
+      },
+      "ghost": {
+        "url": "URL Ghost",
+        "urlPlaceholder": "https://votresite.ghost.io",
+        "adminApiKey": "Clé API Admin",
+        "adminApiKeyPlaceholder": "Laisser vide pour conserver l'actuel"
+      }
+    },
     "types": {
       "wordpress": { "name": "WordPress", "description": "Publication via REST API" },
       "webflow": { "name": "Webflow", "description": "Intégration CMS Webflow" },
