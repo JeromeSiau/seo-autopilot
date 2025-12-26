@@ -65,6 +65,11 @@ class Team extends Model
         return $this->hasMany(Integration::class);
     }
 
+    public function invitations(): HasMany
+    {
+        return $this->hasMany(TeamInvitation::class);
+    }
+
     public function billingPlan(): BelongsTo
     {
         return $this->belongsTo(Plan::class, 'plan_id');
