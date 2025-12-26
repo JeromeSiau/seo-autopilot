@@ -9,7 +9,6 @@ import {
     Check,
     FileText,
     Clock,
-    DollarSign,
 } from 'lucide-react';
 import { Button } from '@/Components/ui/Button';
 import { Card, CardHeader } from '@/Components/ui/Card';
@@ -75,10 +74,6 @@ export default function ArticleShow({ article, integrations }: ArticleShowProps)
                                 <span className="flex items-center gap-1">
                                     <Clock className="h-4 w-4" />
                                     {format(new Date(article.created_at), 'MMM d, yyyy')}
-                                </span>
-                                <span className="flex items-center gap-1">
-                                    <DollarSign className="h-4 w-4" />
-                                    ${article.generation_cost.toFixed(3)}
                                 </span>
                             </div>
                         </div>

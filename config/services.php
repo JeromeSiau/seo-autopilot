@@ -37,27 +37,34 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | LLM Providers
+    | LLM Provider (OpenRouter - unified access to all models)
     |--------------------------------------------------------------------------
     */
 
-    'openai' => [
-        'api_key' => env('OPENAI_API_KEY'),
+    'openrouter' => [
+        'api_key' => env('OPENROUTER_API_KEY'),
     ],
 
-    'anthropic' => [
-        'api_key' => env('ANTHROPIC_API_KEY'),
-    ],
-
-    'google' => [
-        'ai_api_key' => env('GOOGLE_AI_API_KEY'),
-        'client_id' => env('GOOGLE_CLIENT_ID'),
-        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
-        'redirect' => env('GOOGLE_REDIRECT_URI'),
-    ],
+    /*
+    |--------------------------------------------------------------------------
+    | Embeddings (Voyage AI)
+    |--------------------------------------------------------------------------
+    */
 
     'voyage' => [
         'api_key' => env('VOYAGE_API_KEY'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Google OAuth (Search Console & GA4)
+    |--------------------------------------------------------------------------
+    */
+
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URI'),
     ],
 
     /*

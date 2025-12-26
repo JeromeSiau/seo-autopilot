@@ -4,9 +4,7 @@ namespace App\Services\LLM;
 
 use App\Services\LLM\Contracts\LLMProviderInterface;
 use App\Services\LLM\DTOs\LLMResponse;
-use App\Services\LLM\Providers\AnthropicProvider;
-use App\Services\LLM\Providers\GoogleProvider;
-use App\Services\LLM\Providers\OpenAIProvider;
+use App\Services\LLM\Providers\OpenRouterProvider;
 use Illuminate\Support\Facades\Log;
 
 class LLMManager
@@ -21,19 +19,9 @@ class LLMManager
 
     private function registerProviders(): void
     {
-        // OpenAI
-        if ($key = config('services.openai.api_key')) {
-            $this->providers['openai'] = new OpenAIProvider($key);
-        }
-
-        // Anthropic
-        if ($key = config('services.anthropic.api_key')) {
-            $this->providers['anthropic'] = new AnthropicProvider($key);
-        }
-
-        // Google
-        if ($key = config('services.google.ai_api_key')) {
-            $this->providers['google'] = new GoogleProvider($key);
+        // OpenRouter (unified provider for all LLMs)
+        if ($key = config('services.openrouter.api_key')) {
+            $this->providers['openrouter'] = new OpenRouterProvider($key);
         }
     }
 
@@ -96,29 +84,29 @@ class LLMManager
 
     /**
      * Get the recommended provider/model for each pipeline step.
+     * All models are routed through OpenRouter for unified billing.
      */
     private function getStepConfig(string $step): array
     {
-        // Our optimized pipeline from the design
         $steps = [
             'research' => [
-                'provider' => 'google',
-                'model' => 'gemini-2.5-flash-lite',
+                'provider' => 'openrouter',
+                'model' => 'google/gemini-2.5-flash',
                 'json' => true,
             ],
             'outline' => [
-                'provider' => 'openai',
-                'model' => 'gpt-4o',
+                'provider' => 'openrouter',
+                'model' => 'deepseek/deepseek-v3.2',
                 'json' => true,
             ],
             'write_section' => [
-                'provider' => 'anthropic',
-                'model' => 'claude-sonnet-4-5-20241022',
+                'provider' => 'openrouter',
+                'model' => 'anthropic/claude-sonnet-4-5',
                 'json' => false,
             ],
             'polish' => [
-                'provider' => 'openai',
-                'model' => 'gpt-4o-mini',
+                'provider' => 'openrouter',
+                'model' => 'deepseek/deepseek-v3.2',
                 'json' => true,
             ],
         ];

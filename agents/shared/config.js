@@ -12,8 +12,11 @@ export const config = {
         port: parseInt(process.env.REDIS_PORT || '6379'),
         password: process.env.REDIS_PASSWORD || undefined,
     },
-    openai: {
-        apiKey: process.env.OPENAI_API_KEY,
+    openrouter: {
+        apiKey: process.env.OPENROUTER_API_KEY,
+        baseUrl: 'https://openrouter.ai/api/v1',
+        siteUrl: 'https://rankcruise.io',
+        siteName: 'RankCruise',
     },
     voyage: {
         apiKey: process.env.VOYAGE_API_KEY,

@@ -7,60 +7,73 @@ use App\Services\LLM\DTOs\LLMResponse;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
-class OpenAIProvider implements LLMProviderInterface
+class OpenRouterProvider implements LLMProviderInterface
 {
-    private const API_URL = 'https://api.openai.com/v1/chat/completions';
+    private const API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
     // Pricing per 1M tokens (December 2025)
     private const PRICING = [
-        'gpt-4o' => ['input' => 2.50, 'output' => 10.00],
-        'gpt-4o-mini' => ['input' => 0.15, 'output' => 0.60],
-        'o1' => ['input' => 15.00, 'output' => 60.00],
-        'o1-mini' => ['input' => 3.00, 'output' => 12.00],
+        // DeepSeek
+        'deepseek/deepseek-v3.2' => ['input' => 0.26, 'output' => 0.38],
+        // Anthropic
+        'anthropic/claude-sonnet-4-5' => ['input' => 3.00, 'output' => 15.00],
+        'anthropic/claude-sonnet-4' => ['input' => 3.00, 'output' => 15.00],
+        'anthropic/claude-haiku-3.5' => ['input' => 0.80, 'output' => 4.00],
+        // Google
+        'google/gemini-2.5-flash' => ['input' => 0.15, 'output' => 0.60],
+        'google/gemini-2.5-pro' => ['input' => 1.25, 'output' => 10.00],
+        // OpenAI
+        'openai/gpt-4o' => ['input' => 2.50, 'output' => 10.00],
+        'openai/gpt-4o-mini' => ['input' => 0.15, 'output' => 0.60],
     ];
 
-    // Models that use max_completion_tokens instead of max_tokens
-    private const REASONING_MODELS = ['o1', 'o1-mini', 'o1-preview'];
+    private const DEFAULT_MODEL = 'deepseek/deepseek-v3.2';
 
     public function __construct(
         private readonly string $apiKey,
-        private readonly string $defaultModel = 'gpt-4o',
+        private readonly string $defaultModel = self::DEFAULT_MODEL,
+        private readonly string $siteUrl = 'https://rankcruise.io',
+        private readonly string $siteName = 'RankCruise',
     ) {}
 
     public function complete(string $prompt, array $options = []): LLMResponse
     {
         $model = $options['model'] ?? $this->defaultModel;
         $startTime = microtime(true);
-        $isReasoningModel = in_array($model, self::REASONING_MODELS);
 
         $requestBody = [
             'model' => $model,
             'messages' => [
                 ['role' => 'user', 'content' => $prompt],
             ],
+            'temperature' => $options['temperature'] ?? 0.7,
+            'max_tokens' => $options['max_tokens'] ?? 4096,
         ];
 
-        // Reasoning models don't support temperature and use max_completion_tokens
-        if ($isReasoningModel) {
-            $requestBody['max_completion_tokens'] = $options['max_tokens'] ?? 4096;
-        } else {
-            $requestBody['temperature'] = $options['temperature'] ?? 0.7;
-            $requestBody['max_tokens'] = $options['max_tokens'] ?? 4096;
+        // Add provider preferences for reliability
+        if (!empty($options['provider_order'])) {
+            $requestBody['provider'] = [
+                'order' => $options['provider_order'],
+                'allow_fallbacks' => $options['allow_fallbacks'] ?? true,
+            ];
         }
 
         $response = Http::withHeaders([
             'Authorization' => "Bearer {$this->apiKey}",
             'Content-Type' => 'application/json',
+            'HTTP-Referer' => $this->siteUrl,
+            'X-Title' => $this->siteName,
         ])->timeout(120)->post(self::API_URL, $requestBody);
 
         $latencyMs = (microtime(true) - $startTime) * 1000;
 
         if (!$response->successful()) {
-            Log::error('OpenAI API error', [
+            Log::error('OpenRouter API error', [
                 'status' => $response->status(),
                 'body' => $response->body(),
+                'model' => $model,
             ]);
-            throw new \RuntimeException('OpenAI API error: ' . $response->body());
+            throw new \RuntimeException('OpenRouter API error: ' . $response->body());
         }
 
         $data = $response->json();
@@ -83,7 +96,6 @@ class OpenAIProvider implements LLMProviderInterface
     {
         $model = $options['model'] ?? $this->defaultModel;
         $startTime = microtime(true);
-        $isReasoningModel = in_array($model, self::REASONING_MODELS);
 
         $requestBody = [
             'model' => $model,
@@ -91,29 +103,34 @@ class OpenAIProvider implements LLMProviderInterface
                 ['role' => 'user', 'content' => $prompt],
             ],
             'response_format' => ['type' => 'json_object'],
+            'temperature' => $options['temperature'] ?? 0.3,
+            'max_tokens' => $options['max_tokens'] ?? 4096,
         ];
 
-        // Reasoning models don't support temperature and use max_completion_tokens
-        if ($isReasoningModel) {
-            $requestBody['max_completion_tokens'] = $options['max_tokens'] ?? 4096;
-        } else {
-            $requestBody['temperature'] = $options['temperature'] ?? 0.3;
-            $requestBody['max_tokens'] = $options['max_tokens'] ?? 4096;
+        // Add provider preferences for reliability
+        if (!empty($options['provider_order'])) {
+            $requestBody['provider'] = [
+                'order' => $options['provider_order'],
+                'allow_fallbacks' => $options['allow_fallbacks'] ?? true,
+            ];
         }
 
         $response = Http::withHeaders([
             'Authorization' => "Bearer {$this->apiKey}",
             'Content-Type' => 'application/json',
+            'HTTP-Referer' => $this->siteUrl,
+            'X-Title' => $this->siteName,
         ])->timeout(120)->post(self::API_URL, $requestBody);
 
         $latencyMs = (microtime(true) - $startTime) * 1000;
 
         if (!$response->successful()) {
-            Log::error('OpenAI API error', [
+            Log::error('OpenRouter API error', [
                 'status' => $response->status(),
                 'body' => $response->body(),
+                'model' => $model,
             ]);
-            throw new \RuntimeException('OpenAI API error: ' . $response->body());
+            throw new \RuntimeException('OpenRouter API error: ' . $response->body());
         }
 
         $data = $response->json();
@@ -134,7 +151,7 @@ class OpenAIProvider implements LLMProviderInterface
 
     public function getName(): string
     {
-        return 'openai';
+        return 'openrouter';
     }
 
     public function getAvailableModels(): array
@@ -144,7 +161,7 @@ class OpenAIProvider implements LLMProviderInterface
 
     public function calculateCost(string $model, int $inputTokens, int $outputTokens): float
     {
-        $pricing = self::PRICING[$model] ?? self::PRICING['gpt-4o'];
+        $pricing = self::PRICING[$model] ?? self::PRICING[self::DEFAULT_MODEL];
 
         $inputCost = ($inputTokens / 1_000_000) * $pricing['input'];
         $outputCost = ($outputTokens / 1_000_000) * $pricing['output'];
