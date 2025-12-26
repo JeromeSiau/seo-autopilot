@@ -1,10 +1,11 @@
 import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link } from '@inertiajs/react';
-import { Plus, AlertTriangle, ArrowRight, Globe, Search, FileText, CheckCircle, TrendingUp, Zap } from 'lucide-react';
+import { Plus, AlertTriangle, ArrowRight, Globe, Search, FileText, CheckCircle, TrendingUp, Zap, Sparkles, Loader2 } from 'lucide-react';
 import SiteCard from '@/Components/Dashboard/SiteCard';
 import { PageProps } from '@/types';
 import clsx from 'clsx';
 import { useTranslations } from '@/hooks/useTranslations';
+import { trans } from '@/utils/i18n';
 
 interface Site {
     id: number;
@@ -15,6 +16,7 @@ interface Site {
     articles_in_review: number;
     articles_this_week: number;
     onboarding_complete: boolean;
+    is_generating: boolean;
 }
 
 interface Action {
@@ -49,9 +51,10 @@ interface StatCardProps {
     icon: React.ElementType;
     trend?: { value: number; positive: boolean };
     color: 'primary' | 'blue' | 'purple' | 'amber';
+    trendLabel?: string;
 }
 
-function StatCard({ title, value, icon: Icon, trend, color }: StatCardProps) {
+function StatCard({ title, value, icon: Icon, trend, color, trendLabel = 'vs last month' }: StatCardProps) {
     const colorStyles = {
         primary: {
             bg: 'bg-primary-50 dark:bg-primary-500/10',
@@ -89,7 +92,7 @@ function StatCard({ title, value, icon: Icon, trend, color }: StatCardProps) {
                             trend.positive ? 'text-primary-600 dark:text-primary-400' : 'text-red-600 dark:text-red-400'
                         )}>
                             <TrendingUp className={clsx('h-3 w-3', !trend.positive && 'rotate-180')} />
-                            {trend.positive ? '+' : ''}{trend.value}% vs last month
+                            {trend.positive ? '+' : ''}{trend.value}% {trendLabel}
                         </div>
                     )}
                 </div>
@@ -106,6 +109,9 @@ export default function Dashboard({ stats, sites, actionsRequired }: DashboardPr
     const usagePercentage = stats.articles_limit > 0
         ? Math.round((stats.articles_used / stats.articles_limit) * 100)
         : 0;
+
+    // Find sites with active generation
+    const generatingSites = sites.filter(s => s.is_generating);
 
     return (
         <AppLayout
@@ -126,6 +132,35 @@ export default function Dashboard({ stats, sites, actionsRequired }: DashboardPr
             }
         >
             <Head title={t?.dashboard?.title ?? 'Dashboard'} />
+
+            {/* Generation in progress banner */}
+            {generatingSites.length > 0 && (
+                <div className="mb-6 rounded-2xl bg-gradient-to-r from-primary-500/10 to-primary-600/10 dark:from-primary-500/20 dark:to-primary-600/20 border border-primary-200 dark:border-primary-500/30 p-4">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-primary-500/20 dark:bg-primary-500/30 flex items-center justify-center">
+                                <Loader2 className="h-5 w-5 text-primary-600 dark:text-primary-400 animate-spin" />
+                            </div>
+                            <div>
+                                <p className="font-medium text-surface-900 dark:text-white flex items-center gap-2">
+                                    <Sparkles className="h-4 w-4 text-primary-500" />
+                                    {t?.dashboard?.generationBanner?.title ?? 'Content Plan being created'}
+                                </p>
+                                <p className="text-sm text-surface-600 dark:text-surface-400">
+                                    {generatingSites.map(s => s.domain).join(', ')}
+                                </p>
+                            </div>
+                        </div>
+                        <Link
+                            href={route('onboarding.generating', { site: generatingSites[0].id })}
+                            className="inline-flex items-center gap-2 rounded-xl bg-primary-500 hover:bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-green dark:shadow-green-glow transition-all"
+                        >
+                            {t?.dashboard?.generationBanner?.viewProgress ?? 'View progress'}
+                            <ArrowRight className="h-4 w-4" />
+                        </Link>
+                    </div>
+                </div>
+            )}
 
             {/* Stats Grid */}
             <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -184,8 +219,8 @@ export default function Dashboard({ stats, sites, actionsRequired }: DashboardPr
                         />
                     </div>
                     <div className="mt-2 flex justify-between text-xs text-surface-500 dark:text-surface-400">
-                        <span>{usagePercentage}% used</span>
-                        <span>{stats.articles_limit - stats.articles_used} remaining</span>
+                        <span>{trans(t?.dashboard?.usage?.percentUsed ?? '{percent}% used', { percent: usagePercentage })}</span>
+                        <span>{trans(t?.dashboard?.usage?.remaining ?? '{count} remaining', { count: stats.articles_limit - stats.articles_used })}</span>
                     </div>
                 </div>
             </div>
