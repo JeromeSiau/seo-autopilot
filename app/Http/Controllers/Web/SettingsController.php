@@ -20,6 +20,8 @@ class SettingsController extends Controller
                 'plan' => $team->plan,
                 'articles_limit' => $team->articles_limit,
                 'articles_generated_count' => $team->articles_generated_count,
+                'is_trial' => $team->is_trial,
+                'trial_ends_at' => $team->trial_ends_at?->toISOString(),
             ],
         ]);
     }

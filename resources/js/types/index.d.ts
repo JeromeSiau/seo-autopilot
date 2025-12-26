@@ -14,6 +14,8 @@ export interface Team {
     articles_limit: number;
     articles_generated_count: number;
     plan: 'free' | 'starter' | 'pro' | 'enterprise';
+    is_trial?: boolean;
+    trial_ends_at?: string;
 }
 
 export interface Site {

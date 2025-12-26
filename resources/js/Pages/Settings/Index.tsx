@@ -1,6 +1,6 @@
 import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link } from '@inertiajs/react';
-import { CreditCard, Users, Key, Bell, ChevronRight, Zap, Sparkles } from 'lucide-react';
+import { CreditCard, Users, Key, Bell, ChevronRight, Zap, Sparkles, Clock } from 'lucide-react';
 import clsx from 'clsx';
 import { PageProps, Team } from '@/types';
 import { useTranslations } from '@/hooks/useTranslations';
@@ -20,6 +20,9 @@ export default function SettingsIndex({ team }: SettingsIndexProps) {
     const { t } = useTranslations();
     const usagePercentage = Math.round((team.articles_generated_count / team.articles_limit) * 100);
     const planConfig = PLAN_CONFIG[team.plan] || PLAN_CONFIG.free;
+    const trialDaysLeft = team.trial_ends_at
+        ? Math.max(0, Math.ceil((new Date(team.trial_ends_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+        : 0;
 
     const settingsLinks = [
         {
@@ -76,6 +79,35 @@ export default function SettingsIndex({ team }: SettingsIndexProps) {
             }
         >
             <Head title={t?.settings?.title ?? 'Paramètres'} />
+
+            {/* Trial Banner */}
+            {team.is_trial && (
+                <div className="mb-6 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 p-4">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-500/20">
+                                <Clock className="h-5 w-5 text-amber-600" />
+                            </div>
+                            <div>
+                                <p className="font-medium text-amber-800 dark:text-amber-400">
+                                    Période d'essai
+                                </p>
+                                <p className="text-sm text-amber-600 dark:text-amber-500">
+                                    {trialDaysLeft > 0
+                                        ? `${trialDaysLeft} jour${trialDaysLeft > 1 ? 's' : ''} restant${trialDaysLeft > 1 ? 's' : ''}`
+                                        : 'Expirée - choisissez un plan pour continuer'}
+                                </p>
+                            </div>
+                        </div>
+                        <Link
+                            href={route('settings.billing')}
+                            className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-white hover:bg-amber-600 transition-colors"
+                        >
+                            Voir les plans
+                        </Link>
+                    </div>
+                </div>
+            )}
 
             {/* Current Plan Card */}
             <div className="bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 p-6 mb-8">
