@@ -96,6 +96,21 @@ class OnboardingController extends Controller
             'language' => 'required|string|size:2',
         ]);
 
+        // Normalize domain (remove www. prefix)
+        $domain = preg_replace('/^www\./', '', strtolower($validated['domain']));
+        $validated['domain'] = $domain;
+
+        // Check if domain already exists (anti-abuse protection)
+        $existingSite = Site::where('domain', $domain)->first();
+        if ($existingSite) {
+            return response()->json([
+                'message' => 'The given data was invalid.',
+                'errors' => [
+                    'domain' => ['Ce site est déjà enregistré. Contactez support@seo-autopilot.com si vous êtes le propriétaire.'],
+                ],
+            ], 422);
+        }
+
         // Créer le site avec status running
         $site = Site::create([
             'team_id' => auth()->user()->team_id,
