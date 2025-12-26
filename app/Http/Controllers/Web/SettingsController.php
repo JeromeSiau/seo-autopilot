@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -36,12 +37,50 @@ class SettingsController extends Controller
         ]);
     }
 
-    public function team(Request $request): Response
+    public function team(Request $request): Response|RedirectResponse
     {
-        $team = $request->user()->currentTeam;
+        $user = $request->user();
+        $team = $user->currentTeam;
+
+        if (!$team) {
+            return redirect()->route('dashboard')->with('error', 'No team selected.');
+        }
+
+        // Get members with their role (owner gets 'owner' role regardless of pivot)
+        $members = $team->users()->withPivot('role', 'created_at')->get()->map(fn ($member) => [
+            'id' => $member->id,
+            'name' => $member->name,
+            'email' => $member->email,
+            'role' => $member->id === $team->owner_id ? 'owner' : $member->pivot->role,
+            'joined_at' => $member->pivot->created_at,
+        ]);
+
+        // Get pending invitations (not expired)
+        $invitations = $team->invitations()
+            ->where('expires_at', '>', now())
+            ->get()
+            ->map(fn ($inv) => [
+                'id' => $inv->id,
+                'email' => $inv->email,
+                'role' => $inv->role,
+                'created_at' => $inv->created_at,
+                'expires_at' => $inv->expires_at,
+            ]);
+
+        // Determine current user's role
+        $userRole = $user->id === $team->owner_id
+            ? 'owner'
+            : $user->teams()->where('team_id', $team->id)->first()?->pivot?->role ?? 'member';
 
         return Inertia::render('Settings/Team', [
-            'team' => $team->load('users'),
+            'team' => [
+                'id' => $team->id,
+                'name' => $team->name,
+                'owner_id' => $team->owner_id,
+            ],
+            'members' => $members,
+            'invitations' => $invitations,
+            'userRole' => $userRole,
         ]);
     }
 
