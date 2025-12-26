@@ -4,27 +4,11 @@ import { ArrowLeft, Plus, X } from 'lucide-react';
 import clsx from 'clsx';
 import { Site, PageProps } from '@/types';
 import { FormEvent, useState } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
 
 interface SiteEditProps extends PageProps {
     site: Site;
 }
-
-const LANGUAGES = [
-    { code: 'fr', label: 'Français' },
-    { code: 'en', label: 'English' },
-    { code: 'es', label: 'Español' },
-    { code: 'de', label: 'Deutsch' },
-    { code: 'it', label: 'Italiano' },
-    { code: 'pt', label: 'Português' },
-];
-
-const TONES = [
-    { value: 'professional', label: 'Professionnel', description: 'Formel et crédible' },
-    { value: 'casual', label: 'Décontracté', description: 'Accessible et convivial' },
-    { value: 'expert', label: 'Expert', description: 'Technique et approfondi' },
-    { value: 'friendly', label: 'Amical', description: 'Chaleureux et engageant' },
-    { value: 'neutral', label: 'Neutre', description: 'Objectif et factuel' },
-];
 
 function TagInput({
     value,
@@ -93,6 +77,25 @@ function TagInput({
 }
 
 export default function SiteEdit({ site }: SiteEditProps) {
+    const { t } = useTranslations();
+
+    const LANGUAGES = [
+        { code: 'fr', label: t?.sites?.languages?.fr ?? 'Français' },
+        { code: 'en', label: t?.sites?.languages?.en ?? 'English' },
+        { code: 'es', label: t?.sites?.languages?.es ?? 'Español' },
+        { code: 'de', label: t?.sites?.languages?.de ?? 'Deutsch' },
+        { code: 'it', label: t?.sites?.languages?.it ?? 'Italiano' },
+        { code: 'pt', label: t?.sites?.languages?.pt ?? 'Português' },
+    ];
+
+    const TONES = [
+        { value: 'professional', label: t?.sites?.tones?.professional?.name ?? 'Professional', description: t?.sites?.tones?.professional?.description ?? 'Formal and credible' },
+        { value: 'casual', label: t?.sites?.tones?.casual?.name ?? 'Casual', description: t?.sites?.tones?.casual?.description ?? 'Accessible and friendly' },
+        { value: 'expert', label: t?.sites?.tones?.expert?.name ?? 'Expert', description: t?.sites?.tones?.expert?.description ?? 'Technical and in-depth' },
+        { value: 'friendly', label: t?.sites?.tones?.friendly?.name ?? 'Friendly', description: t?.sites?.tones?.friendly?.description ?? 'Warm and engaging' },
+        { value: 'neutral', label: t?.sites?.tones?.neutral?.name ?? 'Neutral', description: t?.sites?.tones?.neutral?.description ?? 'Objective and factual' },
+    ];
+
     const { data, setData, put, processing, errors } = useForm({
         name: site.name,
         language: site.language,
@@ -135,7 +138,7 @@ export default function SiteEdit({ site }: SiteEditProps) {
                     </Link>
                     <div>
                         <h1 className="font-display text-2xl font-bold text-surface-900 dark:text-white">
-                            Modifier {site.name}
+                            {t?.sites?.edit?.title ?? 'Edit'} {site.name}
                         </h1>
                         <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
                             {site.domain}
@@ -144,19 +147,19 @@ export default function SiteEdit({ site }: SiteEditProps) {
                 </div>
             }
         >
-            <Head title={`Modifier ${site.name}`} />
+            <Head title={`${t?.sites?.edit?.title ?? 'Edit'} ${site.name}`} />
 
             <div className="mx-auto max-w-2xl space-y-6">
                 {/* General Settings */}
                 <div className="bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 p-6">
                     <h2 className="font-display text-lg font-semibold text-surface-900 dark:text-white mb-6">
-                        Informations générales
+                        {t?.sites?.edit?.generalInfo ?? 'General information'}
                     </h2>
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {/* Site Name */}
                         <div>
                             <label htmlFor="name" className="block text-sm font-medium text-surface-700 dark:text-surface-300">
-                                Nom du site
+                                {t?.sites?.edit?.siteName ?? 'Site name'}
                             </label>
                             <input
                                 type="text"
@@ -175,7 +178,7 @@ export default function SiteEdit({ site }: SiteEditProps) {
                         {/* Language */}
                         <div>
                             <label htmlFor="language" className="block text-sm font-medium text-surface-700 dark:text-surface-300">
-                                Langue du contenu
+                                {t?.sites?.edit?.contentLanguage ?? 'Content language'}
                             </label>
                             <select
                                 id="language"
@@ -196,14 +199,14 @@ export default function SiteEdit({ site }: SiteEditProps) {
                         {/* Business Description */}
                         <div>
                             <label htmlFor="business_description" className="block text-sm font-medium text-surface-700 dark:text-surface-300">
-                                Description de l'activité
+                                {t?.sites?.edit?.businessDescription ?? 'Business description'}
                             </label>
                             <textarea
                                 id="business_description"
                                 rows={3}
                                 value={data.business_description}
                                 onChange={(e) => setData('business_description', e.target.value)}
-                                placeholder="Décrivez votre activité en quelques phrases..."
+                                placeholder={t?.sites?.edit?.businessPlaceholder ?? 'Describe your business in a few sentences...'}
                                 className={clsx(
                                     'mt-1.5 block w-full rounded-xl border-surface-300 dark:border-surface-700 shadow-sm',
                                     'bg-white dark:bg-surface-800 text-surface-900 dark:text-white',
@@ -216,14 +219,14 @@ export default function SiteEdit({ site }: SiteEditProps) {
                         {/* Target Audience */}
                         <div>
                             <label htmlFor="target_audience" className="block text-sm font-medium text-surface-700 dark:text-surface-300">
-                                Audience cible
+                                {t?.sites?.edit?.targetAudience ?? 'Target audience'}
                             </label>
                             <input
                                 type="text"
                                 id="target_audience"
                                 value={data.target_audience}
                                 onChange={(e) => setData('target_audience', e.target.value)}
-                                placeholder="Ex: entrepreneurs, sportifs, développeurs..."
+                                placeholder={t?.sites?.edit?.audiencePlaceholder ?? 'E.g.: entrepreneurs, athletes, developers...'}
                                 className={clsx(
                                     'mt-1.5 block w-full rounded-xl border-surface-300 dark:border-surface-700 shadow-sm',
                                     'bg-white dark:bg-surface-800 text-surface-900 dark:text-white',
@@ -236,17 +239,17 @@ export default function SiteEdit({ site }: SiteEditProps) {
                         {/* Divider */}
                         <div className="border-t border-surface-100 dark:border-surface-800 pt-6">
                             <h2 className="font-display text-lg font-semibold text-surface-900 dark:text-white mb-4">
-                                Voix de marque
+                                {t?.sites?.edit?.brandVoice ?? 'Brand voice'}
                             </h2>
                             <p className="text-sm text-surface-500 dark:text-surface-400 mb-6">
-                                Personnalisez le ton et le style de vos articles générés.
+                                {t?.sites?.edit?.brandVoiceSubtitle ?? 'Customize the tone and style of your generated articles.'}
                             </p>
                         </div>
 
                         {/* Tone */}
                         <div>
                             <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-3">
-                                Ton
+                                {t?.sites?.edit?.tone ?? 'Tone'}
                             </label>
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                                 {TONES.map((tone) => (
@@ -278,14 +281,14 @@ export default function SiteEdit({ site }: SiteEditProps) {
                         {/* Writing Style */}
                         <div>
                             <label htmlFor="writing_style" className="block text-sm font-medium text-surface-700 dark:text-surface-300">
-                                Style d'écriture
+                                {t?.sites?.edit?.writingStyle ?? 'Writing style'}
                             </label>
                             <textarea
                                 id="writing_style"
                                 rows={3}
                                 value={data.writing_style}
                                 onChange={(e) => setData('writing_style', e.target.value)}
-                                placeholder="Ex: Phrases courtes et percutantes. Utiliser des exemples concrets. Éviter le jargon technique..."
+                                placeholder={t?.sites?.edit?.stylePlaceholder ?? 'E.g.: Short, punchy sentences. Use concrete examples...'}
                                 className={clsx(
                                     'mt-1.5 block w-full rounded-xl border-surface-300 dark:border-surface-700 shadow-sm',
                                     'bg-white dark:bg-surface-800 text-surface-900 dark:text-white',
@@ -298,40 +301,40 @@ export default function SiteEdit({ site }: SiteEditProps) {
                         {/* Vocabulary Use */}
                         <div>
                             <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
-                                Vocabulaire à utiliser
+                                {t?.sites?.edit?.vocabularyUse ?? 'Vocabulary to use'}
                             </label>
                             <p className="text-xs text-surface-500 dark:text-surface-400 mb-2">
-                                Mots et expressions à privilégier dans vos articles.
+                                {t?.sites?.edit?.vocabularyUseHelp ?? 'Words and expressions to favor in your articles.'}
                             </p>
                             <TagInput
                                 value={data.vocabulary.use || []}
                                 onChange={(tags) => setData('vocabulary', { ...data.vocabulary, use: tags })}
-                                placeholder="Ajouter un mot ou expression..."
+                                placeholder={t?.sites?.edit?.addWord ?? 'Add a word or expression...'}
                             />
                         </div>
 
                         {/* Vocabulary Avoid */}
                         <div>
                             <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
-                                Vocabulaire à éviter
+                                {t?.sites?.edit?.vocabularyAvoid ?? 'Vocabulary to avoid'}
                             </label>
                             <p className="text-xs text-surface-500 dark:text-surface-400 mb-2">
-                                Mots et expressions à ne pas utiliser.
+                                {t?.sites?.edit?.vocabularyAvoidHelp ?? 'Words and expressions not to use.'}
                             </p>
                             <TagInput
                                 value={data.vocabulary.avoid || []}
                                 onChange={(tags) => setData('vocabulary', { ...data.vocabulary, avoid: tags })}
-                                placeholder="Ajouter un mot à éviter..."
+                                placeholder={t?.sites?.edit?.addWordAvoid ?? 'Add a word to avoid...'}
                             />
                         </div>
 
                         {/* Brand Examples */}
                         <div>
                             <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
-                                Exemples de contenu ({data.brand_examples.length}/5)
+                                {t?.sites?.edit?.contentExamples ?? 'Content examples'} ({data.brand_examples.length}/5)
                             </label>
                             <p className="text-xs text-surface-500 dark:text-surface-400 mb-2">
-                                Collez des extraits représentatifs de votre style d'écriture.
+                                {t?.sites?.edit?.contentExamplesHelp ?? 'Paste representative excerpts of your writing style.'}
                             </p>
                             <div className="space-y-3">
                                 {data.brand_examples.map((example, index) => (
@@ -354,7 +357,7 @@ export default function SiteEdit({ site }: SiteEditProps) {
                                             rows={3}
                                             value={exampleInput}
                                             onChange={(e) => setExampleInput(e.target.value)}
-                                            placeholder="Collez un extrait de texte représentatif de votre style..."
+                                            placeholder={t?.sites?.edit?.examplePlaceholder ?? 'Paste a representative text excerpt...'}
                                             className={clsx(
                                                 'block w-full rounded-xl border-surface-300 dark:border-surface-700 shadow-sm',
                                                 'bg-white dark:bg-surface-800 text-surface-900 dark:text-white',
@@ -373,7 +376,7 @@ export default function SiteEdit({ site }: SiteEditProps) {
                                             )}
                                         >
                                             <Plus className="h-4 w-4" />
-                                            Ajouter cet exemple
+                                            {t?.sites?.edit?.addExample ?? 'Add this example'}
                                         </button>
                                     </div>
                                 )}
@@ -391,7 +394,7 @@ export default function SiteEdit({ site }: SiteEditProps) {
                                     'hover:bg-surface-50 dark:hover:bg-surface-700 transition-colors'
                                 )}
                             >
-                                Annuler
+                                {t?.common?.cancel ?? 'Cancel'}
                             </Link>
                             <button
                                 type="submit"
@@ -403,7 +406,7 @@ export default function SiteEdit({ site }: SiteEditProps) {
                                     'transition-all disabled:opacity-50 disabled:cursor-not-allowed'
                                 )}
                             >
-                                {processing ? 'Enregistrement...' : 'Enregistrer'}
+                                {processing ? (t?.sites?.edit?.saving ?? 'Saving...') : (t?.common?.save ?? 'Save')}
                             </button>
                         </div>
                     </form>

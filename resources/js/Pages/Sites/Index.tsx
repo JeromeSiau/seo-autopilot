@@ -6,35 +6,46 @@ import {
 } from 'lucide-react';
 import clsx from 'clsx';
 import { Site, PaginatedData, PageProps } from '@/types';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { format, Locale } from 'date-fns';
+import { fr, enUS, es, de, it, pt, nl } from 'date-fns/locale';
 import { useTranslations } from '@/hooks/useTranslations';
+
+const DATE_LOCALES: Record<string, Locale> = {
+    fr,
+    en: enUS,
+    es,
+    de,
+    it,
+    pt,
+    nl
+};
 
 interface SitesIndexProps extends PageProps {
     sites: PaginatedData<Site>;
 }
 
 export default function SitesIndex({ sites }: SitesIndexProps) {
-    const { t } = useTranslations();
+    const { t, locale } = useTranslations();
+    const dateLocale = DATE_LOCALES[locale ?? 'en'] || enUS;
 
     const STATUS_CONFIG = {
         active: {
-            label: t?.status?.active ?? 'Actif',
+            label: t?.status?.active ?? 'Active',
             color: 'bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-400',
             icon: Play,
         },
         paused: {
-            label: t?.status?.paused ?? 'Pause',
+            label: t?.status?.paused ?? 'Paused',
             color: 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400',
             icon: Pause,
         },
         not_configured: {
-            label: t?.status?.notConfigured ?? 'Non configuré',
+            label: t?.status?.notConfigured ?? 'Not configured',
             color: 'bg-surface-100 text-surface-600 dark:bg-surface-800 dark:text-surface-400',
             icon: AlertCircle,
         },
         error: {
-            label: t?.status?.error ?? 'Erreur',
+            label: t?.status?.error ?? 'Error',
             color: 'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400',
             icon: AlertCircle,
         },
@@ -42,7 +53,7 @@ export default function SitesIndex({ sites }: SitesIndexProps) {
     const handleDelete = (e: React.MouseEvent, site: Site) => {
         e.preventDefault();
         e.stopPropagation();
-        if (confirm((t?.sites?.confirmDelete ?? 'Êtes-vous sûr de vouloir supprimer {domain} ?').replace('{domain}', site.domain))) {
+        if (confirm((t?.sites?.confirmDelete ?? 'Are you sure you want to delete this site?').replace('{domain}', site.domain))) {
             router.delete(route('sites.destroy', { site: site.id }));
         }
     };
@@ -54,7 +65,7 @@ export default function SitesIndex({ sites }: SitesIndexProps) {
                     <div>
                         <h1 className="font-display text-2xl font-bold text-surface-900 dark:text-white">{t?.sites?.title ?? 'Sites'}</h1>
                         <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
-                            {t?.sites?.subtitle ?? 'Gérez vos sites web connectés'}
+                            {t?.sites?.subtitle ?? 'Manage your connected websites'}
                         </p>
                     </div>
                     <Link
@@ -67,7 +78,7 @@ export default function SitesIndex({ sites }: SitesIndexProps) {
                         )}
                     >
                         <Plus className="h-4 w-4" />
-                        {t?.sites?.addSite ?? 'Ajouter un site'}
+                        {t?.sites?.addSite ?? 'Add a site'}
                     </Link>
                 </div>
             }
@@ -80,10 +91,10 @@ export default function SitesIndex({ sites }: SitesIndexProps) {
                         <Globe className="h-7 w-7 text-surface-400" />
                     </div>
                     <h3 className="font-display font-semibold text-surface-900 dark:text-white mb-1">
-                        {t?.sites?.noSites ?? 'Aucun site configuré'}
+                        {t?.sites?.noSites ?? 'No sites configured'}
                     </h3>
                     <p className="text-sm text-surface-500 dark:text-surface-400 max-w-sm mx-auto mb-6">
-                        {t?.sites?.noSitesDescription ?? 'Ajoutez votre premier site web pour commencer à découvrir des mots-clés et générer du contenu.'}
+                        {t?.sites?.noSitesDescription ?? 'Add your first website to start generating content'}
                     </p>
                     <Link
                         href={route('onboarding.create')}
@@ -95,7 +106,7 @@ export default function SitesIndex({ sites }: SitesIndexProps) {
                         )}
                     >
                         <Plus className="h-4 w-4" />
-                        {t?.sites?.addSite ?? 'Ajouter un site'}
+                        {t?.sites?.addSite ?? 'Add a site'}
                     </Link>
                 </div>
             ) : (
@@ -204,7 +215,7 @@ export default function SitesIndex({ sites }: SitesIndexProps) {
                                         {status.label}
                                     </span>
                                     <span className="text-xs text-surface-400">
-                                        {t?.sites?.addedOn ?? 'Ajouté le'} {format(new Date(site.created_at), 'd MMM yyyy', { locale: fr })}
+                                        {t?.sites?.addedOn ?? 'Added on'} {format(new Date(site.created_at), 'd MMM yyyy', { locale: dateLocale })}
                                     </span>
                                 </div>
                             </div>

@@ -13,6 +13,7 @@ import { Button } from '@/Components/ui/Button';
 import { Card } from '@/Components/ui/Card';
 import ContentCalendar from '@/Components/ContentPlan/ContentCalendar';
 import { Site, PageProps } from '@/types';
+import { useTranslations } from '@/hooks/useTranslations';
 
 interface ContentPlanProps extends PageProps {
     site: Site;
@@ -26,10 +27,11 @@ interface ContentPlanProps extends PageProps {
 }
 
 export default function ContentPlan({ site, stats, canRegenerate }: ContentPlanProps) {
+    const { t } = useTranslations();
     const [regenerating, setRegenerating] = useState(false);
 
     const handleRegenerate = async () => {
-        if (!confirm('Cela va régénérer tout votre Content Plan. Continuer ?')) return;
+        if (!confirm(t?.contentPlan?.confirmRegenerate ?? 'This will regenerate your entire Content Plan. Continue?')) return;
 
         setRegenerating(true);
         try {
@@ -65,7 +67,7 @@ export default function ContentPlan({ site, stats, canRegenerate }: ContentPlanP
                             <Calendar className="h-6 w-6 text-primary-600 dark:text-primary-400" />
                         </div>
                         <div>
-                            <h1 className="text-2xl font-bold text-surface-900 dark:text-white">Content Plan</h1>
+                            <h1 className="text-2xl font-bold text-surface-900 dark:text-white">{t?.contentPlan?.title ?? 'Content Plan'}</h1>
                             <p className="text-sm text-surface-500 dark:text-surface-400">{site.domain}</p>
                         </div>
                     </div>
@@ -77,7 +79,7 @@ export default function ContentPlan({ site, stats, canRegenerate }: ContentPlanP
                                 onClick={handleRegenerate}
                                 disabled={regenerating}
                             >
-                                {regenerating ? 'Régénération...' : 'Régénérer'}
+                                {regenerating ? (t?.contentPlan?.regenerating ?? 'Regenerating...') : (t?.contentPlan?.regenerate ?? 'Regenerate')}
                             </Button>
                         )}
                         <Button
@@ -86,13 +88,13 @@ export default function ContentPlan({ site, stats, canRegenerate }: ContentPlanP
                             variant="secondary"
                             icon={Settings}
                         >
-                            Paramètres
+                            {t?.contentPlan?.settings ?? 'Settings'}
                         </Button>
                     </div>
                 </div>
             }
         >
-            <Head title={`Content Plan - ${site.name}`} />
+            <Head title={`${t?.contentPlan?.title ?? 'Content Plan'} - ${site.name}`} />
 
             <div className="space-y-6">
                 {/* Stats */}
@@ -103,7 +105,7 @@ export default function ContentPlan({ site, stats, canRegenerate }: ContentPlanP
                         </div>
                         <div>
                             <p className="text-2xl font-bold text-surface-900 dark:text-white">{stats.keywords_total}</p>
-                            <p className="text-sm text-surface-500 dark:text-surface-400">Keywords</p>
+                            <p className="text-sm text-surface-500 dark:text-surface-400">{t?.contentPlan?.tabs?.keywords ?? 'Keywords'}</p>
                         </div>
                     </Card>
                     <Card className="flex items-center gap-4">
@@ -112,7 +114,7 @@ export default function ContentPlan({ site, stats, canRegenerate }: ContentPlanP
                         </div>
                         <div>
                             <p className="text-2xl font-bold text-surface-900 dark:text-white">{stats.articles_planned}</p>
-                            <p className="text-sm text-surface-500 dark:text-surface-400">Planifiés</p>
+                            <p className="text-sm text-surface-500 dark:text-surface-400">{t?.contentPlan?.tabs?.planned ?? 'Planned'}</p>
                         </div>
                     </Card>
                     <Card className="flex items-center gap-4">
@@ -121,7 +123,7 @@ export default function ContentPlan({ site, stats, canRegenerate }: ContentPlanP
                         </div>
                         <div>
                             <p className="text-2xl font-bold text-surface-900 dark:text-white">{stats.articles_generated}</p>
-                            <p className="text-sm text-surface-500 dark:text-surface-400">Générés</p>
+                            <p className="text-sm text-surface-500 dark:text-surface-400">{t?.contentPlan?.tabs?.generated ?? 'Generated'}</p>
                         </div>
                     </Card>
                     <Card className="flex items-center gap-4">
@@ -130,7 +132,7 @@ export default function ContentPlan({ site, stats, canRegenerate }: ContentPlanP
                         </div>
                         <div>
                             <p className="text-2xl font-bold text-surface-900 dark:text-white">{stats.articles_published}</p>
-                            <p className="text-sm text-surface-500 dark:text-surface-400">Publiés</p>
+                            <p className="text-sm text-surface-500 dark:text-surface-400">{t?.contentPlan?.tabs?.published ?? 'Published'}</p>
                         </div>
                     </Card>
                 </div>
@@ -142,19 +144,19 @@ export default function ContentPlan({ site, stats, canRegenerate }: ContentPlanP
                 <Card className="flex flex-wrap gap-6">
                     <div className="flex items-center gap-2">
                         <div className="h-3 w-3 rounded-full bg-blue-500" />
-                        <span className="text-sm text-surface-600 dark:text-surface-400">Planifié</span>
+                        <span className="text-sm text-surface-600 dark:text-surface-400">{t?.contentPlan?.status?.planned ?? 'Planned'}</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <div className="h-3 w-3 rounded-full bg-yellow-500" />
-                        <span className="text-sm text-surface-600 dark:text-surface-400">En génération</span>
+                        <span className="text-sm text-surface-600 dark:text-surface-400">{t?.contentPlan?.status?.generating ?? 'Generating'}</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <div className="h-3 w-3 rounded-full bg-green-500" />
-                        <span className="text-sm text-surface-600 dark:text-surface-400">Prêt</span>
+                        <span className="text-sm text-surface-600 dark:text-surface-400">{t?.contentPlan?.status?.ready ?? 'Ready'}</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <div className="h-3 w-3 rounded-full bg-primary-500" />
-                        <span className="text-sm text-surface-600 dark:text-surface-400">Publié</span>
+                        <span className="text-sm text-surface-600 dark:text-surface-400">{t?.contentPlan?.status?.published ?? 'Published'}</span>
                     </div>
                 </Card>
             </div>

@@ -22,6 +22,7 @@ import { Card } from '@/Components/ui/Card';
 import { Badge } from '@/Components/ui/Badge';
 import { Site, Keyword, PageProps } from '@/types';
 import { format } from 'date-fns';
+import { useTranslations } from '@/hooks/useTranslations';
 
 interface SiteShowProps extends PageProps {
     site: Site & {
@@ -39,14 +40,16 @@ interface SiteShowProps extends PageProps {
 }
 
 export default function SiteShow({ site }: SiteShowProps) {
+    const { t } = useTranslations();
+
     const dayLabels: Record<string, string> = {
-        mon: 'Lun',
-        tue: 'Mar',
-        wed: 'Mer',
-        thu: 'Jeu',
-        fri: 'Ven',
-        sat: 'Sam',
-        sun: 'Dim',
+        mon: 'Mon',
+        tue: 'Tue',
+        wed: 'Wed',
+        thu: 'Thu',
+        fri: 'Fri',
+        sat: 'Sat',
+        sun: 'Sun',
     };
 
     const [decliningArticles, setDecliningArticles] = useState<Array<{
@@ -92,7 +95,7 @@ export default function SiteShow({ site }: SiteShowProps) {
                         </div>
                     </div>
                     <Button as="link" href={route('sites.edit', { site: site.id })} variant="secondary" icon={Settings}>
-                        Paramètres
+                        {t?.sites?.show?.settings ?? 'Settings'}
                     </Button>
                 </div>
             }
@@ -110,7 +113,7 @@ export default function SiteShow({ site }: SiteShowProps) {
                             </div>
                             <div>
                                 <p className="text-2xl font-bold text-surface-900 dark:text-white">{site.keywords_count || 0}</p>
-                                <p className="text-sm text-surface-500 dark:text-surface-400">Keywords</p>
+                                <p className="text-sm text-surface-500 dark:text-surface-400">{t?.common?.keywords ?? 'Keywords'}</p>
                             </div>
                         </Card>
                         <Card className="flex items-center gap-4">
@@ -119,7 +122,7 @@ export default function SiteShow({ site }: SiteShowProps) {
                             </div>
                             <div>
                                 <p className="text-2xl font-bold text-surface-900 dark:text-white">{site.articles_count || 0}</p>
-                                <p className="text-sm text-surface-500 dark:text-surface-400">Articles</p>
+                                <p className="text-sm text-surface-500 dark:text-surface-400">{t?.common?.articles ?? 'Articles'}</p>
                             </div>
                         </Card>
                         <Card className="flex items-center gap-4">
@@ -128,7 +131,7 @@ export default function SiteShow({ site }: SiteShowProps) {
                             </div>
                             <div>
                                 <p className="text-2xl font-bold text-surface-900 dark:text-white">{site.integrations_count || 0}</p>
-                                <p className="text-sm text-surface-500 dark:text-surface-400">Intégrations</p>
+                                <p className="text-sm text-surface-500 dark:text-surface-400">{t?.nav?.integrations ?? 'Integrations'}</p>
                             </div>
                         </Card>
                     </div>
@@ -137,14 +140,14 @@ export default function SiteShow({ site }: SiteShowProps) {
                     <Card>
                         <div className="flex items-center justify-between border-b border-surface-100 dark:border-surface-800 pb-4">
                             <div>
-                                <h2 className="font-semibold text-surface-900 dark:text-white">Top 10 Keywords</h2>
-                                <p className="text-xs text-surface-500 dark:text-surface-400">Triés par score</p>
+                                <h2 className="font-semibold text-surface-900 dark:text-white">{t?.sites?.show?.topKeywords ?? 'Top 10 Keywords'}</h2>
+                                <p className="text-xs text-surface-500 dark:text-surface-400">{t?.sites?.show?.sortedByScore ?? 'Sorted by score'}</p>
                             </div>
                             <Link
                                 href={route('keywords.index', { site_id: site.id })}
                                 className="flex items-center gap-1 text-sm text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300"
                             >
-                                Voir tous ({site.keywords_count || 0})
+                                {t?.dashboard?.viewAll ?? 'View all'} ({site.keywords_count || 0})
                                 <ArrowRight className="h-4 w-4" />
                             </Link>
                         </div>
@@ -162,9 +165,9 @@ export default function SiteShow({ site }: SiteShowProps) {
                                                     <span>{keyword.volume.toLocaleString()} vol.</span>
                                                 )}
                                                 {keyword.difficulty !== null && (
-                                                    <span>Diff: {Number(keyword.difficulty).toFixed(0)}</span>
+                                                    <span>{t?.sites?.show?.diff ?? 'Diff:'} {Number(keyword.difficulty).toFixed(0)}</span>
                                                 )}
-                                                {keyword.position && <span>Pos: {keyword.position}</span>}
+                                                {keyword.position && <span>{t?.sites?.show?.pos ?? 'Pos:'} {keyword.position}</span>}
                                             </div>
                                         </div>
                                         <Badge
@@ -183,7 +186,7 @@ export default function SiteShow({ site }: SiteShowProps) {
                             </div>
                         ) : (
                             <p className="py-8 text-center text-sm text-surface-500 dark:text-surface-400">
-                                Aucun keyword pour le moment. L'autopilot en découvrira bientôt !
+                                {t?.keywords?.noKeywords ?? 'No keywords found'}
                             </p>
                         )}
                     </Card>
@@ -191,13 +194,13 @@ export default function SiteShow({ site }: SiteShowProps) {
                     {/* Business Info */}
                     {site.business_description && (
                         <Card>
-                            <h2 className="mb-4 font-semibold text-surface-900 dark:text-white">Description du business</h2>
+                            <h2 className="mb-4 font-semibold text-surface-900 dark:text-white">{t?.sites?.show?.businessDescription ?? 'Business description'}</h2>
                             <p className="text-surface-600 dark:text-surface-400">{site.business_description}</p>
                             {site.target_audience && (
                                 <div className="mt-4 flex items-start gap-2">
                                     <Users className="mt-0.5 h-4 w-4 text-surface-400" />
                                     <div>
-                                        <p className="text-xs font-medium text-surface-500 dark:text-surface-400">Audience cible</p>
+                                        <p className="text-xs font-medium text-surface-500 dark:text-surface-400">{t?.sites?.show?.targetAudience ?? 'Target audience'}</p>
                                         <p className="text-sm text-surface-600 dark:text-surface-400">{site.target_audience}</p>
                                     </div>
                                 </div>
@@ -219,17 +222,17 @@ export default function SiteShow({ site }: SiteShowProps) {
                 <div className="space-y-6">
                     {/* Autopilot Status */}
                     <Card>
-                        <h2 className="mb-4 font-semibold text-surface-900 dark:text-white">Autopilot</h2>
+                        <h2 className="mb-4 font-semibold text-surface-900 dark:text-white">{t?.sites?.show?.autopilot ?? 'Autopilot'}</h2>
                         {site.settings?.autopilot_enabled ? (
                             <div className="space-y-4">
                                 <div className="flex items-center gap-2">
                                     <div className="h-3 w-3 animate-pulse rounded-full bg-green-500" />
-                                    <span className="font-medium text-green-600 dark:text-green-400">Actif</span>
+                                    <span className="font-medium text-green-600 dark:text-green-400">{t?.sites?.show?.active ?? 'Active'}</span>
                                 </div>
                                 <div className="space-y-2 text-sm text-surface-600 dark:text-surface-400">
                                     <div className="flex items-center gap-2">
                                         <FileText className="h-4 w-4 text-surface-400" />
-                                        <span>{site.settings.articles_per_week} articles/semaine</span>
+                                        <span>{site.settings.articles_per_week} {t?.siteCard?.perWeek ?? 'per week'}</span>
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <Calendar className="h-4 w-4 text-surface-400" />
@@ -243,8 +246,8 @@ export default function SiteShow({ site }: SiteShowProps) {
                                         <Target className="h-4 w-4 text-surface-400" />
                                         <span>
                                             {site.settings.auto_publish
-                                                ? 'Publication automatique'
-                                                : 'Validation manuelle'}
+                                                ? t?.status?.published ?? 'Auto-publish'
+                                                : t?.status?.review ?? 'Manual review'}
                                         </span>
                                     </div>
                                 </div>
@@ -252,14 +255,14 @@ export default function SiteShow({ site }: SiteShowProps) {
                         ) : (
                             <div className="text-center">
                                 <p className="mb-4 text-sm text-surface-500 dark:text-surface-400">
-                                    L'autopilot n'est pas encore configuré.
+                                    {t?.status?.notConfigured ?? 'Autopilot is not configured yet.'}
                                 </p>
                                 <Button
                                     as="link"
                                     href={route('onboarding.resume', { site: site.id })}
                                     size="sm"
                                 >
-                                    Configurer
+                                    {t?.siteCard?.setup ?? 'Configure'}
                                 </Button>
                             </div>
                         )}
@@ -267,38 +270,38 @@ export default function SiteShow({ site }: SiteShowProps) {
 
                     {/* Connections */}
                     <Card>
-                        <h2 className="mb-4 font-semibold text-surface-900 dark:text-white">Connexions</h2>
+                        <h2 className="mb-4 font-semibold text-surface-900 dark:text-white">{t?.sites?.show?.connections ?? 'Connections'}</h2>
                         <div className="space-y-3">
                             <div className="flex items-center justify-between">
-                                <span className="text-sm text-surface-600 dark:text-surface-400">Google Search Console</span>
+                                <span className="text-sm text-surface-600 dark:text-surface-400">{t?.sites?.show?.gsc ?? 'Google Search Console'}</span>
                                 {site.gsc_connected ? (
                                     <span className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400">
                                         <CheckCircle className="h-4 w-4" />
-                                        Connecté
+                                        {t?.integrations?.connectedTo ? t.integrations.connectedTo.split(' ')[0] : 'Connected'}
                                     </span>
                                 ) : (
                                     <span className="flex items-center gap-1 text-sm text-surface-400">
                                         <XCircle className="h-4 w-4" />
-                                        Non connecté
+                                        {t?.status?.notConfigured ?? 'Not connected'}
                                     </span>
                                 )}
                             </div>
                             <div className="flex items-center justify-between">
-                                <span className="text-sm text-surface-600 dark:text-surface-400">Google Analytics 4</span>
+                                <span className="text-sm text-surface-600 dark:text-surface-400">{t?.sites?.show?.ga4 ?? 'Google Analytics 4'}</span>
                                 {site.ga4_connected ? (
                                     <span className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400">
                                         <CheckCircle className="h-4 w-4" />
-                                        Connecté
+                                        {t?.integrations?.connectedTo ? t.integrations.connectedTo.split(' ')[0] : 'Connected'}
                                     </span>
                                 ) : (
                                     <span className="flex items-center gap-1 text-sm text-surface-400">
                                         <XCircle className="h-4 w-4" />
-                                        Non connecté
+                                        {t?.status?.notConfigured ?? 'Not connected'}
                                     </span>
                                 )}
                             </div>
                             <div className="flex items-center justify-between">
-                                <span className="text-sm text-surface-600 dark:text-surface-400">Intégrations CMS</span>
+                                <span className="text-sm text-surface-600 dark:text-surface-400">{t?.sites?.show?.cmsIntegrations ?? 'CMS Integrations'}</span>
                                 <span className="text-sm text-surface-600 dark:text-surface-400">{site.integrations_count || 0}</span>
                             </div>
                         </div>
@@ -307,18 +310,18 @@ export default function SiteShow({ site }: SiteShowProps) {
                                 href={route('integrations.index', { site_id: site.id })}
                                 className="flex items-center justify-center gap-1 text-sm text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300"
                             >
-                                Gérer les intégrations
+                                {t?.integrations?.title ?? 'Manage integrations'}
                                 <ArrowRight className="h-4 w-4" />
                             </Link>
                         </div>
                     </Card>
 
-                    {/* Articles à surveiller */}
+                    {/* Articles to watch */}
                     <Card>
                         <div className="mb-4 flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <AlertTriangle className="h-5 w-5 text-orange-500" />
-                                <h2 className="font-semibold text-surface-900 dark:text-white">Articles à surveiller</h2>
+                                <h2 className="font-semibold text-surface-900 dark:text-white">{t?.sites?.show?.articlesToWatch ?? 'Articles to watch'}</h2>
                                 {!loadingDeclining && decliningArticles.length > 0 && (
                                     <Badge variant="warning">{decliningArticles.length}</Badge>
                                 )}
@@ -344,7 +347,7 @@ export default function SiteShow({ site }: SiteShowProps) {
                                             </Link>
                                             <div className="mt-2 flex items-center gap-3 text-xs">
                                                 <span className="text-surface-600 dark:text-surface-400">
-                                                    Position actuelle: {item.current_position}
+                                                    {t?.sites?.show?.pos ?? 'Position:'} {item.current_position}
                                                 </span>
                                                 <span className="flex items-center gap-1 text-red-600 dark:text-red-400">
                                                     <TrendingDown className="h-3 w-3" />
@@ -360,49 +363,49 @@ export default function SiteShow({ site }: SiteShowProps) {
                                             href={route('analytics.index', { site_id: site.id })}
                                             className="flex items-center justify-center gap-1 text-sm text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300"
                                         >
-                                            Voir les {decliningArticles.length - 5} autres →
+                                            {t?.dashboard?.viewAll ?? 'View all'} ({decliningArticles.length - 5} more)
                                         </Link>
                                     </div>
                                 )}
                             </>
                         ) : (
                             <p className="py-8 text-center text-sm text-surface-500 dark:text-surface-400">
-                                Tous vos articles performent bien 🎉
+                                {t?.articles?.noArticles ?? 'All your articles are performing well'}
                             </p>
                         )}
                     </Card>
 
                     {/* Quick Links */}
                     <Card>
-                        <h2 className="mb-4 font-semibold text-surface-900 dark:text-white">Actions rapides</h2>
+                        <h2 className="mb-4 font-semibold text-surface-900 dark:text-white">{t?.sites?.show?.quickActions ?? 'Quick actions'}</h2>
                         <div className="space-y-2">
                             <Link
                                 href={route('sites.content-plan-page', { site: site.id })}
                                 className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-surface-600 dark:text-surface-400 hover:bg-surface-50 dark:hover:bg-surface-800"
                             >
                                 <Calendar className="h-4 w-4" />
-                                Content Plan
+                                {t?.contentPlan?.title ?? 'Content Plan'}
                             </Link>
                             <Link
                                 href={route('keywords.index', { site_id: site.id })}
                                 className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-surface-600 dark:text-surface-400 hover:bg-surface-50 dark:hover:bg-surface-800"
                             >
                                 <Key className="h-4 w-4" />
-                                Voir les keywords
+                                {t?.nav?.keywords ?? 'Keywords'}
                             </Link>
                             <Link
                                 href={route('articles.index', { site_id: site.id })}
                                 className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-surface-600 dark:text-surface-400 hover:bg-surface-50 dark:hover:bg-surface-800"
                             >
                                 <FileText className="h-4 w-4" />
-                                Voir les articles
+                                {t?.nav?.articles ?? 'Articles'}
                             </Link>
                             <Link
                                 href={route('analytics.index', { site_id: site.id })}
                                 className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-surface-600 dark:text-surface-400 hover:bg-surface-50 dark:hover:bg-surface-800"
                             >
                                 <Target className="h-4 w-4" />
-                                Voir les analytics
+                                {t?.analytics?.title ?? 'Analytics'}
                             </Link>
                         </div>
                     </Card>
@@ -410,16 +413,16 @@ export default function SiteShow({ site }: SiteShowProps) {
                     {/* Metadata */}
                     <Card className="text-sm text-surface-500 dark:text-surface-400">
                         <div className="flex items-center justify-between">
-                            <span>Langue</span>
+                            <span>{t?.sites?.show?.language ?? 'Language'}</span>
                             <Badge variant="secondary">{site.language.toUpperCase()}</Badge>
                         </div>
                         <div className="mt-2 flex items-center justify-between">
-                            <span>Créé le</span>
+                            <span>{t?.sites?.show?.createdAt ?? 'Created on'}</span>
                             <span>{format(new Date(site.created_at), 'dd/MM/yyyy')}</span>
                         </div>
                         {site.onboarding_completed_at && (
                             <div className="mt-2 flex items-center justify-between">
-                                <span>Configuré le</span>
+                                <span>{t?.sites?.show?.configuredAt ?? 'Configured on'}</span>
                                 <span>{format(new Date(site.onboarding_completed_at), 'dd/MM/yyyy')}</span>
                             </div>
                         )}
