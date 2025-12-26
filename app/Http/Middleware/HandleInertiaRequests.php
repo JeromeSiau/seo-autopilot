@@ -41,6 +41,7 @@ class HandleInertiaRequests extends Middleware
                     'name' => $user->name,
                     'email' => $user->email,
                     'email_verified_at' => $user->email_verified_at,
+                    'current_team_id' => $user->current_team_id,
                     'current_team' => $user->currentTeam ? [
                         'id' => $user->currentTeam->id,
                         'name' => $user->currentTeam->name,
@@ -48,6 +49,13 @@ class HandleInertiaRequests extends Middleware
                         'articles_generated_count' => $user->currentTeam->articles_generated_count,
                         'plan' => $user->currentTeam->plan,
                     ] : null,
+                    'teams' => $user->teams->map(fn ($team) => [
+                        'id' => $team->id,
+                        'name' => $team->name,
+                        'role' => $team->id === $user->currentTeam?->owner_id
+                            ? 'owner'
+                            : $team->pivot->role,
+                    ]),
                 ] : null,
             ],
             'flash' => [
