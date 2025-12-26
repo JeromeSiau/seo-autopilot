@@ -52,9 +52,9 @@ class TeamInvitationController extends Controller
             'role' => $validated['role'],
         ]);
 
-        // Send invitation email (placeholder)
+        // Send invitation email
         Mail::to($validated['email'])->send(
-            new \App\Mail\TeamInvitation($invitation)
+            new \App\Mail\TeamInvitationMail($invitation)
         );
 
         return back()->with('success', 'Invitation sent successfully.');
