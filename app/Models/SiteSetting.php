@@ -13,6 +13,7 @@ class SiteSetting extends Model
         'articles_per_week',
         'publish_days',
         'auto_publish',
+        'articles_allocated',
     ];
 
     protected $casts = [
