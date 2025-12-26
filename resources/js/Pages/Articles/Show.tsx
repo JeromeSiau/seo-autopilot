@@ -16,6 +16,7 @@ import { Badge, getStatusVariant } from '@/Components/ui/Badge';
 import { Article, Integration, PageProps } from '@/types';
 import { format } from 'date-fns';
 import { useState } from 'react';
+import DOMPurify from 'dompurify';
 import { useTranslations } from '@/hooks/useTranslations';
 
 interface ArticleShowProps extends PageProps {
@@ -28,6 +29,13 @@ export default function ArticleShow({ article, integrations }: ArticleShowProps)
     const [copied, setCopied] = useState(false);
     const [publishing, setPublishing] = useState(false);
     const [selectedIntegration, setSelectedIntegration] = useState<number | null>(null);
+
+    const sanitizedContent = article.content
+        ? DOMPurify.sanitize(article.content, {
+              ALLOWED_TAGS: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'a', 'ul', 'ol', 'li', 'strong', 'em', 'code', 'pre', 'blockquote', 'img', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'br', 'hr', 'span', 'div'],
+              ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'id', 'target', 'rel'],
+          })
+        : '';
 
     const handleCopyContent = async () => {
         if (article.content) {
@@ -125,10 +133,10 @@ export default function ArticleShow({ article, integrations }: ArticleShowProps)
                             </div>
                         </div>
                         <div className="mt-4">
-                            {article.content ? (
+                            {sanitizedContent ? (
                                 <div
                                     className="prose prose-sm max-w-none"
-                                    dangerouslySetInnerHTML={{ __html: article.content }}
+                                    dangerouslySetInnerHTML={{ __html: sanitizedContent }}
                                 />
                             ) : (
                                 <p className="text-gray-500">{t?.articles?.show?.noContent ?? 'No content available.'}</p>
