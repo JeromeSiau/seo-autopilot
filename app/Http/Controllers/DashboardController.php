@@ -13,48 +13,74 @@ class DashboardController extends Controller
     public function index()
     {
         $user = auth()->user();
-        $team = $user->team;
+        $team = $user->currentTeam;
 
-        $sites = $team->sites()->with(['settings', 'keywords', 'articles'])->get();
+        if (! $team) {
+            return redirect()->route('teams.create');
+        }
 
-        // Aggregate stats
+        $sites = $team->sites()
+            ->withCount([
+                'keywords as total_keywords_count',
+                'keywords as queued_keywords_count' => fn ($q) => $q->where('status', 'queued'),
+                'articles as total_articles_count',
+                'articles as review_articles_count' => fn ($q) => $q->where('status', 'review'),
+                'articles as failed_articles_count' => fn ($q) => $q->where('status', 'failed'),
+                'articles as this_month_articles_count' => fn ($q) => $q->where('created_at', '>=', now()->startOfMonth()),
+                'articles as this_week_articles_count' => fn ($q) => $q->where('created_at', '>=', now()->startOfWeek()),
+            ])
+            ->with(['settings'])
+            ->get();
+
         $stats = [
             'total_sites' => $sites->count(),
-            'active_sites' => $sites->filter(fn($s) => $s->isAutopilotActive())->count(),
-            'total_keywords_queued' => $sites->sum(fn($s) => $s->keywords()->where('status', 'queued')->count()),
-            'articles_this_month' => $sites->sum(fn($s) => $s->articles()->where('created_at', '>=', now()->startOfMonth())->count()),
-            'articles_published_this_month' => $sites->sum(fn($s) => $s->articles()->where('status', 'published')->where('published_at', '>=', now()->startOfMonth())->count()),
-            'articles_used' => $team->articles_used_this_month,
-            'articles_limit' => $team->articles_limit,
+            'total_keywords' => $sites->sum('total_keywords_count'),
+            'keywords_in_queue' => $sites->sum('queued_keywords_count'),
+            'total_articles' => $sites->sum('total_articles_count'),
+            'articles_this_month' => $sites->sum('this_month_articles_count'),
         ];
 
-        // Get sites with active generations
-        $activeGenerations = ContentPlanGeneration::whereIn('site_id', $sites->pluck('id'))
-            ->whereIn('status', ['pending', 'running'])
-            ->pluck('site_id')
-            ->toArray();
-
-        // Sites with status
-        $sitesData = $sites->map(fn($site) => [
+        $sitesData = $sites->map(fn ($site) => [
             'id' => $site->id,
-            'domain' => $site->domain,
             'name' => $site->name,
-            'autopilot_status' => $this->getAutopilotStatus($site),
-            'articles_per_week' => $site->settings?->articles_per_week ?? 0,
-            'articles_in_review' => $site->articles()->where('status', 'review')->count(),
-            'articles_this_week' => $site->articles()->where('created_at', '>=', now()->startOfWeek())->count(),
-            'onboarding_complete' => $site->isOnboardingComplete(),
-            'is_generating' => in_array($site->id, $activeGenerations),
+            'domain' => $site->domain,
+            'keywords_count' => $site->total_keywords_count,
+            'articles_count' => $site->total_articles_count,
+            'articles_in_review' => $site->review_articles_count,
+            'articles_this_week' => $site->this_week_articles_count,
+            'autopilot_enabled' => $site->settings?->autopilot_enabled ?? false,
+            'onboarding_completed' => $site->isOnboardingComplete(),
         ]);
 
-        // Actions required
-        $actionsRequired = $this->getActionsRequired($sites);
+        $actionsRequired = [];
+        foreach ($sites as $site) {
+            if ($site->review_articles_count > 0) {
+                $actionsRequired[] = [
+                    'type' => 'review',
+                    'site_id' => $site->id,
+                    'site_domain' => $site->domain,
+                    'count' => $site->review_articles_count,
+                    'message' => "{$site->review_articles_count} article(s) en attente de review",
+                    'action_url' => route('sites.show', $site->id) . '?tab=review',
+                ];
+            }
+
+            if ($site->failed_articles_count > 0) {
+                $actionsRequired[] = [
+                    'type' => 'failed',
+                    'site_id' => $site->id,
+                    'site_domain' => $site->domain,
+                    'count' => $site->failed_articles_count,
+                    'message' => "Échec de publication ({$site->failed_articles_count})",
+                    'action_url' => route('sites.show', $site->id) . '?tab=failed',
+                ];
+            }
+        }
 
         return Inertia::render('Dashboard', [
             'stats' => $stats,
             'sites' => $sitesData,
             'actionsRequired' => $actionsRequired,
-            'unreadNotifications' => $user->unreadNotificationsCount(),
         ]);
     }
 
