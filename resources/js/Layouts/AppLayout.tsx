@@ -1,5 +1,6 @@
 import { Link, usePage } from '@inertiajs/react';
 import { PropsWithChildren, ReactNode, useState, useRef, useEffect } from 'react';
+import TeamSwitcher from '@/Components/TeamSwitcher';
 import { ActivityButton, ActivityDrawer } from '@/Components/AgentActivity';
 import { useGlobalAgentActivity } from '@/hooks/useGlobalAgentActivity';
 import {
@@ -200,6 +201,10 @@ export default function AppLayout({
                         <X className="h-5 w-5" />
                     </button>
                 </div>
+                {/* Team Switcher */}
+                <div className="mt-4 px-3">
+                    <TeamSwitcher />
+                </div>
                 <nav className="mt-4 px-3">
                     {navigation.map((section) => (
                         <div key={section.title} className="mb-6">
@@ -226,8 +231,13 @@ export default function AppLayout({
                         </Link>
                     </div>
 
+                    {/* Team Switcher */}
+                    <div className="mt-4">
+                        <TeamSwitcher />
+                    </div>
+
                     {/* Navigation */}
-                    <nav className="mt-6 flex-1 px-3">
+                    <nav className="mt-2 flex-1 px-3">
                         {navigation.map((section) => (
                             <div key={section.title} className="mb-6">
                                 <h3 className="mb-3 px-3 text-xs font-semibold uppercase tracking-wider text-surface-400 dark:text-surface-500">
