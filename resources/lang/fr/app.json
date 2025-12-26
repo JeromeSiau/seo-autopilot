@@ -67,7 +67,18 @@
     "noSites": "Aucun site configuré",
     "noSitesDescription": "Commencez par ajouter votre premier site web",
     "addFirstSite": "Ajouter votre premier site",
-    "actionsRequired": "Actions requises"
+    "actionsRequired": "Actions requises",
+    "generationBanner": {
+      "title": "Content Plan en cours de création",
+      "viewProgress": "Voir la progression"
+    },
+    "usage": {
+      "percentUsed": "{percent}% utilisé",
+      "remaining": "{count} restants"
+    },
+    "trend": {
+      "vsLastMonth": "vs mois dernier"
+    }
   },
   "sites": {
     "title": "Sites",
@@ -80,7 +91,77 @@
     "articlesCount": "{count} articles",
     "confirmDelete": "Êtes-vous sûr de vouloir supprimer ce site ?",
     "gscConnected": "GSC connecté",
-    "gscNotConnected": "GSC non connecté"
+    "gscNotConnected": "GSC non connecté",
+    "create": {
+      "title": "Ajouter un nouveau site",
+      "domain": "Domaine",
+      "domainHelp": "Entrez votre domaine sans http:// ou www.",
+      "name": "Nom du site",
+      "namePlaceholder": "Mon site web",
+      "language": "Langue principale"
+    },
+    "show": {
+      "settings": "Paramètres",
+      "topKeywords": "Top 10 Keywords",
+      "sortedByScore": "Triés par score",
+      "diff": "Diff:",
+      "pos": "Pos:",
+      "businessDescription": "Description du business",
+      "targetAudience": "Audience cible",
+      "autopilot": "Autopilot",
+      "active": "Actif",
+      "connections": "Connexions",
+      "gsc": "Google Search Console",
+      "ga4": "Google Analytics 4",
+      "cmsIntegrations": "Intégrations CMS",
+      "articlesToWatch": "Articles à surveiller",
+      "quickActions": "Actions rapides",
+      "language": "Langue",
+      "createdAt": "Créé le",
+      "configuredAt": "Configuré le"
+    },
+    "edit": {
+      "title": "Modifier",
+      "generalInfo": "Informations générales",
+      "siteName": "Nom du site",
+      "contentLanguage": "Langue du contenu",
+      "businessDescription": "Description de l'activité",
+      "businessPlaceholder": "Décrivez votre activité en quelques phrases...",
+      "targetAudience": "Audience cible",
+      "audiencePlaceholder": "Ex: entrepreneurs, sportifs, développeurs...",
+      "brandVoice": "Voix de marque",
+      "brandVoiceSubtitle": "Personnalisez le ton et le style de vos articles générés.",
+      "tone": "Ton",
+      "writingStyle": "Style d'écriture",
+      "stylePlaceholder": "Ex: Phrases courtes et percutantes. Utiliser des exemples concrets...",
+      "vocabularyUse": "Vocabulaire à utiliser",
+      "vocabularyUseHelp": "Mots et expressions à privilégier dans vos articles.",
+      "vocabularyAvoid": "Vocabulaire à éviter",
+      "vocabularyAvoidHelp": "Mots et expressions à ne pas utiliser.",
+      "addWord": "Ajouter un mot ou expression...",
+      "addWordAvoid": "Ajouter un mot à éviter...",
+      "contentExamples": "Exemples de contenu",
+      "contentExamplesHelp": "Collez des extraits représentatifs de votre style d'écriture.",
+      "examplePlaceholder": "Collez un extrait de texte représentatif de votre style...",
+      "addExample": "Ajouter cet exemple",
+      "saving": "Enregistrement..."
+    },
+    "tones": {
+      "professional": { "name": "Professionnel", "description": "Formel et crédible" },
+      "casual": { "name": "Décontracté", "description": "Accessible et convivial" },
+      "expert": { "name": "Expert", "description": "Technique et approfondi" },
+      "friendly": { "name": "Amical", "description": "Chaleureux et engageant" },
+      "neutral": { "name": "Neutre", "description": "Objectif et factuel" }
+    },
+    "languages": {
+      "fr": "Français",
+      "en": "English",
+      "es": "Español",
+      "de": "Deutsch",
+      "it": "Italiano",
+      "pt": "Português",
+      "nl": "Néerlandais"
+    }
   },
   "articles": {
     "title": "Articles",
@@ -101,7 +182,31 @@
     "approve": "Approuver",
     "publish": "Publier",
     "noArticles": "Aucun article trouvé",
-    "noArticlesDescription": "Les articles apparaîtront ici une fois générés"
+    "noArticlesDescription": "Les articles apparaîtront ici une fois générés",
+    "show": {
+      "content": "Contenu",
+      "copy": "Copier",
+      "copied": "Copié !",
+      "edit": "Modifier",
+      "noContent": "Aucun contenu disponible.",
+      "seoMeta": "SEO Meta",
+      "metaTitle": "Meta Title",
+      "metaDescription": "Meta Description",
+      "noDescription": "Aucune description",
+      "slug": "Slug",
+      "actions": "Actions",
+      "approveForPublishing": "Approuver pour publication",
+      "selectIntegration": "Sélectionner l'intégration",
+      "choose": "Choisir...",
+      "publishArticle": "Publier l'article",
+      "noIntegrations": "Aucune intégration configurée.",
+      "addOne": "Ajoutez-en une",
+      "toPublish": "pour publier cet article.",
+      "targetKeyword": "Mot-clé cible",
+      "volume": "Volume",
+      "difficulty": "Difficulté",
+      "characters": "caractères"
+    }
   },
   "keywords": {
     "title": "Mots-clés",
@@ -241,7 +346,19 @@
     "back": "Retour",
     "skip": "Passer",
     "finish": "Terminer la configuration",
-    "continue": "Continuer"
+    "continue": "Continuer",
+    "wizard": {
+      "title": "Configuration du site",
+      "exit": "Quitter"
+    },
+    "steps": {
+      "site": { "name": "Site", "description": "Infos de base" },
+      "searchConsole": { "name": "Search Console", "description": "Connexion GSC" },
+      "business": { "name": "Business", "description": "Votre activité" },
+      "config": { "name": "Configuration", "description": "Rythme de publication" },
+      "publication": { "name": "Publication", "description": "Intégration CMS" },
+      "launch": { "name": "Lancement", "description": "Activer l'autopilot" }
+    }
   },
   "usage": {
     "title": "Utilisation",
@@ -295,5 +412,98 @@
       "logout": "Déconnexion"
     },
     "backToHome": "Retour à l'accueil"
+  },
+  "profile": {
+    "title": "Profil",
+    "subtitle": "Gérez vos informations personnelles et vos préférences de sécurité",
+    "info": {
+      "title": "Informations du profil",
+      "subtitle": "Mettez à jour votre nom et votre adresse email"
+    },
+    "password": {
+      "title": "Mot de passe",
+      "subtitle": "Assurez-vous d'utiliser un mot de passe long et sécurisé",
+      "current": "Mot de passe actuel",
+      "new": "Nouveau mot de passe",
+      "confirm": "Confirmer le mot de passe"
+    },
+    "delete": {
+      "title": "Supprimer le compte",
+      "subtitle": "Supprimez définitivement votre compte et toutes vos données",
+      "warning": "Une fois votre compte supprimé, toutes ses ressources et données seront définitivement effacées. Avant de supprimer votre compte, veuillez télécharger toutes les données que vous souhaitez conserver.",
+      "button": "Supprimer le compte",
+      "confirmTitle": "Supprimer votre compte ?",
+      "confirmWarning": "Cette action est irréversible. Toutes vos données seront définitivement supprimées.",
+      "confirmPassword": "Confirmez votre mot de passe",
+      "cancel": "Annuler",
+      "confirmButton": "Supprimer définitivement"
+    },
+    "saved": "Enregistré",
+    "name": "Nom",
+    "email": "Adresse email",
+    "emailNotVerified": "Votre adresse email n'est pas vérifiée.",
+    "resendLink": "Cliquez ici pour renvoyer le lien de vérification.",
+    "verificationSent": "Un nouveau lien de vérification a été envoyé à votre adresse email."
+  },
+  "integrations": {
+    "title": "Intégrations",
+    "subtitle": "Connectez vos CMS pour publier automatiquement",
+    "add": "Ajouter",
+    "addIntegration": "Ajouter une intégration",
+    "connectedTo": "Connecté à",
+    "available": "Intégrations disponibles",
+    "confirmDelete": "Êtes-vous sûr de vouloir supprimer {name} ?",
+    "site": "Site",
+    "createSiteFirst": "Vous devez d'abord créer un site avant d'ajouter une intégration.",
+    "createSite": "Créer un site",
+    "types": {
+      "wordpress": { "name": "WordPress", "description": "Publication via REST API" },
+      "webflow": { "name": "Webflow", "description": "Intégration CMS Webflow" },
+      "shopify": { "name": "Shopify", "description": "Publication sur le blog Shopify" },
+      "ghost": { "name": "Ghost", "description": "Plateforme de publication open-source" }
+    }
+  },
+  "contentPlan": {
+    "title": "Content Plan",
+    "regenerate": "Régénérer",
+    "regenerating": "Régénération...",
+    "confirmRegenerate": "Cela va régénérer tout votre Content Plan. Continuer ?",
+    "settings": "Paramètres",
+    "tabs": { "keywords": "Keywords", "planned": "Planifiés", "generated": "Générés", "published": "Publiés" },
+    "status": { "planned": "Planifié", "generating": "En génération", "ready": "Prêt", "published": "Publié" },
+    "progress": {
+      "queuedTitle": "Préparation en cours...",
+      "queuedSubtitle": "Votre Content Plan est en file d'attente. L'analyse démarrera dans quelques instants.",
+      "generatingTitle": "Création de votre Content Plan",
+      "generatingSubtitle": "Nous analysons votre site et préparons votre calendrier de contenu",
+      "completed": "% complété",
+      "backgroundNote": "Vous pouvez fermer cette page, la génération continue en arrière-plan."
+    },
+    "tips": {
+      "tip1": "Nous analysons les données de Google pour trouver vos meilleures opportunités SEO",
+      "tip2": "Plus votre site a de données, meilleur sera le plan",
+      "tip3": "Les articles seront optimisés pour votre audience cible",
+      "tip4": "Chaque sujet est sélectionné pour son potentiel de trafic",
+      "tip5": "Notre IA évite les sujets que vous avez déjà traités"
+    }
+  },
+  "siteCard": {
+    "status": { "active": "Actif", "paused": "En pause", "setupRequired": "Configuration requise", "error": "Erreur" },
+    "view": "Voir",
+    "setup": "Configurer",
+    "perWeek": "par semaine",
+    "thisWeek": "cette semaine",
+    "inReview": "en révision",
+    "setupIncomplete": "Configuration incomplète",
+    "continueSetup": "Continuer la configuration"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "loading": "Chargement...",
+    "empty": "Aucune notification"
+  },
+  "activity": {
+    "title": "Activité",
+    "empty": "Aucune activité pour le moment"
   }
 }
