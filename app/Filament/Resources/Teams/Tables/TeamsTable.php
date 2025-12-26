@@ -30,7 +30,7 @@ class TeamsTable
                     ->badge()
                     ->state(fn (Team $record): string => match (true) {
                         $record->is_trial && ! $record->isTrialExpired() => 'trial',
-                        $record->subscribed() => 'active',
+                        $record->plan_id !== null && ! $record->is_trial => 'active',
                         default => 'inactive',
                     })
                     ->color(fn (string $state): string => match ($state) {
@@ -58,8 +58,8 @@ class TeamsTable
                     ->query(function ($query, array $data) {
                         return match ($data['value']) {
                             'trial' => $query->where('is_trial', true)->where(fn ($q) => $q->whereNull('trial_ends_at')->orWhere('trial_ends_at', '>', now())),
-                            'active' => $query->whereHas('subscriptions', fn ($q) => $q->active()),
-                            'inactive' => $query->where('is_trial', false)->whereDoesntHave('subscriptions', fn ($q) => $q->active()),
+                            'active' => $query->whereNotNull('plan_id')->where('is_trial', false),
+                            'inactive' => $query->where('is_trial', false)->whereNull('plan_id'),
                             default => $query,
                         };
                     }),

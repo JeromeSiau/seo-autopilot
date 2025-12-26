@@ -23,10 +23,11 @@ class StatsOverviewWidget extends BaseWidget
                 $q->whereNull('trial_ends_at')
                   ->orWhere('trial_ends_at', '>', now());
             })->count();
-        $teamsActive = Team::whereHas('subscriptions', fn ($q) => $q->active())->count();
+        $teamsActive = Team::whereNotNull('plan_id')->where('is_trial', false)->count();
         $teamsInactive = $teamsTotal - $teamsTrial - $teamsActive;
 
-        $mrr = Team::whereHas('subscriptions', fn ($q) => $q->active())
+        $mrr = Team::whereNotNull('plan_id')
+            ->where('is_trial', false)
             ->with('billingPlan')
             ->get()
             ->sum(fn ($team) => $team->billingPlan?->price ?? 0);

@@ -17,7 +17,8 @@ class Plan extends Model
         'price',
         'articles_per_month',
         'sites_limit',
-        'stripe_price_id',
+        'stripe_price_id_live',
+        'stripe_price_id_test',
         'features',
         'is_active',
         'sort_order',
@@ -45,5 +46,15 @@ class Plan extends Model
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
+    }
+
+    /**
+     * Get the appropriate Stripe price ID based on environment.
+     */
+    public function getStripePriceIdAttribute(): ?string
+    {
+        return app()->environment('production')
+            ? $this->stripe_price_id_live
+            : $this->stripe_price_id_test;
     }
 }
