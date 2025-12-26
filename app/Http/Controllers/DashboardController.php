@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Site;
 use App\Models\Article;
+use App\Models\ContentPlanGeneration;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -27,6 +28,12 @@ class DashboardController extends Controller
             'articles_limit' => $team->articles_limit,
         ];
 
+        // Get sites with active generations
+        $activeGenerations = ContentPlanGeneration::whereIn('site_id', $sites->pluck('id'))
+            ->whereIn('status', ['pending', 'running'])
+            ->pluck('site_id')
+            ->toArray();
+
         // Sites with status
         $sitesData = $sites->map(fn($site) => [
             'id' => $site->id,
@@ -37,6 +44,7 @@ class DashboardController extends Controller
             'articles_in_review' => $site->articles()->where('status', 'review')->count(),
             'articles_this_week' => $site->articles()->where('created_at', '>=', now()->startOfWeek())->count(),
             'onboarding_complete' => $site->isOnboardingComplete(),
+            'is_generating' => in_array($site->id, $activeGenerations),
         ]);
 
         // Actions required

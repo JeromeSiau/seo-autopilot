@@ -55,31 +55,47 @@
   },
   "features": {
     "label": "Features",
-    "title": "Everything you need to dominate search.",
-    "subtitle": "Powerful tools to automate your content strategy.",
+    "title": "5 AI Experts. One Perfect Article.",
+    "subtitle": "Every article passes through our multi-agent pipeline before reaching your site.",
+    "workflow": {
+      "step1": {
+        "icon": "research",
+        "title": "Research",
+        "description": "Gathers insights from top-ranking pages and identifies winning angles"
+      },
+      "step2": {
+        "icon": "analysis",
+        "title": "Analysis",
+        "description": "Studies competitor content to find gaps and opportunities"
+      },
+      "step3": {
+        "icon": "writing",
+        "title": "Writing",
+        "description": "Crafts SEO-optimized content in your brand voice"
+      },
+      "step4": {
+        "icon": "verification",
+        "title": "Verification",
+        "description": "Fact-checks claims and ensures accuracy"
+      },
+      "step5": {
+        "icon": "optimization",
+        "title": "Optimization",
+        "description": "Adds smart internal links to boost your SEO"
+      }
+    },
+    "moreFeatures": "And more powerful tools",
     "feature1": {
-      "title": "AI Content Generation",
-      "description": "Articles that match your brand voice, target your keywords, and engage your readers. Every single time."
+      "title": "Smart Keyword Discovery",
+      "description": "Uncover high-potential keywords from Google Search Console and AI-powered suggestions."
     },
     "feature2": {
-      "title": "Smart Keyword Research",
-      "description": "Discover high-opportunity keywords from Google Search Console and competitor analysis."
+      "title": "Autopilot Publishing",
+      "description": "Set your schedule and let articles publish automatically to your CMS."
     },
     "feature3": {
-      "title": "Autopilot Publishing",
-      "description": "Set your schedule. We write, optimize, and publish automatically to WordPress, Webflow, and more."
-    },
-    "feature4": {
-      "title": "Multi-Language Support",
-      "description": "Native content in English, French, Spanish, and 20+ languages. No awkward translations."
-    },
-    "feature5": {
-      "title": "Multi-Language",
-      "description": "Generate content in 50+ languages."
-    },
-    "feature6": {
-      "title": "Quality Guarantee",
-      "description": "Every article passes plagiarism checks."
+      "title": "4 Platforms Supported",
+      "description": "Publish directly to WordPress, Webflow, Shopify, or Ghost."
     }
   },
   "howItWorks": {
@@ -211,6 +227,14 @@
     "q6": {
       "question": "Can I cancel anytime?",
       "answer": "Yes. No contracts, no commitments. Cancel anytime from your dashboard. We're confident you'll want to stay."
+    },
+    "q7": {
+      "question": "How does your AI work?",
+      "answer": "Our content engine uses 5 specialized AI agents working together. First, a Research agent gathers insights from top-ranking pages. Then, an Analysis agent studies your competitors. A Writing agent crafts the article in your brand voice. A Verification agent fact-checks every claim. Finally, an Optimization agent adds smart internal links. The result: content that's thoroughly researched and ready to rank."
+    },
+    "q8": {
+      "question": "How do you guarantee content quality?",
+      "answer": "Every article passes through our verification pipeline before reaching your site. Our AI fact-checks claims against reliable sources, ensures proper keyword optimization, and automatically adds relevant internal links to strengthen your SEO."
     }
   },
   "cta": {

@@ -55,31 +55,47 @@
   },
   "features": {
     "label": "Fonctionnalités",
-    "title": "Tout ce qu'il faut pour dominer la recherche.",
-    "subtitle": "Des outils puissants pour automatiser votre stratégie de contenu.",
+    "title": "5 Experts IA. Un article parfait.",
+    "subtitle": "Chaque article passe par notre pipeline multi-agent avant d'atteindre votre site.",
+    "workflow": {
+      "step1": {
+        "icon": "research",
+        "title": "Recherche",
+        "description": "Collecte les insights des pages les mieux classées et identifie les angles gagnants"
+      },
+      "step2": {
+        "icon": "analysis",
+        "title": "Analyse",
+        "description": "Étudie le contenu concurrent pour trouver les lacunes et opportunités"
+      },
+      "step3": {
+        "icon": "writing",
+        "title": "Rédaction",
+        "description": "Rédige du contenu SEO optimisé dans votre voix de marque"
+      },
+      "step4": {
+        "icon": "verification",
+        "title": "Vérification",
+        "description": "Vérifie les faits et assure l'exactitude des informations"
+      },
+      "step5": {
+        "icon": "optimization",
+        "title": "Optimisation",
+        "description": "Ajoute des liens internes intelligents pour booster votre SEO"
+      }
+    },
+    "moreFeatures": "Et d'autres outils puissants",
     "feature1": {
-      "title": "Génération de contenu IA",
-      "description": "Des articles qui correspondent à votre voix de marque, ciblent vos mots-clés et engagent vos lecteurs. À chaque fois."
+      "title": "Découverte de mots-clés",
+      "description": "Trouvez des mots-clés à fort potentiel via Google Search Console et suggestions IA."
     },
     "feature2": {
-      "title": "Recherche de mots-clés intelligente",
-      "description": "Découvrez des opportunités de mots-clés via Google Search Console et l'analyse concurrentielle."
+      "title": "Publication automatique",
+      "description": "Définissez votre planning et laissez les articles se publier automatiquement sur votre CMS."
     },
     "feature3": {
-      "title": "Publication automatique",
-      "description": "Définissez votre planning. On rédige, optimise et publie automatiquement sur WordPress, Webflow, et plus."
-    },
-    "feature4": {
-      "title": "Support multi-langue",
-      "description": "Contenu natif en français, anglais, espagnol et 20+ langues. Pas de traductions maladroites."
-    },
-    "feature5": {
-      "title": "Multi-langue",
-      "description": "Générez du contenu dans plus de 50 langues."
-    },
-    "feature6": {
-      "title": "Garantie qualité",
-      "description": "Chaque article passe les contrôles anti-plagiat."
+      "title": "4 Plateformes supportées",
+      "description": "Publiez directement sur WordPress, Webflow, Shopify ou Ghost."
     }
   },
   "howItWorks": {
@@ -211,6 +227,14 @@
     "q6": {
       "question": "Puis-je annuler à tout moment ?",
       "answer": "Oui. Pas de contrat, pas d'engagement. Annulez quand vous voulez depuis votre tableau de bord. On est confiant que vous voudrez rester."
+    },
+    "q7": {
+      "question": "Comment fonctionne votre IA ?",
+      "answer": "Notre moteur de contenu utilise 5 agents IA spécialisés qui travaillent ensemble. D'abord, un agent Recherche collecte les insights des pages les mieux positionnées. Ensuite, un agent Analyse étudie vos concurrents. Un agent Rédaction rédige l'article dans votre voix de marque. Un agent Vérification vérifie chaque affirmation. Enfin, un agent Optimisation ajoute des liens internes intelligents. Résultat : du contenu minutieusement recherché et prêt à se positionner."
+    },
+    "q8": {
+      "question": "Comment garantissez-vous la qualité du contenu ?",
+      "answer": "Chaque article passe par notre pipeline de vérification avant d'atteindre votre site. Notre IA vérifie les faits avec des sources fiables, assure une optimisation des mots-clés appropriée, et ajoute automatiquement des liens internes pertinents pour renforcer votre SEO."
     }
   },
   "cta": {

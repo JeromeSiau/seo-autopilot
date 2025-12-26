@@ -14,6 +14,14 @@ import {
     Check,
     ChevronDown,
     Globe,
+    Search,
+    BarChart2,
+    PenTool,
+    ShieldCheck,
+    Link2,
+    Target,
+    Rocket,
+    Plug,
 } from 'lucide-react';
 import Logo from '@/Components/Logo';
 import ThemeToggle from '@/Components/ThemeToggle';
@@ -190,13 +198,18 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
 
     const currentLang = languages.find(l => l.code === locale) || languages[0];
 
+    const workflowSteps = [
+        { icon: Search, title: t.features.workflow?.step1?.title || 'Research', description: t.features.workflow?.step1?.description || 'Gathers insights from top-ranking pages' },
+        { icon: BarChart2, title: t.features.workflow?.step2?.title || 'Analysis', description: t.features.workflow?.step2?.description || 'Studies competitor content' },
+        { icon: PenTool, title: t.features.workflow?.step3?.title || 'Writing', description: t.features.workflow?.step3?.description || 'Crafts SEO-optimized content' },
+        { icon: ShieldCheck, title: t.features.workflow?.step4?.title || 'Verification', description: t.features.workflow?.step4?.description || 'Fact-checks claims' },
+        { icon: Link2, title: t.features.workflow?.step5?.title || 'Optimization', description: t.features.workflow?.step5?.description || 'Adds smart internal links' },
+    ];
+
     const features = [
-        { icon: Wind, title: t.features.feature1.title, description: t.features.feature1.description },
-        { icon: Compass, title: t.features.feature2.title, description: t.features.feature2.description },
-        { icon: Ship, title: t.features.feature3.title, description: t.features.feature3.description },
-        { icon: Map, title: t.features.feature4.title, description: t.features.feature4.description },
-        { icon: Globe, title: t.features.feature5?.title || 'Multi-Language', description: t.features.feature5?.description || 'Generate content in 50+ languages.' },
-        { icon: Anchor, title: t.features.feature6?.title || 'Quality Guarantee', description: t.features.feature6?.description || 'Every article passes plagiarism checks.' },
+        { icon: Target, title: t.features.feature1.title, description: t.features.feature1.description },
+        { icon: Rocket, title: t.features.feature2.title, description: t.features.feature2.description },
+        { icon: Plug, title: t.features.feature3.title, description: t.features.feature3.description },
     ];
 
     const steps = [
@@ -215,8 +228,12 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
     const faqs = [
         t.faq.q1,
         t.faq.q2,
+        t.faq.q7,
+        t.faq.q8,
         t.faq.q3,
         t.faq.q4,
+        t.faq.q5,
+        t.faq.q6,
     ];
 
     const pricingPlans = [
@@ -600,7 +617,7 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
                 {/* Wave separator */}
                 <WaveSeparator lightColor="#f5f4f0" darkColor="#1a1a1a" />
 
-                {/* Features */}
+                {/* Features - Multi-Agent Workflow */}
                 <section id="features" className="py-24 bg-surface-100 dark:bg-surface-900">
                     <div className="max-w-[1200px] mx-auto px-8">
                         <AnimatedSection>
@@ -617,11 +634,74 @@ export default function Landing({ locale, translations: t, canLogin, canRegister
                             </div>
                         </AnimatedSection>
 
-                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {/* Workflow Pipeline */}
+                        <AnimatedSection delay={100}>
+                            <div className="relative mb-16">
+                                {/* Workflow steps */}
+                                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-8 lg:gap-3">
+                                    {workflowSteps.map((step, i) => (
+                                        <div key={i} className="group relative flex flex-col items-center">
+                                            {/* Connection line to next step - desktop only */}
+                                            {i < workflowSteps.length - 1 && (
+                                                <div className="hidden lg:flex absolute top-[40px] left-[calc(50%+52px)] items-center" style={{ width: 'calc(100% - 104px + 12px)' }}>
+                                                    <div className="flex-1 h-[3px] bg-gradient-to-r from-primary-400 to-primary-300 dark:from-primary-500 dark:to-primary-600 rounded-full" />
+                                                    <ArrowRight className="w-5 h-5 text-primary-400 dark:text-primary-500 -ml-1 flex-shrink-0" />
+                                                </div>
+                                            )}
+
+                                            {/* Icon container */}
+                                            <div className="relative mb-5">
+                                                {/* Glow effect on hover */}
+                                                <div className="absolute inset-0 bg-primary-400/30 dark:bg-primary-500/40 rounded-full blur-xl scale-75 opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" />
+
+                                                {/* Main icon circle */}
+                                                <div className="relative w-20 h-20 bg-gradient-to-br from-white via-white to-surface-100 dark:from-surface-800 dark:via-surface-800 dark:to-surface-900 rounded-full flex items-center justify-center shadow-lg dark:shadow-card-dark border-2 border-primary-200/80 dark:border-primary-500/40 group-hover:border-primary-400 dark:group-hover:border-primary-400 group-hover:shadow-xl dark:group-hover:shadow-green-glow transition-all duration-300 group-hover:-translate-y-1 group-hover:scale-105">
+                                                    {/* Step number badge */}
+                                                    <div className="absolute -top-1.5 -right-1.5 w-6 h-6 bg-gradient-to-br from-primary-500 to-primary-600 text-white text-[0.7rem] font-bold rounded-full flex items-center justify-center shadow-md ring-2 ring-white dark:ring-surface-900">
+                                                        {i + 1}
+                                                    </div>
+                                                    <step.icon className="w-8 h-8 text-primary-600 dark:text-primary-400 group-hover:scale-110 transition-transform duration-300" />
+                                                </div>
+                                            </div>
+
+                                            {/* Title */}
+                                            <h3 className="font-display text-base font-semibold text-surface-900 dark:text-white mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors text-center">
+                                                {step.title}
+                                            </h3>
+
+                                            {/* Description - always visible */}
+                                            <p className="text-[0.85rem] text-surface-500 dark:text-surface-400 leading-relaxed text-center max-w-[180px] min-h-[3rem]">
+                                                {step.description}
+                                            </p>
+
+                                            {/* Arrow connector - mobile only */}
+                                            {i < workflowSteps.length - 1 && (
+                                                <div className="lg:hidden flex justify-center mt-4 mb-2 md:hidden">
+                                                    <div className="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-500/20 flex items-center justify-center">
+                                                        <ArrowRight className="w-4 h-4 text-primary-500 dark:text-primary-400 rotate-90" />
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </AnimatedSection>
+
+                        {/* Additional Features */}
+                        <AnimatedSection delay={200}>
+                            <div className="text-center mb-8">
+                                <span className="text-sm font-medium text-surface-400 dark:text-surface-500 uppercase tracking-wide">
+                                    {t.features.moreFeatures}
+                                </span>
+                            </div>
+                        </AnimatedSection>
+
+                        <div className="grid md:grid-cols-3 gap-6">
                             {features.map((feature, i) => (
-                                <AnimatedSection key={i} delay={i * 100}>
-                                    <div className="bg-white dark:bg-surface-800/50 dark:backdrop-blur-xl rounded-2xl p-8 shadow-sm dark:shadow-card-dark border border-surface-200 dark:border-surface-700 hover:-translate-y-1 hover:shadow-lg dark:hover:shadow-green-glow hover:border-primary-200 dark:hover:border-primary-500/30 hover:animate-sway transition-all">
-                                        <div className="w-12 h-12 bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-500/15 dark:to-primary-500/5 rounded-xl flex items-center justify-center text-primary-600 dark:text-primary-400 mb-5 animate-float" style={{ animationDelay: `${i * 0.2}s` }}>
+                                <AnimatedSection key={i} delay={250 + i * 100}>
+                                    <div className="bg-white dark:bg-surface-800/50 dark:backdrop-blur-xl rounded-2xl p-8 shadow-sm dark:shadow-card-dark border border-surface-200 dark:border-surface-700 hover:-translate-y-1 hover:shadow-lg dark:hover:shadow-green-glow hover:border-primary-200 dark:hover:border-primary-500/30 transition-all">
+                                        <div className="w-12 h-12 bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-500/15 dark:to-primary-500/5 rounded-xl flex items-center justify-center text-primary-600 dark:text-primary-400 mb-5">
                                             <feature.icon className="w-6 h-6" />
                                         </div>
                                         <h3 className="font-display text-lg font-semibold text-surface-900 dark:text-white mb-2">
