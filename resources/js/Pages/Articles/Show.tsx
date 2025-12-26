@@ -17,6 +17,7 @@ import { Badge, getStatusVariant } from '@/Components/ui/Badge';
 import { Article, Integration, PageProps } from '@/types';
 import { format } from 'date-fns';
 import { useState } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
 
 interface ArticleShowProps extends PageProps {
     article: Article;
@@ -24,6 +25,7 @@ interface ArticleShowProps extends PageProps {
 }
 
 export default function ArticleShow({ article, integrations }: ArticleShowProps) {
+    const { t } = useTranslations();
     const [copied, setCopied] = useState(false);
     const [publishing, setPublishing] = useState(false);
     const [selectedIntegration, setSelectedIntegration] = useState<number | null>(null);
@@ -106,7 +108,7 @@ export default function ArticleShow({ article, integrations }: ArticleShowProps)
                 <div className="lg:col-span-2">
                     <Card>
                         <div className="flex items-center justify-between border-b border-gray-200 pb-4">
-                            <h2 className="text-lg font-semibold text-gray-900">Content</h2>
+                            <h2 className="text-lg font-semibold text-gray-900">{t?.articles?.show?.content ?? 'Content'}</h2>
                             <div className="flex gap-2">
                                 <Button
                                     variant="secondary"
@@ -114,7 +116,7 @@ export default function ArticleShow({ article, integrations }: ArticleShowProps)
                                     icon={copied ? Check : Copy}
                                     onClick={handleCopyContent}
                                 >
-                                    {copied ? 'Copied!' : 'Copy'}
+                                    {copied ? (t?.articles?.show?.copied ?? 'Copied!') : (t?.articles?.show?.copy ?? 'Copy')}
                                 </Button>
                                 <Button
                                     as="link"
@@ -123,7 +125,7 @@ export default function ArticleShow({ article, integrations }: ArticleShowProps)
                                     size="sm"
                                     icon={Edit}
                                 >
-                                    Edit
+                                    {t?.articles?.show?.edit ?? 'Edit'}
                                 </Button>
                             </div>
                         </div>
@@ -134,7 +136,7 @@ export default function ArticleShow({ article, integrations }: ArticleShowProps)
                                     dangerouslySetInnerHTML={{ __html: article.content }}
                                 />
                             ) : (
-                                <p className="text-gray-500">No content available.</p>
+                                <p className="text-gray-500">{t?.articles?.show?.noContent ?? 'No content available.'}</p>
                             )}
                         </div>
                     </Card>
@@ -144,33 +146,33 @@ export default function ArticleShow({ article, integrations }: ArticleShowProps)
                 <div className="space-y-6">
                     {/* Meta Information */}
                     <Card>
-                        <CardHeader title="SEO Meta" />
+                        <CardHeader title={t?.articles?.show?.seoMeta ?? 'SEO Meta'} />
                         <div className="mt-4 space-y-4">
                             <div>
                                 <label className="text-xs font-medium uppercase tracking-wider text-gray-500">
-                                    Meta Title
+                                    {t?.articles?.show?.metaTitle ?? 'Meta Title'}
                                 </label>
                                 <p className="mt-1 text-sm text-gray-900">
                                     {article.meta_title || article.title}
                                 </p>
                                 <p className="mt-1 text-xs text-gray-400">
-                                    {(article.meta_title || article.title).length}/60 characters
+                                    {(article.meta_title || article.title).length}/60 {t?.articles?.show?.characters ?? 'characters'}
                                 </p>
                             </div>
                             <div>
                                 <label className="text-xs font-medium uppercase tracking-wider text-gray-500">
-                                    Meta Description
+                                    {t?.articles?.show?.metaDescription ?? 'Meta Description'}
                                 </label>
                                 <p className="mt-1 text-sm text-gray-900">
-                                    {article.meta_description || article.excerpt || 'No description'}
+                                    {article.meta_description || article.excerpt || (t?.articles?.show?.noDescription ?? 'No description')}
                                 </p>
                                 <p className="mt-1 text-xs text-gray-400">
-                                    {(article.meta_description || article.excerpt || '').length}/160 characters
+                                    {(article.meta_description || article.excerpt || '').length}/160 {t?.articles?.show?.characters ?? 'characters'}
                                 </p>
                             </div>
                             <div>
                                 <label className="text-xs font-medium uppercase tracking-wider text-gray-500">
-                                    Slug
+                                    {t?.articles?.show?.slug ?? 'Slug'}
                                 </label>
                                 <p className="mt-1 text-sm font-mono text-gray-900">{article.slug}</p>
                             </div>
@@ -180,7 +182,7 @@ export default function ArticleShow({ article, integrations }: ArticleShowProps)
                     {/* Actions */}
                     {article.status !== 'published' && (
                         <Card>
-                            <CardHeader title="Actions" />
+                            <CardHeader title={t?.articles?.show?.actions ?? 'Actions'} />
                             <div className="mt-4 space-y-4">
                                 {article.status === 'draft' || article.status === 'review' ? (
                                     <Button
@@ -188,7 +190,7 @@ export default function ArticleShow({ article, integrations }: ArticleShowProps)
                                         variant="secondary"
                                         className="w-full"
                                     >
-                                        Approve for Publishing
+                                        {t?.articles?.show?.approveForPublishing ?? 'Approve for Publishing'}
                                     </Button>
                                 ) : null}
 
@@ -196,7 +198,7 @@ export default function ArticleShow({ article, integrations }: ArticleShowProps)
                                     <>
                                         <div>
                                             <label className="text-sm font-medium text-gray-700">
-                                                Select Integration
+                                                {t?.articles?.show?.selectIntegration ?? 'Select Integration'}
                                             </label>
                                             <select
                                                 value={selectedIntegration || ''}
@@ -205,7 +207,7 @@ export default function ArticleShow({ article, integrations }: ArticleShowProps)
                                                 }
                                                 className="mt-1 block w-full rounded-lg border-gray-300 text-sm focus:border-indigo-500 focus:ring-indigo-500"
                                             >
-                                                <option value="">Choose...</option>
+                                                <option value="">{t?.articles?.show?.choose ?? 'Choose...'}</option>
                                                 {integrations.map((integration) => (
                                                     <option key={integration.id} value={integration.id}>
                                                         {integration.name} ({integration.type})
@@ -220,7 +222,7 @@ export default function ArticleShow({ article, integrations }: ArticleShowProps)
                                             icon={Send}
                                             className="w-full"
                                         >
-                                            Publish Article
+                                            {t?.articles?.show?.publishArticle ?? 'Publish Article'}
                                         </Button>
                                     </>
                                 )}
@@ -228,14 +230,14 @@ export default function ArticleShow({ article, integrations }: ArticleShowProps)
                                 {article.status === 'approved' && integrations.length === 0 && (
                                     <div className="rounded-lg bg-yellow-50 p-4 text-sm text-yellow-700">
                                         <p>
-                                            No integrations configured.{' '}
+                                            {t?.articles?.show?.noIntegrations ?? 'No integrations configured.'}{' '}
                                             <Link
                                                 href={route('integrations.create')}
                                                 className="font-medium underline"
                                             >
-                                                Add one
+                                                {t?.articles?.show?.addOne ?? 'Add one'}
                                             </Link>{' '}
-                                            to publish this article.
+                                            {t?.articles?.show?.toPublish ?? 'to publish this article.'}
                                         </p>
                                     </div>
                                 )}
@@ -246,7 +248,7 @@ export default function ArticleShow({ article, integrations }: ArticleShowProps)
                     {/* Keyword Info */}
                     {article.keyword && (
                         <Card>
-                            <CardHeader title="Target Keyword" />
+                            <CardHeader title={t?.articles?.show?.targetKeyword ?? 'Target Keyword'} />
                             <div className="mt-4">
                                 <p className="text-lg font-medium text-indigo-600">
                                     "{article.keyword.keyword}"
@@ -254,7 +256,7 @@ export default function ArticleShow({ article, integrations }: ArticleShowProps)
                                 <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
                                     {article.keyword.volume && (
                                         <div>
-                                            <p className="text-gray-500">Volume</p>
+                                            <p className="text-gray-500">{t?.articles?.show?.volume ?? 'Volume'}</p>
                                             <p className="font-medium">
                                                 {article.keyword.volume.toLocaleString()}
                                             </p>
@@ -262,7 +264,7 @@ export default function ArticleShow({ article, integrations }: ArticleShowProps)
                                     )}
                                     {article.keyword.difficulty !== null && (
                                         <div>
-                                            <p className="text-gray-500">Difficulty</p>
+                                            <p className="text-gray-500">{t?.articles?.show?.difficulty ?? 'Difficulty'}</p>
                                             <p className="font-medium">{article.keyword.difficulty}</p>
                                         </div>
                                     )}
