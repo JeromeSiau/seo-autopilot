@@ -38,6 +38,12 @@ class SiteController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        $team = $request->user()->currentTeam;
+
+        if (!$team->canCreateSite()) {
+            abort(403, 'Vous avez atteint la limite de sites pour votre plan. Passez à un plan supérieur pour ajouter plus de sites.');
+        }
+
         $validated = $request->validate([
             'domain' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],

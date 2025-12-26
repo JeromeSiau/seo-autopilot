@@ -63,8 +63,9 @@ class Team extends Model
 
     public function canCreateSite(): bool
     {
-        if (! $this->billingPlan) {
-            return false;
+        // Trial users without a billing plan can create 1 site
+        if (!$this->billingPlan) {
+            return $this->sites()->count() < 1;
         }
 
         if ($this->billingPlan->isUnlimitedSites()) {
