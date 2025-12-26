@@ -15,6 +15,7 @@ class UserSeeder extends Seeder
             'name' => 'Jérôme Siau',
             'email' => 'siau.jerome@gmail.com',
             'password' => Hash::make('password'),
+            'is_admin' => true,
         ]);
 
         $team = Team::create([
