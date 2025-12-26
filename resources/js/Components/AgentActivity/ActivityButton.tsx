@@ -1,5 +1,6 @@
 import { Activity } from 'lucide-react';
 import { clsx } from 'clsx';
+import { useTranslations } from '@/hooks/useTranslations';
 
 interface ActivityButtonProps {
     activeAgents: number;
@@ -8,6 +9,8 @@ interface ActivityButtonProps {
 }
 
 export function ActivityButton({ activeAgents, hasNewEvents, onClick }: ActivityButtonProps) {
+    const { t } = useTranslations();
+
     return (
         <button
             onClick={onClick}
@@ -27,7 +30,7 @@ export function ActivityButton({ activeAgents, hasNewEvents, onClick }: Activity
                     {activeAgents} agent{activeAgents > 1 ? 's' : ''} actif{activeAgents > 1 ? 's' : ''}
                 </span>
             ) : (
-                <span className="text-sm font-medium">Activité</span>
+                <span className="text-sm font-medium">{t?.activity?.title ?? 'Activity'}</span>
             )}
 
             {hasNewEvents && (

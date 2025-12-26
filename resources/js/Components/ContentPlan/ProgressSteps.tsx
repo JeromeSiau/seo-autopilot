@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Check, Loader2, Circle, Globe, BarChart3, Sparkles, Search, TrendingUp, Calendar } from 'lucide-react';
+import { Check, Loader2, Circle, Globe, BarChart3, Sparkles, Search, TrendingUp, Calendar, X } from 'lucide-react';
 import clsx from 'clsx';
+import { useTranslations } from '@/hooks/useTranslations';
 
 interface Step {
     name: string;
@@ -33,16 +34,17 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
     calendar: Calendar,
 };
 
-const TIPS = [
-    "Nous analysons les données de Google pour trouver vos meilleures opportunités SEO",
-    "Plus votre site a de données, meilleur sera le plan",
-    "Les articles seront optimisés pour votre audience cible",
-    "Chaque sujet est sélectionné pour son potentiel de trafic",
-    "Notre IA évite les sujets que vous avez déjà traités",
-];
-
 export default function ProgressSteps({ status }: Props) {
+    const { t } = useTranslations();
     const [tipIndex, setTipIndex] = useState(0);
+
+    const TIPS = [
+        t?.contentPlan?.tips?.tip1 ?? "We analyze Google data to find your best SEO opportunities",
+        t?.contentPlan?.tips?.tip2 ?? "The more data your site has, the better the plan",
+        t?.contentPlan?.tips?.tip3 ?? "Articles will be optimized for your target audience",
+        t?.contentPlan?.tips?.tip4 ?? "Each topic is selected for its traffic potential",
+        t?.contentPlan?.tips?.tip5 ?? "Our AI avoids topics you've already covered",
+    ];
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -71,10 +73,10 @@ export default function ProgressSteps({ status }: Props) {
                         <Loader2 className="h-8 w-8 text-primary-600 dark:text-primary-400 animate-spin" />
                     </div>
                     <h1 className="text-2xl font-bold text-surface-900 dark:text-white">
-                        Préparation en cours...
+                        {t?.contentPlan?.progress?.queuedTitle ?? 'Preparing...'}
                     </h1>
                     <p className="mt-2 text-surface-500 dark:text-surface-400">
-                        Votre Content Plan est en file d'attente. L'analyse démarrera dans quelques instants.
+                        {t?.contentPlan?.progress?.queuedSubtitle ?? 'Your Content Plan is in the queue. Analysis will start shortly.'}
                     </p>
                 </div>
 
@@ -103,10 +105,10 @@ export default function ProgressSteps({ status }: Props) {
                     <Sparkles className="h-8 w-8 text-primary-600 dark:text-primary-400" />
                 </div>
                 <h1 className="text-2xl font-bold text-surface-900 dark:text-white">
-                    Création de votre Content Plan
+                    {t?.contentPlan?.progress?.generatingTitle ?? 'Creating your Content Plan'}
                 </h1>
                 <p className="mt-2 text-surface-500 dark:text-surface-400">
-                    Nous analysons votre site et préparons votre calendrier de contenu
+                    {t?.contentPlan?.progress?.generatingSubtitle ?? 'We are analyzing your site and preparing your content calendar'}
                 </p>
             </div>
 
@@ -165,7 +167,7 @@ export default function ProgressSteps({ status }: Props) {
                     />
                 </div>
                 <p className="mt-2 text-center text-sm text-surface-500 dark:text-surface-400">
-                    {Math.round(progress)}% complété
+                    {Math.round(progress)}{t?.contentPlan?.progress?.completed ?? '% completed'}
                 </p>
             </div>
 
@@ -174,6 +176,16 @@ export default function ProgressSteps({ status }: Props) {
                 <p className="text-sm text-surface-500 dark:text-surface-400 transition-opacity duration-300">
                     💡 {TIPS[tipIndex]}
                 </p>
+            </div>
+
+            {/* Dismissible hint */}
+            <div className="max-w-md mx-auto mt-6">
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-surface-100 dark:bg-surface-800/50 text-surface-600 dark:text-surface-400 text-sm">
+                    <X className="h-4 w-4 flex-shrink-0" />
+                    <span>
+                        {t?.contentPlan?.progress?.backgroundNote ?? 'You can close this page, generation continues in the background.'}
+                    </span>
+                </div>
             </div>
         </div>
     );

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link } from '@inertiajs/react';
 import { Bell, Check, CheckCheck } from 'lucide-react';
 import axios from 'axios';
+import { useTranslations } from '@/hooks/useTranslations';
 
 interface Notification {
     id: number;
@@ -19,6 +20,7 @@ interface Props {
 }
 
 export default function NotificationDropdown({ initialCount = 0 }: Props) {
+    const { t } = useTranslations();
     const [isOpen, setIsOpen] = useState(false);
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [unreadCount, setUnreadCount] = useState(initialCount);
@@ -117,7 +119,7 @@ export default function NotificationDropdown({ initialCount = 0 }: Props) {
             {isOpen && (
                 <div className="absolute right-0 mt-2 w-80 rounded-xl bg-white dark:bg-surface-900 shadow-lg dark:shadow-card-dark ring-1 ring-surface-200 dark:ring-surface-800 z-50">
                     <div className="flex items-center justify-between border-b border-surface-100 dark:border-surface-800 px-4 py-3">
-                        <h3 className="font-semibold text-surface-900 dark:text-white">Notifications</h3>
+                        <h3 className="font-semibold text-surface-900 dark:text-white">{t?.notifications?.title ?? 'Notifications'}</h3>
                         {unreadCount > 0 && (
                             <button
                                 onClick={markAllAsRead}
@@ -131,9 +133,9 @@ export default function NotificationDropdown({ initialCount = 0 }: Props) {
 
                     <div className="max-h-96 overflow-y-auto">
                         {loading ? (
-                            <div className="py-8 text-center text-surface-500 dark:text-surface-400">Chargement...</div>
+                            <div className="py-8 text-center text-surface-500 dark:text-surface-400">{t?.notifications?.loading ?? 'Loading...'}</div>
                         ) : notifications.length === 0 ? (
-                            <div className="py-8 text-center text-surface-500 dark:text-surface-400">Aucune notification</div>
+                            <div className="py-8 text-center text-surface-500 dark:text-surface-400">{t?.notifications?.empty ?? 'No notifications'}</div>
                         ) : (
                             notifications.map((notification) => (
                                 <div

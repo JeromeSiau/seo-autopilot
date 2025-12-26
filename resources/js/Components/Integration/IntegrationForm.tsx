@@ -2,6 +2,7 @@ import { useState, FormEvent } from 'react';
 import axios from 'axios';
 import { Plug, ArrowRight, ChevronLeft, Check, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import clsx from 'clsx';
+import { useTranslations } from '@/hooks/useTranslations';
 
 type PlatformType = 'wordpress' | 'webflow' | 'shopify' | 'ghost';
 
@@ -26,11 +27,17 @@ interface Props {
     showBack?: boolean;
 }
 
-const PLATFORMS: Platform[] = [
+interface PlatformData {
+    id: PlatformType;
+    name: string;
+    icon: React.ReactNode;
+    color: string;
+}
+
+const PLATFORM_DATA: PlatformData[] = [
     {
         id: 'wordpress',
         name: 'WordPress',
-        description: 'Publication automatique via REST API',
         icon: (
             <svg className="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 19.5c-5.247 0-9.5-4.253-9.5-9.5S6.753 2.5 12 2.5s9.5 4.253 9.5 9.5-4.253 9.5-9.5 9.5z"/>
@@ -42,7 +49,6 @@ const PLATFORMS: Platform[] = [
     {
         id: 'webflow',
         name: 'Webflow',
-        description: 'Intégration CMS Webflow',
         icon: (
             <svg className="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M17.803 6.958c0 1.271-.479 2.26-1.343 3.176l-.69.752c-.577.577-.895 1.343-.895 2.145v.434h3.03v-.434c0-.802.318-1.568.895-2.145l.69-.752c.864-.916 1.343-1.905 1.343-3.176 0-2.638-2.058-4.791-5.036-4.791-2.979 0-5.037 2.153-5.037 4.791h3.03c0-.964.73-1.761 2.007-1.761 1.278 0 2.006.797 2.006 1.761zm-3.491 9.537c0 1.014.822 1.836 1.836 1.836s1.836-.822 1.836-1.836-.822-1.836-1.836-1.836-1.836.822-1.836 1.836zM6.86 13.465h3.03V6.958c0-.964.729-1.761 2.006-1.761v-3.03c-2.978 0-5.036 2.153-5.036 4.791v6.507z"/>
@@ -53,7 +59,6 @@ const PLATFORMS: Platform[] = [
     {
         id: 'shopify',
         name: 'Shopify',
-        description: 'Publication sur le blog Shopify',
         icon: (
             <svg className="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M15.337 3.415c-.03-.145-.147-.227-.257-.239-.106-.012-2.355-.17-2.355-.17s-1.878-1.842-2.071-2.032c-.195-.19-.57-.133-.717-.09-.025.007-.489.15-1.246.384C8.239.376 7.565-.001 6.72 0 5.046 0 3.92 1.67 3.539 3.26c-1.01.313-1.726.535-1.797.557-.559.175-.575.192-.648.717C1.022 5.07 0 14.124 0 14.124l11.232 2.109 6.075-1.507s-1.916-11.069-1.97-11.311z"/>
@@ -64,7 +69,6 @@ const PLATFORMS: Platform[] = [
     {
         id: 'ghost',
         name: 'Ghost',
-        description: 'Plateforme de publication open-source',
         icon: (
             <svg className="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
@@ -83,6 +87,7 @@ export default function IntegrationForm({
     showSkip = true,
     showBack = true,
 }: Props) {
+    const { t } = useTranslations();
     const [selectedPlatform, setSelectedPlatform] = useState<PlatformType | null>(
         existingIntegration?.type || null
     );
@@ -93,6 +98,25 @@ export default function IntegrationForm({
     // Form data
     const [name, setName] = useState(existingIntegration?.name || '');
     const [credentials, setCredentials] = useState<Record<string, string>>({});
+
+    // Build PLATFORMS with translated descriptions
+    const PLATFORMS: Platform[] = PLATFORM_DATA.map((p) => ({
+        ...p,
+        description: (() => {
+            switch (p.id) {
+                case 'wordpress':
+                    return t?.integrations?.types?.wordpress?.description ?? 'Automatic publishing via REST API';
+                case 'webflow':
+                    return t?.integrations?.types?.webflow?.description ?? 'Webflow CMS integration';
+                case 'shopify':
+                    return t?.integrations?.types?.shopify?.description ?? 'Publishing to Shopify blog';
+                case 'ghost':
+                    return t?.integrations?.types?.ghost?.description ?? 'Open-source publishing platform';
+                default:
+                    return '';
+            }
+        })(),
+    }));
 
     const handleCredentialChange = (field: string, value: string) => {
         setCredentials((prev) => ({ ...prev, [field]: value }));

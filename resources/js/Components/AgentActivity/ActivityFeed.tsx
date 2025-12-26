@@ -2,6 +2,7 @@ import { useRef, useEffect } from 'react';
 import { ActivityItem } from './ActivityItem';
 import { AgentBadge } from './AgentBadge';
 import { AgentEvent } from './types';
+import { useTranslations } from '@/hooks/useTranslations';
 
 interface ActivityFeedProps {
     events: AgentEvent[];
@@ -9,6 +10,7 @@ interface ActivityFeedProps {
 }
 
 export function ActivityFeed({ events, groupByAgent = true }: ActivityFeedProps) {
+    const { t } = useTranslations();
     const feedRef = useRef<HTMLDivElement>(null);
 
     // Auto-scroll to bottom on new events
@@ -21,7 +23,7 @@ export function ActivityFeed({ events, groupByAgent = true }: ActivityFeedProps)
     if (events.length === 0) {
         return (
             <div className="text-center py-8 text-gray-500">
-                <p>Aucune activité pour le moment</p>
+                <p>{t?.activity?.empty ?? 'No activity yet'}</p>
             </div>
         );
     }

@@ -1,6 +1,7 @@
 import { Link } from '@inertiajs/react';
 import { ArrowRight, Settings, Play, Pause, AlertCircle, Circle } from 'lucide-react';
 import clsx from 'clsx';
+import { useTranslations } from '@/hooks/useTranslations';
 
 interface Site {
     id: number;
@@ -53,8 +54,17 @@ const STATUS_CONFIG = {
 };
 
 export default function SiteCard({ site }: Props) {
+    const { t } = useTranslations();
     const status = STATUS_CONFIG[site.autopilot_status];
     const StatusIcon = status.icon;
+
+    // Status labels with translations
+    const statusLabels = {
+        active: t?.siteCard?.status?.active ?? 'Active',
+        paused: t?.siteCard?.status?.paused ?? 'Paused',
+        not_configured: t?.siteCard?.status?.setupRequired ?? 'Setup required',
+        error: t?.siteCard?.status?.error ?? 'Error',
+    };
 
     return (
         <div className="bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 p-5 hover:shadow-lg dark:hover:shadow-green-glow/20 hover:border-primary-200 dark:hover:border-primary-500/30 transition-all group">
@@ -75,7 +85,7 @@ export default function SiteCard({ site }: Props) {
                     href={site.onboarding_complete ? route('sites.show', { site: site.id }) : route('onboarding.resume', { site: site.id })}
                     className="flex items-center gap-1 text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 opacity-0 group-hover:opacity-100 transition-opacity"
                 >
-                    {site.onboarding_complete ? 'View' : 'Setup'}
+                    {site.onboarding_complete ? (t?.siteCard?.view ?? 'View') : (t?.siteCard?.setup ?? 'Setup')}
                     <ArrowRight className="h-4 w-4" />
                 </Link>
             </div>
@@ -85,11 +95,11 @@ export default function SiteCard({ site }: Props) {
                 <div className="mt-5 grid grid-cols-3 gap-3">
                     <div className="rounded-xl bg-surface-50 dark:bg-surface-800/50 p-3 text-center">
                         <p className="font-display text-lg font-bold text-surface-900 dark:text-white">{site.articles_per_week}</p>
-                        <p className="text-xs text-surface-500 dark:text-surface-400">per week</p>
+                        <p className="text-xs text-surface-500 dark:text-surface-400">{t?.siteCard?.perWeek ?? 'per week'}</p>
                     </div>
                     <div className="rounded-xl bg-surface-50 dark:bg-surface-800/50 p-3 text-center">
                         <p className="font-display text-lg font-bold text-surface-900 dark:text-white">{site.articles_this_week}</p>
-                        <p className="text-xs text-surface-500 dark:text-surface-400">this week</p>
+                        <p className="text-xs text-surface-500 dark:text-surface-400">{t?.siteCard?.thisWeek ?? 'this week'}</p>
                     </div>
                     <div className="rounded-xl bg-surface-50 dark:bg-surface-800/50 p-3 text-center">
                         <p className={clsx(
@@ -98,17 +108,17 @@ export default function SiteCard({ site }: Props) {
                         )}>
                             {site.articles_in_review}
                         </p>
-                        <p className="text-xs text-surface-500 dark:text-surface-400">in review</p>
+                        <p className="text-xs text-surface-500 dark:text-surface-400">{t?.siteCard?.inReview ?? 'in review'}</p>
                     </div>
                 </div>
             ) : (
                 <div className="mt-5 rounded-xl bg-surface-50 dark:bg-surface-800/50 p-4 text-center">
-                    <p className="text-sm text-surface-500 dark:text-surface-400">Setup incomplete</p>
+                    <p className="text-sm text-surface-500 dark:text-surface-400">{t?.siteCard?.setupIncomplete ?? 'Setup incomplete'}</p>
                     <Link
                         href={route('onboarding.resume', { site: site.id })}
                         className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300"
                     >
-                        Continue setup
+                        {t?.siteCard?.continueSetup ?? 'Continue setup'}
                         <ArrowRight className="h-4 w-4" />
                     </Link>
                 </div>
@@ -122,7 +132,7 @@ export default function SiteCard({ site }: Props) {
                     status.color
                 )}>
                     <StatusIcon className={clsx('h-3 w-3', status.iconColor)} />
-                    {status.label}
+                    {statusLabels[site.autopilot_status]}
                 </div>
                 {site.onboarding_complete && (
                     <Link
