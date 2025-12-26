@@ -37,12 +37,25 @@ class UserForm
                             ->required(fn (string $context): bool => $context === 'create')
                             ->minLength(8)
                             ->placeholder('••••••••'),
-                        Select::make('team_id')
-                            ->label('Team')
-                            ->relationship('team', 'name')
+                        Select::make('current_team_id')
+                            ->label('Current Team')
+                            ->relationship('currentTeam', 'name')
                             ->searchable()
                             ->preload()
-                            ->placeholder('Assign to a team'),
+                            ->placeholder('Select active team'),
+                    ]),
+
+                Section::make('Team Memberships')
+                    ->description('Teams this user belongs to')
+                    ->icon('heroicon-o-user-group')
+                    ->schema([
+                        Select::make('teams')
+                            ->label('Teams')
+                            ->relationship('teams', 'name')
+                            ->multiple()
+                            ->searchable()
+                            ->preload()
+                            ->placeholder('Select teams'),
                     ]),
 
                 Section::make('Permissions')

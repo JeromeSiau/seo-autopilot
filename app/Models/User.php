@@ -7,6 +7,7 @@ use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -25,7 +26,7 @@ class User extends Authenticatable implements FilamentUser
         'name',
         'email',
         'password',
-        'team_id',
+        'current_team_id',
         'notification_email_frequency',
         'notification_immediate_failures',
         'notification_immediate_quota',
@@ -65,27 +66,73 @@ class User extends Authenticatable implements FilamentUser
         return $this->is_admin;
     }
 
-    public function team(): BelongsTo
+    /**
+     * All teams the user belongs to.
+     */
+    public function teams(): BelongsToMany
     {
-        return $this->belongsTo(Team::class);
+        return $this->belongsToMany(Team::class)
+            ->withPivot('role')
+            ->withTimestamps();
     }
 
+    /**
+     * The user's currently active team.
+     */
+    public function currentTeam(): BelongsTo
+    {
+        return $this->belongsTo(Team::class, 'current_team_id');
+    }
+
+    /**
+     * Teams owned by this user.
+     */
     public function ownedTeams(): HasMany
     {
         return $this->hasMany(Team::class, 'owner_id');
     }
 
     /**
-     * Get the user's current team (accessor).
+     * Get the user's current team (accessor for backward compatibility).
      */
     public function getCurrentTeamAttribute(): ?Team
     {
-        return $this->team;
+        return $this->currentTeam;
+    }
+
+    /**
+     * Alias for backward compatibility.
+     */
+    public function team(): BelongsTo
+    {
+        return $this->currentTeam();
     }
 
     public function hasTeam(): bool
     {
-        return $this->team_id !== null;
+        return $this->current_team_id !== null;
+    }
+
+    /**
+     * Switch the user's current team.
+     */
+    public function switchTeam(Team $team): bool
+    {
+        if (! $this->belongsToTeam($team)) {
+            return false;
+        }
+
+        $this->update(['current_team_id' => $team->id]);
+
+        return true;
+    }
+
+    /**
+     * Check if user belongs to a team.
+     */
+    public function belongsToTeam(Team $team): bool
+    {
+        return $this->teams()->where('team_id', $team->id)->exists();
     }
 
     public function isTeamOwner(): bool
@@ -102,7 +149,11 @@ class User extends Authenticatable implements FilamentUser
             'articles_limit' => 10,
         ]);
 
-        $this->update(['team_id' => $team->id]);
+        // Add user to team with owner role
+        $this->teams()->attach($team->id, ['role' => 'owner']);
+
+        // Set as current team
+        $this->update(['current_team_id' => $team->id]);
 
         return $team;
     }

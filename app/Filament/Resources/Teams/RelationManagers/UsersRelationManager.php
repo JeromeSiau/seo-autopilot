@@ -2,13 +2,12 @@
 
 namespace App\Filament\Resources\Teams\RelationManagers;
 
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
+use Filament\Actions\AttachAction;
+use Filament\Actions\DetachAction;
+use Filament\Actions\DetachBulkAction;
+use Filament\Forms\Components\Select;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
-use Filament\Actions\CreateAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -18,31 +17,6 @@ class UsersRelationManager extends RelationManager
     protected static string $relationship = 'users';
 
     protected static ?string $recordTitleAttribute = 'name';
-
-    public function form(Schema $schema): Schema
-    {
-        return $schema
-            ->columns(2)
-            ->components([
-                TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                TextInput::make('email')
-                    ->email()
-                    ->required()
-                    ->unique(ignoreRecord: true)
-                    ->maxLength(255),
-                TextInput::make('password')
-                    ->password()
-                    ->revealable()
-                    ->dehydrated(fn ($state) => filled($state))
-                    ->required(fn (string $context): bool => $context === 'create')
-                    ->minLength(8),
-                Toggle::make('is_admin')
-                    ->label('Administrator')
-                    ->inline(false),
-            ]);
-    }
 
     public function table(Table $table): Table
     {
@@ -54,8 +28,16 @@ class UsersRelationManager extends RelationManager
                 TextColumn::make('email')
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('pivot.role')
+                    ->label('Role')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'owner' => 'success',
+                        'admin' => 'warning',
+                        default => 'gray',
+                    }),
                 IconColumn::make('is_admin')
-                    ->label('Admin')
+                    ->label('Platform Admin')
                     ->boolean(),
                 TextColumn::make('created_at')
                     ->label('Joined')
@@ -63,11 +45,25 @@ class UsersRelationManager extends RelationManager
                     ->sortable(),
             ])
             ->headerActions([
-                CreateAction::make(),
+                AttachAction::make()
+                    ->preloadRecordSelect()
+                    ->form(fn (AttachAction $action): array => [
+                        $action->getRecordSelect(),
+                        Select::make('role')
+                            ->options([
+                                'owner' => 'Owner',
+                                'admin' => 'Admin',
+                                'member' => 'Member',
+                            ])
+                            ->default('member')
+                            ->required(),
+                    ]),
             ])
             ->actions([
-                EditAction::make(),
-                DeleteAction::make(),
+                DetachAction::make(),
+            ])
+            ->bulkActions([
+                DetachBulkAction::make(),
             ]);
     }
 }

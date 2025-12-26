@@ -22,11 +22,14 @@ class UsersTable
                 TextColumn::make('email')
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('team.name')
-                    ->label('Team')
-                    ->searchable()
-                    ->sortable()
-                    ->placeholder('No team'),
+                TextColumn::make('teams.name')
+                    ->label('Teams')
+                    ->badge()
+                    ->separator(', ')
+                    ->placeholder('No teams'),
+                TextColumn::make('currentTeam.name')
+                    ->label('Active Team')
+                    ->placeholder('-'),
                 IconColumn::make('is_admin')
                     ->label('Admin')
                     ->boolean()
@@ -40,11 +43,12 @@ class UsersTable
             ->filters([
                 TernaryFilter::make('is_admin')
                     ->label('Admin Status'),
-                SelectFilter::make('team_id')
+                SelectFilter::make('teams')
                     ->label('Team')
-                    ->relationship('team', 'name')
+                    ->relationship('teams', 'name')
                     ->searchable()
-                    ->preload(),
+                    ->preload()
+                    ->multiple(),
             ])
             ->actions([
                 EditAction::make(),
