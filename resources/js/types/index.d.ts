@@ -5,6 +5,7 @@ export interface User {
     email_verified_at?: string;
     current_team_id?: number;
     current_team?: Team;
+    teams?: UserTeam[];
 }
 
 export interface Team {
@@ -16,6 +17,28 @@ export interface Team {
     plan: 'free' | 'starter' | 'pro' | 'enterprise';
     is_trial?: boolean;
     trial_ends_at?: string;
+}
+
+export interface TeamMember {
+    id: number;
+    name: string;
+    email: string;
+    role: 'owner' | 'admin' | 'member';
+    joined_at: string;
+}
+
+export interface TeamInvitation {
+    id: number;
+    email: string;
+    role: 'admin' | 'member';
+    created_at: string;
+    expires_at: string;
+}
+
+export interface UserTeam {
+    id: number;
+    name: string;
+    role: 'owner' | 'admin' | 'member';
 }
 
 export interface Site {
