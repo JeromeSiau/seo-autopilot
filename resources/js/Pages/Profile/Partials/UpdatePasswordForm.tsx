@@ -1,9 +1,11 @@
+import { useTranslations } from '@/hooks/useTranslations';
 import { useForm } from '@inertiajs/react';
 import { FormEventHandler, useRef } from 'react';
 import { Check } from 'lucide-react';
 import clsx from 'clsx';
 
 export default function UpdatePasswordForm() {
+    const { t } = useTranslations();
     const passwordInput = useRef<HTMLInputElement>(null);
     const currentPasswordInput = useRef<HTMLInputElement>(null);
 
@@ -59,7 +61,7 @@ export default function UpdatePasswordForm() {
                     htmlFor="current_password"
                     className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5"
                 >
-                    Mot de passe actuel
+                    {t?.profile?.password?.current ?? 'Current password'}
                 </label>
                 <input
                     id="current_password"
@@ -80,7 +82,7 @@ export default function UpdatePasswordForm() {
                     htmlFor="password"
                     className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5"
                 >
-                    Nouveau mot de passe
+                    {t?.profile?.password?.new ?? 'New password'}
                 </label>
                 <input
                     id="password"
@@ -101,7 +103,7 @@ export default function UpdatePasswordForm() {
                     htmlFor="password_confirmation"
                     className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5"
                 >
-                    Confirmer le mot de passe
+                    {t?.profile?.password?.confirm ?? 'Confirm password'}
                 </label>
                 <input
                     id="password_confirmation"
@@ -129,13 +131,13 @@ export default function UpdatePasswordForm() {
                         'transition-all'
                     )}
                 >
-                    Enregistrer
+                    {t?.common?.save ?? 'Save'}
                 </button>
 
                 {recentlySuccessful && (
                     <span className="inline-flex items-center gap-1.5 text-sm text-green-600 dark:text-green-400">
                         <Check className="h-4 w-4" />
-                        Enregistré
+                        {t?.profile?.saved ?? 'Saved'}
                     </span>
                 )}
             </div>

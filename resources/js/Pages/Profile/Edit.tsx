@@ -1,4 +1,5 @@
 import AppLayout from '@/Layouts/AppLayout';
+import { useTranslations } from '@/hooks/useTranslations';
 import { PageProps } from '@/types';
 import { Head } from '@inertiajs/react';
 import { User, Lock, Trash2 } from 'lucide-react';
@@ -10,18 +11,20 @@ export default function Edit({
     mustVerifyEmail,
     status,
 }: PageProps<{ mustVerifyEmail: boolean; status?: string }>) {
+    const { t } = useTranslations();
+
     return (
         <AppLayout
             header={
                 <div>
-                    <h1 className="font-display text-2xl font-bold text-surface-900 dark:text-white">Profil</h1>
+                    <h1 className="font-display text-2xl font-bold text-surface-900 dark:text-white">{t?.profile?.title ?? 'Profile'}</h1>
                     <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
-                        Gérez vos informations personnelles et vos préférences de sécurité
+                        {t?.profile?.subtitle ?? 'Manage your personal information and security preferences'}
                     </p>
                 </div>
             }
         >
-            <Head title="Profil" />
+            <Head title={t?.profile?.title ?? 'Profile'} />
 
             <div className="space-y-6">
                 {/* Profile Information */}
@@ -32,10 +35,10 @@ export default function Edit({
                         </div>
                         <div>
                             <h2 className="font-display text-lg font-semibold text-surface-900 dark:text-white">
-                                Informations du profil
+                                {t?.profile?.info?.title ?? 'Profile Information'}
                             </h2>
                             <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
-                                Mettez à jour votre nom et votre adresse email
+                                {t?.profile?.info?.subtitle ?? 'Update your name and email address'}
                             </p>
                         </div>
                     </div>
@@ -53,10 +56,10 @@ export default function Edit({
                         </div>
                         <div>
                             <h2 className="font-display text-lg font-semibold text-surface-900 dark:text-white">
-                                Mot de passe
+                                {t?.profile?.password?.title ?? 'Password'}
                             </h2>
                             <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
-                                Assurez-vous d'utiliser un mot de passe long et sécurisé
+                                {t?.profile?.password?.subtitle ?? 'Use a long, secure password'}
                             </p>
                         </div>
                     </div>
@@ -71,10 +74,10 @@ export default function Edit({
                         </div>
                         <div>
                             <h2 className="font-display text-lg font-semibold text-surface-900 dark:text-white">
-                                Supprimer le compte
+                                {t?.profile?.delete?.title ?? 'Delete Account'}
                             </h2>
                             <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
-                                Supprimez définitivement votre compte et toutes vos données
+                                {t?.profile?.delete?.subtitle ?? 'Permanently delete your account and all your data'}
                             </p>
                         </div>
                     </div>

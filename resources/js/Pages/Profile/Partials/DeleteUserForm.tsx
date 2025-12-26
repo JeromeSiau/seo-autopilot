@@ -1,9 +1,11 @@
+import { useTranslations } from '@/hooks/useTranslations';
 import { useForm } from '@inertiajs/react';
 import { FormEventHandler, useRef, useState } from 'react';
 import { AlertTriangle, X } from 'lucide-react';
 import clsx from 'clsx';
 
 export default function DeleteUserForm() {
+    const { t } = useTranslations();
     const [confirmingUserDeletion, setConfirmingUserDeletion] = useState(false);
     const passwordInput = useRef<HTMLInputElement>(null);
 
@@ -46,9 +48,7 @@ export default function DeleteUserForm() {
                 <div className="flex gap-3">
                     <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
                     <p className="text-sm text-red-800 dark:text-red-300">
-                        Une fois votre compte supprimé, toutes ses ressources et données seront
-                        définitivement effacées. Avant de supprimer votre compte, veuillez télécharger
-                        toutes les données que vous souhaitez conserver.
+                        {t?.profile?.delete?.warning ?? 'Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data you wish to retain.'}
                     </p>
                 </div>
             </div>
@@ -64,7 +64,7 @@ export default function DeleteUserForm() {
                     'transition-all'
                 )}
             >
-                Supprimer le compte
+                {t?.profile?.delete?.button ?? 'Delete Account'}
             </button>
 
             {/* Modal */}
@@ -89,11 +89,10 @@ export default function DeleteUserForm() {
                                 </div>
                                 <div>
                                     <h3 className="font-display text-lg font-semibold text-surface-900 dark:text-white">
-                                        Supprimer votre compte ?
+                                        {t?.profile?.delete?.confirmTitle ?? 'Delete your account?'}
                                     </h3>
                                     <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
-                                        Cette action est irréversible. Toutes vos données seront
-                                        définitivement supprimées.
+                                        {t?.profile?.delete?.confirmWarning ?? 'This action is irreversible. All your data will be permanently deleted.'}
                                     </p>
                                 </div>
                             </div>
@@ -104,7 +103,7 @@ export default function DeleteUserForm() {
                                         htmlFor="password"
                                         className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5"
                                     >
-                                        Confirmez votre mot de passe
+                                        {t?.profile?.delete?.confirmPassword ?? 'Confirm your password'}
                                     </label>
                                     <input
                                         id="password"
@@ -121,7 +120,7 @@ export default function DeleteUserForm() {
                                                 ? 'border-red-300 dark:border-red-500/30 bg-red-50 dark:bg-red-500/10'
                                                 : 'border-surface-300 dark:border-surface-700 bg-white dark:bg-surface-800'
                                         )}
-                                        placeholder="Mot de passe"
+                                        placeholder={t?.auth?.login?.password ?? 'Password'}
                                     />
                                     {errors.password && (
                                         <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">{errors.password}</p>
@@ -140,7 +139,7 @@ export default function DeleteUserForm() {
                                             'transition-all'
                                         )}
                                     >
-                                        Annuler
+                                        {t?.profile?.delete?.cancel ?? 'Cancel'}
                                     </button>
                                     <button
                                         type="submit"
@@ -154,7 +153,7 @@ export default function DeleteUserForm() {
                                             'transition-all'
                                         )}
                                     >
-                                        Supprimer définitivement
+                                        {t?.profile?.delete?.confirmButton ?? 'Delete permanently'}
                                     </button>
                                 </div>
                             </form>
