@@ -15,10 +15,6 @@ class DashboardController extends Controller
         $user = auth()->user();
         $team = $user->currentTeam;
 
-        if (! $team) {
-            return redirect()->route('teams.create');
-        }
-
         $sites = $team->sites()
             ->withCount([
                 'keywords as total_keywords_count',
@@ -32,12 +28,29 @@ class DashboardController extends Controller
             ->with(['settings'])
             ->get();
 
+        // Calculate sites limit based on plan (1 for trial, or plan limit)
+        $sitesLimit = $team->billingPlan?->sites_limit ?? 1;
+        if ($sitesLimit === -1) {
+            $sitesLimit = '∞';
+        }
+
+        // For trial: count all articles during trial period; for paid: count this month
+        if ($team->is_trial && !$team->billingPlan) {
+            $articlesUsed = $sites->sum('total_articles_count');
+        } else {
+            $articlesUsed = $team->articlesUsedThisMonth();
+        }
+
         $stats = [
-            'total_sites' => $sites->count(),
+            'active_sites' => $sites->count(),
+            'total_sites' => $sitesLimit,
             'total_keywords' => $sites->sum('total_keywords_count'),
-            'keywords_in_queue' => $sites->sum('queued_keywords_count'),
+            'total_keywords_queued' => $sites->sum('queued_keywords_count'),
             'total_articles' => $sites->sum('total_articles_count'),
             'articles_this_month' => $sites->sum('this_month_articles_count'),
+            'articles_published_this_month' => $sites->sum(fn ($site) => $site->articles()->where('status', 'published')->where('created_at', '>=', now()->startOfMonth())->count()),
+            'articles_used' => $articlesUsed,
+            'articles_limit' => $team->articles_limit,
         ];
 
         $sitesData = $sites->map(fn ($site) => [

@@ -34,6 +34,7 @@ interface NavItem {
     href: string;
     icon: React.ElementType;
     current: boolean;
+    testId?: string;
 }
 
 interface NavSection {
@@ -45,6 +46,7 @@ function SidebarLink({ item }: { item: NavItem }) {
     return (
         <Link
             href={item.href}
+            data-testid={item.testId}
             className={clsx(
                 'group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all',
                 item.current
@@ -106,30 +108,35 @@ export default function AppLayout({
                     href: route('dashboard'),
                     icon: LayoutDashboard,
                     current: currentPath === '/dashboard',
+                    testId: 'nav-dashboard',
                 },
                 {
                     name: t?.nav?.sites ?? 'Sites',
                     href: route('sites.index'),
                     icon: Globe,
                     current: currentPath.startsWith('/sites') && !currentPath.includes('/content-plan'),
+                    testId: 'nav-sites',
                 },
                 {
                     name: t?.nav?.articles ?? 'Articles',
                     href: route('articles.index'),
                     icon: FileText,
                     current: currentPath.startsWith('/articles'),
+                    testId: 'nav-articles',
                 },
                 {
                     name: t?.nav?.keywords ?? 'Keywords',
                     href: route('keywords.index'),
                     icon: Search,
                     current: currentPath.startsWith('/keywords'),
+                    testId: 'nav-keywords',
                 },
                 {
                     name: t?.nav?.contentPlans ?? 'Content Plans',
                     href: route('content-plans.index'),
                     icon: Calendar,
                     current: currentPath.startsWith('/content-plans') || currentPath.includes('/content-plan'),
+                    testId: 'nav-content-plans',
                 },
             ],
         },
@@ -141,12 +148,14 @@ export default function AppLayout({
                     href: route('analytics.index'),
                     icon: BarChart3,
                     current: currentPath === '/analytics',
+                    testId: 'nav-performance',
                 },
                 {
                     name: t?.nav?.rankings ?? 'Rankings',
                     href: route('analytics.index') + '?tab=rankings',
                     icon: TrendingUp,
                     current: currentPath.startsWith('/analytics') && window.location.search.includes('rankings'),
+                    testId: 'nav-rankings',
                 },
             ],
         },
@@ -158,12 +167,14 @@ export default function AppLayout({
                     href: route('integrations.index'),
                     icon: Plug,
                     current: currentPath.startsWith('/integrations'),
+                    testId: 'nav-integrations',
                 },
                 {
                     name: t?.nav?.settings ?? 'Settings',
                     href: route('settings.index'),
                     icon: Settings,
                     current: currentPath.startsWith('/settings'),
+                    testId: 'nav-settings',
                 },
             ],
         },
@@ -223,7 +234,7 @@ export default function AppLayout({
             </div>
 
             {/* Desktop sidebar */}
-            <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
+            <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col" data-testid="desktop-sidebar">
                 <div className="flex min-h-0 flex-1 flex-col border-r border-surface-200 dark:border-surface-800 bg-white dark:bg-surface-900">
                     {/* Logo */}
                     <div className="flex h-16 flex-shrink-0 items-center px-5 border-b border-surface-100 dark:border-surface-800">
@@ -255,7 +266,7 @@ export default function AppLayout({
 
                     {/* Usage indicator */}
                     {auth.user.current_team && (
-                        <div className="mx-3 mb-3 rounded-xl bg-surface-50 dark:bg-surface-800/50 p-4">
+                        <div className="mx-3 mb-3 rounded-xl bg-surface-50 dark:bg-surface-800/50 p-4" data-testid="usage-section">
                             <div className="flex items-center justify-between mb-2">
                                 <span className="text-xs font-medium text-surface-500 dark:text-surface-400 uppercase tracking-wide">{t?.usage?.title ?? 'Usage'}</span>
                                 <span className="text-xs font-semibold text-surface-700 dark:text-surface-300">

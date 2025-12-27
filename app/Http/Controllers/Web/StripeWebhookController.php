@@ -18,7 +18,9 @@ class StripeWebhookController extends CashierController
         $team = Team::where('stripe_id', $stripeCustomerId)->first();
 
         if ($team && $stripePriceId) {
-            $plan = Plan::where('stripe_price_id', $stripePriceId)->first();
+            $plan = Plan::where('stripe_price_id_live', $stripePriceId)
+                ->orWhere('stripe_price_id_test', $stripePriceId)
+                ->first();
 
             if ($plan) {
                 $team->update([
@@ -41,10 +43,21 @@ class StripeWebhookController extends CashierController
         $team = Team::where('stripe_id', $stripeCustomerId)->first();
 
         if ($team && $stripePriceId) {
-            $plan = Plan::where('stripe_price_id', $stripePriceId)->first();
+            $plan = Plan::where('stripe_price_id_live', $stripePriceId)
+                ->orWhere('stripe_price_id_test', $stripePriceId)
+                ->first();
 
             if ($plan) {
-                $team->update(['plan_id' => $plan->id]);
+                $updateData = ['plan_id' => $plan->id];
+
+                // Track if subscription is set to cancel at period end
+                if ($data['cancel_at_period_end'] ?? false) {
+                    $updateData['subscription_ends_at'] = \Carbon\Carbon::createFromTimestamp($data['current_period_end']);
+                } else {
+                    $updateData['subscription_ends_at'] = null;
+                }
+
+                $team->update($updateData);
             }
         }
 

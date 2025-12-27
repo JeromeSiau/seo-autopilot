@@ -6,7 +6,7 @@ import clsx from 'clsx';
 interface Props {
     data: { domain: string; name: string; language: string };
     setData: (data: any) => void;
-    onNext: (siteId: number) => void;
+    onNext: (siteId: number, crawlWarning?: string | null) => void;
 }
 
 const LANGUAGES = [
@@ -28,7 +28,7 @@ export default function Step1Site({ data, setData, onNext }: Props) {
 
         try {
             const response = await axios.post(route('onboarding.step1'), data);
-            onNext(response.data.site_id);
+            onNext(response.data.site_id, response.data.crawl_warning);
         } catch (error: any) {
             if (error.response?.data?.errors) {
                 const errs: Record<string, string> = {};
@@ -43,7 +43,7 @@ export default function Step1Site({ data, setData, onNext }: Props) {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6" data-testid="onboarding-step1-form">
             {/* Header */}
             <div className="text-center">
                 <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-100 to-primary-200 dark:from-primary-500/20 dark:to-primary-500/10">
@@ -67,6 +67,7 @@ export default function Step1Site({ data, setData, onNext }: Props) {
                     value={data.domain}
                     onChange={(e) => setData({ ...data, domain: e.target.value })}
                     placeholder="monsite.com"
+                    data-testid="onboarding-domain-input"
                     className={clsx(
                         'block w-full rounded-xl border bg-white dark:bg-surface-800 px-4 py-3 text-surface-900 dark:text-white placeholder:text-surface-400',
                         'focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500',
@@ -89,6 +90,7 @@ export default function Step1Site({ data, setData, onNext }: Props) {
                     value={data.name}
                     onChange={(e) => setData({ ...data, name: e.target.value })}
                     placeholder="Mon Super Site"
+                    data-testid="onboarding-name-input"
                     className={clsx(
                         'block w-full rounded-xl border bg-white dark:bg-surface-800 px-4 py-3 text-surface-900 dark:text-white placeholder:text-surface-400',
                         'focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500',
@@ -136,6 +138,7 @@ export default function Step1Site({ data, setData, onNext }: Props) {
                 <button
                     type="submit"
                     disabled={loading}
+                    data-testid="onboarding-step1-submit"
                     className={clsx(
                         'flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3',
                         'bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold',

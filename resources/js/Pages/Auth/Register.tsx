@@ -28,7 +28,7 @@ export default function Register() {
         <GuestLayout>
             <Head title={t?.auth?.register?.title ?? 'Create account'} />
 
-            <form onSubmit={submit}>
+            <form onSubmit={submit} data-testid="register-form">
                 <div>
                     <InputLabel htmlFor="name" value={t?.auth?.register?.name ?? 'Name'} />
 
@@ -106,7 +106,7 @@ export default function Register() {
                 </div>
 
                 <div className="mt-6 flex items-center justify-end">
-                    <PrimaryButton className="w-full" disabled={processing}>
+                    <PrimaryButton className="w-full" disabled={processing} data-testid="register-submit">
                         {t?.auth?.register?.submit ?? 'Create account'}
                     </PrimaryButton>
                 </div>

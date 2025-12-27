@@ -6,9 +6,19 @@ use App\Http\Controllers\Controller;
 use App\Models\Team;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class TeamController extends Controller
 {
+    /**
+     * Show the team creation form.
+     */
+    public function create(): Response
+    {
+        return Inertia::render('Teams/Create');
+    }
+
     /**
      * Create a new team.
      */
@@ -31,6 +41,11 @@ class TeamController extends Controller
 
         // Switch to new team
         $user->update(['current_team_id' => $team->id]);
+
+        // Redirect to dashboard if this is the user's first team
+        if ($user->teams()->count() === 1) {
+            return redirect()->route('dashboard')->with('success', 'Team "' . $team->name . '" created successfully.');
+        }
 
         return back()->with('success', 'Team "' . $team->name . '" created successfully.');
     }

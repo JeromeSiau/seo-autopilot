@@ -106,6 +106,15 @@ class User extends Authenticatable implements FilamentUser
     }
 
     /**
+     * Accessor for backward compatibility.
+     * @deprecated Use current_team_id instead
+     */
+    public function getTeamIdAttribute(): ?int
+    {
+        return $this->current_team_id;
+    }
+
+    /**
      * Switch the user's current team.
      */
     public function switchTeam(Team $team): bool

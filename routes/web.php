@@ -42,7 +42,14 @@ Route::post('/preferences', [PreferencesController::class, 'update'])->name('pre
 Route::post('/stripe/webhook', [StripeWebhookController::class, 'handleWebhook'])
     ->name('stripe.webhook');
 
+// Routes that don't require a team (team creation flow)
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/teams/create', [TeamController::class, 'create'])->name('teams.create');
+    Route::post('/teams', [TeamController::class, 'store'])->name('teams.store');
+});
+
+// Routes that require a team
+Route::middleware(['auth', 'verified', 'has.team'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -124,8 +131,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.readAll');
 
-    // Teams
-    Route::post('/teams', [TeamController::class, 'store'])->name('teams.store');
+    // Teams (requires existing team)
     Route::patch('/teams/{team}', [TeamController::class, 'update'])->name('teams.update');
     Route::post('/teams/{team}/switch', [TeamController::class, 'switch'])->name('teams.switch');
 

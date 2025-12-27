@@ -12,11 +12,24 @@ class CheckSubscriptionTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_allows_get_requests_when_trial_expired(): void
+    private function createUserWithTeam(array $teamAttributes = []): User
     {
         $user = User::factory()->create();
-        $team = Team::factory()->trialExpired()->create(['owner_id' => $user->id]);
-        $user->update(['team_id' => $team->id]);
+        $team = Team::factory()->create(array_merge([
+            'owner_id' => $user->id,
+        ], $teamAttributes));
+        $user->teams()->attach($team->id, ['role' => 'owner']);
+        $user->update(['current_team_id' => $team->id]);
+
+        return $user;
+    }
+
+    public function test_allows_get_requests_when_trial_expired(): void
+    {
+        $user = $this->createUserWithTeam([
+            'is_trial' => true,
+            'trial_ends_at' => now()->subDay(),
+        ]);
 
         $response = $this->actingAs($user)->get(route('dashboard'));
 
@@ -25,9 +38,10 @@ class CheckSubscriptionTest extends TestCase
 
     public function test_blocks_post_requests_when_trial_expired(): void
     {
-        $user = User::factory()->create();
-        $team = Team::factory()->trialExpired()->create(['owner_id' => $user->id]);
-        $user->update(['team_id' => $team->id]);
+        $user = $this->createUserWithTeam([
+            'is_trial' => true,
+            'trial_ends_at' => now()->subDay(),
+        ]);
 
         $response = $this->actingAs($user)->post(route('sites.store'), [
             'domain' => 'test.com',
@@ -39,25 +53,23 @@ class CheckSubscriptionTest extends TestCase
 
     public function test_allows_billing_routes_when_trial_expired(): void
     {
-        $user = User::factory()->create();
-        $team = Team::factory()->trialExpired()->create(['owner_id' => $user->id]);
-        $user->update(['team_id' => $team->id]);
+        $user = $this->createUserWithTeam([
+            'is_trial' => true,
+            'trial_ends_at' => now()->subDay(),
+        ]);
 
         $response = $this->actingAs($user)->get(route('settings.billing'));
 
         // Should not redirect (200 or whatever billing returns)
-        $this->assertNotEquals(302, $response->status());
+        $response->assertStatus(200);
     }
 
     public function test_allows_all_requests_with_active_trial(): void
     {
-        $user = User::factory()->create();
-        $team = Team::factory()->create([
-            'owner_id' => $user->id,
+        $user = $this->createUserWithTeam([
             'is_trial' => true,
             'trial_ends_at' => now()->addDays(5),
         ]);
-        $user->update(['team_id' => $team->id]);
 
         $response = $this->actingAs($user)->post(route('sites.store'), [
             'domain' => 'test-' . time() . '.com',
@@ -71,13 +83,10 @@ class CheckSubscriptionTest extends TestCase
     public function test_allows_all_requests_with_active_subscription(): void
     {
         $plan = Plan::factory()->pro()->create();
-        $user = User::factory()->create();
-        $team = Team::factory()->create([
-            'owner_id' => $user->id,
+        $user = $this->createUserWithTeam([
             'plan_id' => $plan->id,
             'is_trial' => false,
         ]);
-        $user->update(['team_id' => $team->id]);
 
         $response = $this->actingAs($user)->post(route('sites.store'), [
             'domain' => 'test-' . time() . '.com',

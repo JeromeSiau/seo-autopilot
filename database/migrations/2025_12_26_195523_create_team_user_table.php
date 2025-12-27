@@ -23,12 +23,13 @@ return new class extends Migration
         });
 
         // Migrate existing team_id data to pivot table
-        DB::statement('
+        $now = DB::getDriverName() === 'sqlite' ? "datetime('now')" : 'NOW()';
+        DB::statement("
             INSERT INTO team_user (team_id, user_id, role, created_at, updated_at)
-            SELECT team_id, id, "member", NOW(), NOW()
+            SELECT team_id, id, 'member', {$now}, {$now}
             FROM users
             WHERE team_id IS NOT NULL
-        ');
+        ");
 
         // Keep team_id as current_team_id for now (user's active team)
         Schema::table('users', function (Blueprint $table) {

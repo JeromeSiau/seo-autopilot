@@ -32,7 +32,7 @@ function RenameTeamForm({ team }: { team: Team }) {
     };
 
     return (
-        <div className="bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 p-6">
+        <div className="bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 p-6" data-testid="team-rename-section">
             <h2 className="font-display text-lg font-semibold text-surface-900 dark:text-white mb-4">
                 Renommer l'equipe
             </h2>
@@ -69,6 +69,7 @@ function RenameTeamForm({ team }: { team: Team }) {
                     <button
                         type="submit"
                         disabled={processing || data.name === team.name}
+                        data-testid="team-rename-submit"
                         className={clsx(
                             'inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all',
                             'bg-primary-500 text-white',
@@ -100,7 +101,7 @@ function InviteForm({ teamId }: { teamId: number }) {
     };
 
     return (
-        <div className="bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 p-6">
+        <div className="bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 p-6" data-testid="team-invite-section">
             <h2 className="font-display text-lg font-semibold text-surface-900 dark:text-white mb-4">
                 Inviter un membre
             </h2>
@@ -224,7 +225,7 @@ function MembersList({
     };
 
     return (
-        <div className="bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 p-6">
+        <div className="bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 p-6" data-testid="team-members-section">
             <h2 className="font-display text-lg font-semibold text-surface-900 dark:text-white mb-4">
                 Membres de l'equipe
             </h2>
@@ -296,6 +297,7 @@ function MembersList({
                                         'inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-semibold uppercase tracking-wide',
                                         roleColors[member.role]
                                     )}
+                                    data-testid={`member-role-${member.role}`}
                                 >
                                     {member.role}
                                 </span>

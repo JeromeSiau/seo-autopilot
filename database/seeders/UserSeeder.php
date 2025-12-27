@@ -17,14 +17,5 @@ class UserSeeder extends Seeder
             'password' => Hash::make('password'),
             'is_admin' => true,
         ]);
-
-        $team = Team::create([
-            'name' => 'Personal Team',
-            'owner_id' => $user->id,
-            'plan' => 'pro',
-            'articles_limit' => 30,
-        ]);
-
-        $user->update(['team_id' => $team->id]);
     }
 }

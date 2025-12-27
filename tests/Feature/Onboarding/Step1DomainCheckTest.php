@@ -19,18 +19,25 @@ class Step1DomainCheckTest extends TestCase
         Queue::fake();
     }
 
+    private function createUserWithTeam(): User
+    {
+        $user = User::factory()->create();
+        $team = Team::factory()->create(['owner_id' => $user->id]);
+        $user->teams()->attach($team->id, ['role' => 'owner']);
+        $user->update(['current_team_id' => $team->id]);
+
+        return $user;
+    }
+
     public function test_blocks_registration_if_domain_exists(): void
     {
-        $existingUser = User::factory()->create();
-        $existingTeam = Team::factory()->create(['owner_id' => $existingUser->id]);
+        $existingUser = $this->createUserWithTeam();
         Site::factory()->create([
-            'team_id' => $existingTeam->id,
+            'team_id' => $existingUser->currentTeam->id,
             'domain' => 'example.com',
         ]);
 
-        $user = User::factory()->create();
-        $team = Team::factory()->create(['owner_id' => $user->id]);
-        $user->update(['team_id' => $team->id]);
+        $user = $this->createUserWithTeam();
 
         $response = $this->actingAs($user)->post(route('onboarding.step1'), [
             'domain' => 'example.com',
@@ -44,9 +51,7 @@ class Step1DomainCheckTest extends TestCase
 
     public function test_allows_registration_for_new_domain(): void
     {
-        $user = User::factory()->create();
-        $team = Team::factory()->create(['owner_id' => $user->id]);
-        $user->update(['team_id' => $team->id]);
+        $user = $this->createUserWithTeam();
 
         $response = $this->actingAs($user)->post(route('onboarding.step1'), [
             'domain' => 'brand-new-domain-' . time() . '.com',

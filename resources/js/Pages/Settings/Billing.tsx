@@ -63,9 +63,9 @@ export default function Billing({ team, plans }: Props) {
         >
             <Head title="Facturation" />
 
-            <div className="mx-auto max-w-5xl">
+            <div className="mx-auto max-w-5xl" data-testid="billing-page">
                 {/* Current Status */}
-                <div className="rounded-2xl border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 p-6">
+                <div className="rounded-2xl border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 p-6" data-testid="billing-subscription-section">
                     <h2 className="text-lg font-semibold text-surface-900 dark:text-white">
                         Votre abonnement
                     </h2>
@@ -73,11 +73,11 @@ export default function Billing({ team, plans }: Props) {
                     {team.is_trial ? (
                         <div className="mt-4">
                             <div className="flex items-center gap-3">
-                                <span className="rounded-full bg-amber-100 dark:bg-amber-500/20 px-3 py-1 text-sm font-medium text-amber-700 dark:text-amber-400">
+                                <span className="rounded-full bg-amber-100 dark:bg-amber-500/20 px-3 py-1 text-sm font-medium text-amber-700 dark:text-amber-400" data-testid="billing-trial-badge">
                                     Période d'essai
                                 </span>
                                 {trialDaysLeft > 0 ? (
-                                    <span className="text-sm text-surface-500">
+                                    <span className="text-sm text-surface-500" data-testid="billing-trial-days">
                                         {trialDaysLeft} jour{trialDaysLeft > 1 ? 's' : ''} restant{trialDaysLeft > 1 ? 's' : ''}
                                     </span>
                                 ) : (
@@ -117,12 +117,12 @@ export default function Billing({ team, plans }: Props) {
                 </div>
 
                 {/* Plans */}
-                <div className="mt-8">
+                <div className="mt-8" data-testid="billing-plans-section">
                     <h2 className="text-lg font-semibold text-surface-900 dark:text-white">
                         {team.plan ? 'Changer de plan' : 'Choisir un plan'}
                     </h2>
 
-                    <div className="mt-6 grid gap-6 md:grid-cols-3">
+                    <div className="mt-6 grid gap-6 md:grid-cols-3" data-testid="billing-plans-grid">
                         {plans.map((plan) => {
                             const Icon = planIcons[plan.slug] || Zap;
                             const isCurrent = team.plan?.id === plan.id;
@@ -212,7 +212,7 @@ export default function Billing({ team, plans }: Props) {
                 </div>
 
                 {/* FAQ */}
-                <div className="mt-12 rounded-2xl bg-surface-50 dark:bg-surface-800/50 p-6">
+                <div className="mt-12 rounded-2xl bg-surface-50 dark:bg-surface-800/50 p-6" data-testid="billing-faq-section">
                     <h3 className="font-semibold text-surface-900 dark:text-white">
                         Questions fréquentes
                     </h3>

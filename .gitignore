@@ -29,3 +29,4 @@ Thumbs.db
 # sqlite database files
 *.sqlite*
 .worktrees/
+database/dusk.sqlite

@@ -7,6 +7,7 @@ use App\Jobs\SiteIndexJob;
 use App\Models\Site;
 use App\Models\SiteSetting;
 use App\Jobs\DiscoverKeywordsJob;
+use App\Rules\DomainFormat;
 use App\Services\Crawler\SiteCrawlerService;
 use App\Services\Google\GoogleAuthService;
 use App\Services\Google\SearchConsoleService;
@@ -91,7 +92,7 @@ class OnboardingController extends Controller
     public function storeStep1(Request $request)
     {
         $validated = $request->validate([
-            'domain' => 'required|string|max:255',
+            'domain' => ['required', 'string', 'max:255', new DomainFormat],
             'name' => 'required|string|max:255',
             'language' => 'required|string|size:2',
         ]);
@@ -120,6 +121,7 @@ class OnboardingController extends Controller
         ]);
 
         // Crawl rapide du sitemap (sync) - stocke dans site_pages MySQL
+        $crawlWarning = null;
         try {
             $this->crawler->crawl($site);
             $this->crawler->extractTitlesForPages($site, 50);
@@ -132,12 +134,16 @@ class OnboardingController extends Controller
         } catch (\Exception $e) {
             // Le crawl sitemap a échoué, on continue quand même
             Log::warning('Sitemap crawl failed', ['site_id' => $site->id, 'error' => $e->getMessage()]);
+            $crawlWarning = 'Impossible de joindre votre site. Vérifiez que l\'URL est correcte et que le site est accessible.';
         }
 
         // Lancer le crawl profond avec embeddings (async)
         SiteIndexJob::dispatch($site, delta: false)->onQueue('crawl');
 
-        return response()->json(['site_id' => $site->id]);
+        return response()->json([
+            'site_id' => $site->id,
+            'crawl_warning' => $crawlWarning,
+        ]);
     }
 
     public function storeStep2(Request $request, Site $site)

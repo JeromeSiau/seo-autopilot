@@ -35,6 +35,7 @@ class Team extends Model
         'plan_id',
         'is_trial',
         'trial_ends_at',
+        'subscription_ends_at',
         'plan',
         'articles_limit',
     ];
@@ -42,6 +43,7 @@ class Team extends Model
     protected $casts = [
         'is_trial' => 'boolean',
         'trial_ends_at' => 'datetime',
+        'subscription_ends_at' => 'datetime',
     ];
 
     public function owner(): BelongsTo
@@ -83,6 +85,16 @@ class Team extends Model
         }
 
         return $this->trial_ends_at && $this->trial_ends_at->isPast();
+    }
+
+    public function isSubscriptionCancelling(): bool
+    {
+        return $this->subscription_ends_at !== null;
+    }
+
+    public function subscriptionEndsAt(): ?\Carbon\Carbon
+    {
+        return $this->subscription_ends_at;
     }
 
     public function canCreateSite(): bool
@@ -133,8 +145,22 @@ class Team extends Model
 
     public function getArticlesLimitAttribute(): int
     {
-        // Use billing plan limit if available, otherwise fall back to the legacy articles_limit column
-        return $this->billingPlan?->articles_per_month ?? $this->attributes['articles_limit'] ?? 0;
+        // Use billing plan limit if available
+        if ($this->billingPlan) {
+            return $this->billingPlan->articles_per_month;
+        }
+
+        // Legacy articles_limit column
+        if (isset($this->attributes['articles_limit']) && $this->attributes['articles_limit'] > 0) {
+            return $this->attributes['articles_limit'];
+        }
+
+        // Trial users get 3 articles for the entire trial period
+        if ($this->is_trial) {
+            return 3;
+        }
+
+        return 0;
     }
 
     public function getPlanLimits(): array

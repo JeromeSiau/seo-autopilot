@@ -13,19 +13,28 @@ class CreateSiteQuotaTest extends TestCase
 {
     use RefreshDatabase;
 
+    private function createUserWithTeam(array $teamAttributes = []): User
+    {
+        $user = User::factory()->create();
+        $team = Team::factory()->create(array_merge([
+            'owner_id' => $user->id,
+        ], $teamAttributes));
+        $user->teams()->attach($team->id, ['role' => 'owner']);
+        $user->update(['current_team_id' => $team->id]);
+
+        return $user;
+    }
+
     public function test_blocks_site_creation_when_quota_reached(): void
     {
         $plan = Plan::factory()->create(['sites_limit' => 1]);
-        $user = User::factory()->create();
-        $team = Team::factory()->create([
-            'owner_id' => $user->id,
+        $user = $this->createUserWithTeam([
             'plan_id' => $plan->id,
             'is_trial' => false,
         ]);
-        $user->update(['team_id' => $team->id]);
 
         // Already has 1 site
-        Site::factory()->create(['team_id' => $team->id]);
+        Site::factory()->create(['team_id' => $user->currentTeam->id]);
 
         $response = $this->actingAs($user)->post(route('sites.store'), [
             'domain' => 'newsite.com',
@@ -39,13 +48,10 @@ class CreateSiteQuotaTest extends TestCase
     public function test_allows_site_creation_when_under_quota(): void
     {
         $plan = Plan::factory()->create(['sites_limit' => 3]);
-        $user = User::factory()->create();
-        $team = Team::factory()->create([
-            'owner_id' => $user->id,
+        $user = $this->createUserWithTeam([
             'plan_id' => $plan->id,
             'is_trial' => false,
         ]);
-        $user->update(['team_id' => $team->id]);
 
         $response = $this->actingAs($user)->post(route('sites.store'), [
             'domain' => 'newsite-' . time() . '.com',
@@ -60,16 +66,13 @@ class CreateSiteQuotaTest extends TestCase
     public function test_allows_site_creation_for_unlimited_plan(): void
     {
         $plan = Plan::factory()->create(['sites_limit' => -1]); // unlimited
-        $user = User::factory()->create();
-        $team = Team::factory()->create([
-            'owner_id' => $user->id,
+        $user = $this->createUserWithTeam([
             'plan_id' => $plan->id,
             'is_trial' => false,
         ]);
-        $user->update(['team_id' => $team->id]);
 
         // Already has 5 sites
-        Site::factory()->count(5)->create(['team_id' => $team->id]);
+        Site::factory()->count(5)->create(['team_id' => $user->currentTeam->id]);
 
         $response = $this->actingAs($user)->post(route('sites.store'), [
             'domain' => 'newsite-' . time() . '.com',
@@ -83,13 +86,10 @@ class CreateSiteQuotaTest extends TestCase
 
     public function test_allows_trial_user_without_plan_to_create_one_site(): void
     {
-        $user = User::factory()->create();
-        $team = Team::factory()->create([
-            'owner_id' => $user->id,
+        $user = $this->createUserWithTeam([
             'plan_id' => null, // No billing plan
             'is_trial' => true,
         ]);
-        $user->update(['team_id' => $team->id]);
 
         $response = $this->actingAs($user)->post(route('sites.store'), [
             'domain' => 'firstsite.com',
@@ -103,16 +103,13 @@ class CreateSiteQuotaTest extends TestCase
 
     public function test_blocks_trial_user_without_plan_from_creating_second_site(): void
     {
-        $user = User::factory()->create();
-        $team = Team::factory()->create([
-            'owner_id' => $user->id,
+        $user = $this->createUserWithTeam([
             'plan_id' => null, // No billing plan
             'is_trial' => true,
         ]);
-        $user->update(['team_id' => $team->id]);
 
         // Already has 1 site
-        Site::factory()->create(['team_id' => $team->id]);
+        Site::factory()->create(['team_id' => $user->currentTeam->id]);
 
         $response = $this->actingAs($user)->post(route('sites.store'), [
             'domain' => 'secondsite.com',

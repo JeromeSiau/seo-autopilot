@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Web;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\SiteResource;
 use App\Models\Site;
+use App\Rules\DomainFormat;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -45,7 +46,7 @@ class SiteController extends Controller
         }
 
         $validated = $request->validate([
-            'domain' => ['required', 'string', 'max:255'],
+            'domain' => ['required', 'string', 'max:255', new DomainFormat],
             'name' => ['required', 'string', 'max:255'],
             'language' => ['required', 'string', 'size:2'],
         ]);

@@ -24,6 +24,10 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\CheckSubscription::class,
         ]);
 
+        $middleware->alias([
+            'has.team' => \App\Http\Middleware\EnsureHasTeam::class,
+        ]);
+
         $middleware->encryptCookies(except: ['theme']);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

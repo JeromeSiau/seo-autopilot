@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('keywords', function (Blueprint $table) {
-            $table->decimal('score', 5, 2)->nullable()->after('current_position')->index();
+        Schema::table('teams', function (Blueprint $table) {
+            $table->timestamp('subscription_ends_at')->nullable()->after('trial_ends_at');
         });
     }
 
@@ -21,9 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('keywords', function (Blueprint $table) {
-            $table->dropIndex(['score']);
-            $table->dropColumn('score');
+        Schema::table('teams', function (Blueprint $table) {
+            $table->dropColumn('subscription_ends_at');
         });
     }
 };

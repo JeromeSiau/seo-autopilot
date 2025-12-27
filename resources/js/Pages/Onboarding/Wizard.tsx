@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import { PageProps } from '@/types';
-import { Check, X } from 'lucide-react';
+import { Check, X, AlertTriangle } from 'lucide-react';
 import clsx from 'clsx';
 import { useTranslations } from '@/hooks/useTranslations';
 import Step1Site from './Steps/Step1Site';
@@ -64,6 +64,7 @@ export default function Wizard({ team, site: initialSite, resumeStep }: WizardPr
     });
     const [crawlStatus, setCrawlStatus] = useState<Site['crawl_status']>(initialSite?.crawl_status || 'pending');
     const [crawlPagesCount, setCrawlPagesCount] = useState(initialSite?.crawl_pages_count || 0);
+    const [crawlWarning, setCrawlWarning] = useState<string | null>(null);
 
     // Écouter les updates de crawl en temps réel
     useEffect(() => {
@@ -180,6 +181,22 @@ export default function Wizard({ team, site: initialSite, resumeStep }: WizardPr
                             />
                         </div>
                     )}
+
+                    {/* Crawl Warning */}
+                    {crawlWarning && (
+                        <div className="mt-4 flex justify-center">
+                            <div className="flex items-center gap-2 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 px-4 py-3 text-sm text-amber-800 dark:text-amber-400">
+                                <AlertTriangle className="h-4 w-4 flex-shrink-0" />
+                                <span>{crawlWarning}</span>
+                                <button
+                                    onClick={() => setCrawlWarning(null)}
+                                    className="ml-2 rounded p-0.5 hover:bg-amber-100 dark:hover:bg-amber-500/20 transition-colors"
+                                >
+                                    <X className="h-3.5 w-3.5" />
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Step Content */}
@@ -189,9 +206,12 @@ export default function Wizard({ team, site: initialSite, resumeStep }: WizardPr
                             <Step1Site
                                 data={siteData}
                                 setData={setSiteData}
-                                onNext={(id) => {
+                                onNext={(id, warning) => {
                                     setSiteId(id);
                                     setCrawlStatus('running');
+                                    if (warning) {
+                                        setCrawlWarning(warning);
+                                    }
                                     nextStep();
                                 }}
                             />
