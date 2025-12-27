@@ -40,7 +40,7 @@ export default function Login({
                 </div>
             )}
 
-            <form onSubmit={submit}>
+            <form onSubmit={submit} data-testid="login-form">
                 <div>
                     <InputLabel htmlFor="email" value={t?.auth?.login?.email ?? 'Email'} />
 
@@ -102,7 +102,7 @@ export default function Login({
                         </Link>
                     )}
 
-                    <PrimaryButton className="ms-4" disabled={processing}>
+                    <PrimaryButton className="ms-4" disabled={processing} data-testid="login-submit">
                         {t?.auth?.login?.submit ?? 'Log in'}
                     </PrimaryButton>
                 </div>
@@ -114,6 +114,7 @@ export default function Login({
                     <Link
                         href={route('register')}
                         className="font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
+                        data-testid="login-register-link"
                     >
                         {t?.auth?.login?.signUp ?? 'Sign up'}
                     </Link>

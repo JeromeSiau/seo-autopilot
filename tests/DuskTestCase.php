@@ -27,6 +27,9 @@ abstract class DuskTestCase extends BaseTestCase
     {
         parent::setUp();
 
+        // Use the same database as the Dusk server (.env.dusk.local)
+        config(['database.connections.sqlite.database' => database_path('dusk.sqlite')]);
+
         // Fresh database for each test
         Artisan::call('migrate:fresh');
     }
@@ -43,7 +46,7 @@ abstract class DuskTestCase extends BaseTestCase
         ])->unless($this->hasHeadlessDisabled(), function (Collection $items) {
             return $items->merge([
                 '--disable-gpu',
-//                '--headless=new',
+                '--headless=new',
             ]);
         })->all());
 

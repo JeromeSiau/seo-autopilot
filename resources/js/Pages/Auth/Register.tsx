@@ -118,6 +118,7 @@ export default function Register() {
                     <Link
                         href={route('login')}
                         className="font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
+                        data-testid="register-login-link"
                     >
                         {t?.auth?.register?.signIn ?? 'Sign in'}
                     </Link>

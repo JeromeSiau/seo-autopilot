@@ -99,7 +99,7 @@ export function upsertPage(db, pageData) {
 
     // If it was an update, get the ID by URL
     const page = db.prepare('SELECT id FROM pages WHERE url = ?').get(pageData.url);
-    return page.id;
+    return Number(page.id);
 }
 
 /**

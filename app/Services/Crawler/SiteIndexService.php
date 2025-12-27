@@ -42,7 +42,10 @@ class SiteIndexService
             throw new \RuntimeException('Site indexation failed: ' . $result->errorOutput());
         }
 
-        $output = json_decode($result->output(), true);
+        // Extract the last line which contains the JSON output
+        $lines = array_filter(explode("\n", trim($result->output())));
+        $jsonLine = end($lines);
+        $output = json_decode($jsonLine, true);
         if (!is_array($output)) {
             Log::error('SiteIndexService: Invalid JSON output', [
                 'site_id' => $site->id,

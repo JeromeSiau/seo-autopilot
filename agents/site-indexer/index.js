@@ -212,6 +212,7 @@ async function indexSite(siteId, siteUrl, options) {
             metadata: summary,
         });
 
+        return summary;
     } catch (error) {
         console.error('Fatal error:', error);
         await emitError(siteId, AGENT_TYPE, 'Site indexing failed', error);
@@ -236,10 +237,12 @@ program
     .option('--delta', 'Only index new pages not already in database', false)
     .action(async (options) => {
         try {
-            await indexSite(options.siteId, options.siteUrl, {
+            const summary = await indexSite(options.siteId, options.siteUrl, {
                 maxPages: options.maxPages,
                 delta: options.delta,
             });
+            // Output JSON for PHP to parse (must be last line of stdout)
+            console.log(JSON.stringify({ pages_indexed: summary.indexed, discovered: summary.discovered, errors: summary.errors }));
             process.exit(0);
         } catch (error) {
             console.error('Indexing failed:', error.message);
