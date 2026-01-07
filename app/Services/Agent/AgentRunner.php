@@ -79,15 +79,35 @@ class AgentRunner
 
     private function runAgent(string $agentName, array $args): array
     {
-        // Build command as array to prevent shell injection
-        $command = ['node', "{$agentName}/index.js"];
+        // Map agent names to Python script names
+        $pythonAgentMap = [
+            'research-agent' => 'research',
+            'competitor-agent' => 'competitor',
+            'fact-checker-agent' => 'fact-checker',
+            'internal-linking-agent' => 'internal-linking',
+        ];
+
+        $pythonAgent = $pythonAgentMap[$agentName] ?? null;
+
+        if ($pythonAgent) {
+            // Use Python agent via uv
+            $command = [
+                'uv', 'run',
+                '--project', base_path('agents-python'),
+                $pythonAgent,
+            ];
+        } else {
+            // Fallback to Node.js for unmigrated agents
+            $command = ['node', "{$agentName}/index.js"];
+        }
+
         foreach ($args as $key => $value) {
             $command[] = "{$key}={$value}";
         }
 
-        Log::info("AgentRunner: Starting {$agentName}", ['args' => $args]);
+        Log::info("AgentRunner: Starting {$agentName}", ['args' => $args, 'python' => (bool)$pythonAgent]);
 
-        $result = Process::path($this->agentsPath)
+        $result = Process::path($pythonAgent ? base_path('agents-python') : $this->agentsPath)
             ->timeout(600)
             ->run($command);
 
