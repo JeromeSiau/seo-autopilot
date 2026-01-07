@@ -22,17 +22,28 @@ class Config:
         self.openrouter_base_url = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
         self.voyage_api_key = os.getenv("VOYAGE_API_KEY", "")
         self.redis_host = os.getenv("REDIS_HOST", "localhost")
-        self.redis_port = int(os.getenv("REDIS_PORT", "6379"))
-        self.redis_db = int(os.getenv("REDIS_DB", "0"))
+
+        try:
+            self.redis_port = int(os.getenv("REDIS_PORT", "6379"))
+        except ValueError:
+            raise ValueError("REDIS_PORT must be a valid integer")
+
+        try:
+            self.redis_db = int(os.getenv("REDIS_DB", "0"))
+        except ValueError:
+            raise ValueError("REDIS_DB must be a valid integer")
 
         if require_all:
             self._validate()
 
     def _validate(self):
+        errors = []
         if not self.openrouter_api_key:
-            raise ValueError("OPENROUTER_API_KEY environment variable is required")
+            errors.append("OPENROUTER_API_KEY")
         if not self.voyage_api_key:
-            raise ValueError("VOYAGE_API_KEY environment variable is required")
+            errors.append("VOYAGE_API_KEY")
+        if errors:
+            raise ValueError(f"Missing required environment variables: {', '.join(errors)}")
 
 # Global config instance
 config = Config()
