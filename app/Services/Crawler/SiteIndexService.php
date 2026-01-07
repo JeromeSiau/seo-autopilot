@@ -8,15 +8,14 @@ use Illuminate\Support\Facades\Log;
 
 class SiteIndexService
 {
-    private const AGENT_PATH = 'agents/site-indexer/index.js';
-
     public function indexSite(Site $site, bool $delta = false): array
     {
         $command = [
-            'node',
-            base_path(self::AGENT_PATH),
+            'uv', 'run',
+            '--project', base_path('agents-python'),
+            'site-indexer',
             '--siteId', (string) $site->id,
-            '--siteUrl', "https://{$site->domain}",
+            '--siteUrl', $site->url,
             '--maxPages', '500',
         ];
 
@@ -30,7 +29,7 @@ class SiteIndexService
             'delta' => $delta,
         ]);
 
-        $result = Process::path(base_path('agents'))
+        $result = Process::path(base_path('agents-python'))
             ->timeout(600) // 10 minutes
             ->run($command);
 
