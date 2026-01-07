@@ -31,3 +31,9 @@ Thumbs.db
 *.sqlite*
 .worktrees/
 database/dusk.sqlite
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
