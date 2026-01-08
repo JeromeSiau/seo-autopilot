@@ -160,8 +160,8 @@ Example format:
 PROMPT;
 
         try {
-            $response = $this->llm->completeJson('openai', $prompt, [], [
-                'model' => 'gpt-4o-mini',
+            $response = $this->llm->completeJson('openrouter', $prompt, [], [
+                'model' => 'openai/gpt-4o-mini',
                 'temperature' => 0.8,
             ]);
 
@@ -315,8 +315,8 @@ Respond with JSON:
 PROMPT;
 
         try {
-            $response = $this->llm->completeJson('openai', $prompt, [], [
-                'model' => 'gpt-4o',
+            $response = $this->llm->completeJson('openrouter', $prompt, [], [
+                'model' => 'openai/gpt-4o',
                 'temperature' => 0.3,
             ]);
 

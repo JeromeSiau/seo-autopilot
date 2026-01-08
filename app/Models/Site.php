@@ -63,7 +63,26 @@ class Site extends Model
     protected $appends = [
         'gsc_connected',
         'ga4_connected',
+        'url',
     ];
+
+    /**
+     * Normalize domain on save: remove protocol and trailing slash.
+     */
+    protected function setDomainAttribute(string $value): void
+    {
+        $domain = preg_replace('#^https?://#', '', $value);
+        $domain = rtrim($domain, '/');
+        $this->attributes['domain'] = $domain;
+    }
+
+    /**
+     * Get the full URL with protocol.
+     */
+    public function getUrlAttribute(): string
+    {
+        return "https://{$this->domain}";
+    }
 
     public function team(): BelongsTo
     {

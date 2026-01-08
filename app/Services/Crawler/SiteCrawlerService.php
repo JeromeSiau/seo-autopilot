@@ -36,8 +36,8 @@ class SiteCrawlerService
     private function crawlSitemap(Site $site): int
     {
         $sitemapUrls = [
-            "https://{$site->domain}/sitemap.xml",
-            "https://{$site->domain}/sitemap_index.xml",
+            "{$site->url}/sitemap.xml",
+            "{$site->url}/sitemap_index.xml",
             "https://www.{$site->domain}/sitemap.xml",
         ];
 

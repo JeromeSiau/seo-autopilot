@@ -52,7 +52,7 @@ Retourne un JSON avec ce format exact:
 }";
 
         try {
-            $response = $this->llm->completeJson('openai', $prompt, [], ['model' => 'gpt-4o-mini']);
+            $response = $this->llm->completeJson('openrouter', $prompt, [], ['model' => 'openai/gpt-4o-mini']);
             $result = json_decode($response->content, true);
 
             return $result['topics'] ?? [];
