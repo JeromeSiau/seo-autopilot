@@ -15,13 +15,19 @@ class AgentRunner
         $this->agentsPath = base_path('agents');
     }
 
-    public function runResearchAgent(Article $article, string $keyword): array
+    public function runResearchAgent(Article $article, string $keyword, array $urls = []): array
     {
-        return $this->runAgent('research-agent', [
+        $args = [
             '--articleId' => $article->id,
             '--keyword' => $keyword,
             '--siteId' => $article->site_id,
-        ]);
+        ];
+
+        if (!empty($urls)) {
+            $args['--urls'] = json_encode($urls);
+        }
+
+        return $this->runAgent('research-agent', $args);
     }
 
     public function runCompetitorAgent(Article $article, string $keyword, array $urls): array

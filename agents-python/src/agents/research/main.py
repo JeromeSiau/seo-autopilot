@@ -55,17 +55,15 @@ async def analyze_content(llm: LLMClient, keyword: str, sources: list[dict]) -> 
     }
 
 
-async def search_google(query: str) -> list[str]:
-    """Search Google and return URLs.
+async def run(article_id: int, keyword: str, urls: list[str] | None = None, site_id: int | None = None):
+    """Main research agent logic.
 
-    TODO: Implement with SearXNG or Google Custom Search API.
-    For now, returns empty list (placeholder).
+    Args:
+        article_id: Article ID for event tracking
+        keyword: Target keyword to research
+        urls: Optional list of URLs to analyze (from DataForSEO SERP)
+        site_id: Optional site ID
     """
-    return []
-
-
-async def run(article_id: int, keyword: str, site_id: int | None = None):
-    """Main research agent logic."""
     events = EventEmitter(article_id, AGENT_TYPE)
     llm = LLMClient()
     crawler = ContentCrawler()
@@ -76,24 +74,13 @@ async def run(article_id: int, keyword: str, site_id: int | None = None):
             f'Le keyword "{keyword}" sera analysé.'
         )
 
-        # Step 1: Generate search queries
-        await events.progress("Génération des requêtes de recherche...")
-        queries = await generate_search_queries(llm, keyword)
-        await events.progress(f"{len(queries)} requêtes préparées")
+        # Use provided URLs or empty list
+        unique_urls = urls or []
 
-        # Step 2: Search and collect URLs
-        all_urls = []
-        for i, query in enumerate(queries):
-            await events.progress(
-                f'Recherche: "{query}"',
-                progress_current=i + 1,
-                progress_total=len(queries),
-            )
-            urls = await search_google(query)
-            all_urls.extend(urls)
-
-        unique_urls = list(set(all_urls))
-        await events.progress(f"{len(unique_urls)} URLs collectées")
+        if unique_urls:
+            await events.progress(f"{len(unique_urls)} URLs fournies par DataForSEO")
+        else:
+            await events.progress("Aucune URL fournie - analyse limitée")
 
         if not unique_urls:
             await events.completed("Aucune URL trouvée (search not implemented)")
@@ -166,10 +153,13 @@ async def run(article_id: int, keyword: str, site_id: int | None = None):
 @click.command()
 @click.option("--articleId", required=True, type=int, help="Article ID")
 @click.option("--keyword", required=True, help="Target keyword")
+@click.option("--urls", help="JSON array of URLs to analyze (from DataForSEO SERP)")
 @click.option("--siteId", type=int, help="Site ID")
-def main(articleid: int, keyword: str, siteid: int | None):
+def main(articleid: int, keyword: str, urls: str | None, siteid: int | None):
     """Research agent - discovers sources for a keyword."""
-    asyncio.run(run(articleid, keyword, siteid))
+    import json
+    parsed_urls = json.loads(urls) if urls else None
+    asyncio.run(run(articleid, keyword, parsed_urls, siteid))
 
 
 if __name__ == "__main__":
