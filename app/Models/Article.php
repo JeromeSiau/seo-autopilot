@@ -11,10 +11,26 @@ use Illuminate\Support\Str;
 class Article extends Model
 {
     use HasFactory;
+
+    public const STATUS_DRAFT = 'draft';
+    public const STATUS_GENERATING = 'generating';
+    public const STATUS_REVIEW = 'review';
+    public const STATUS_APPROVED = 'approved';
+    public const STATUS_PUBLISHED = 'published';
+    public const STATUS_FAILED = 'failed';
+
+    public const STATUSES = [
+        self::STATUS_DRAFT,
+        self::STATUS_GENERATING,
+        self::STATUS_REVIEW,
+        self::STATUS_APPROVED,
+        self::STATUS_PUBLISHED,
+        self::STATUS_FAILED,
+    ];
+
     protected $fillable = [
         'site_id',
         'keyword_id',
-        'brand_voice_id',
         'title',
         'slug',
         'content',
@@ -88,53 +104,78 @@ class Article extends Model
 
     public function scopeDraft($query)
     {
-        return $query->where('status', 'draft');
+        return $query->where('status', self::STATUS_DRAFT);
     }
 
     public function scopeReady($query)
     {
-        return $query->where('status', 'ready');
+        return $query->where('status', self::STATUS_APPROVED);
+    }
+
+    public function scopeApproved($query)
+    {
+        return $query->where('status', self::STATUS_APPROVED);
+    }
+
+    public function scopeReview($query)
+    {
+        return $query->where('status', self::STATUS_REVIEW);
     }
 
     public function scopePublished($query)
     {
-        return $query->where('status', 'published');
+        return $query->where('status', self::STATUS_PUBLISHED);
     }
 
     public function scopeGenerating($query)
     {
-        return $query->where('status', 'generating');
+        return $query->where('status', self::STATUS_GENERATING);
     }
 
     public function scopeFailed($query)
     {
-        return $query->where('status', 'failed');
+        return $query->where('status', self::STATUS_FAILED);
     }
 
     public function isPublished(): bool
     {
-        return $this->status === 'published';
+        return $this->status === self::STATUS_PUBLISHED;
     }
 
     public function isReady(): bool
     {
-        return $this->status === 'ready';
+        return $this->isApproved();
+    }
+
+    public function isApproved(): bool
+    {
+        return $this->status === self::STATUS_APPROVED;
     }
 
     public function markAsGenerating(): void
     {
-        $this->update(['status' => 'generating']);
+        $this->update(['status' => self::STATUS_GENERATING]);
     }
 
     public function markAsReady(): void
     {
-        $this->update(['status' => 'ready']);
+        $this->markAsApproved();
+    }
+
+    public function markAsReview(): void
+    {
+        $this->update(['status' => self::STATUS_REVIEW]);
+    }
+
+    public function markAsApproved(): void
+    {
+        $this->update(['status' => self::STATUS_APPROVED]);
     }
 
     public function markAsPublished(string $url): void
     {
         $this->update([
-            'status' => 'published',
+            'status' => self::STATUS_PUBLISHED,
             'published_at' => now(),
             'published_url' => $url,
         ]);
@@ -143,7 +184,7 @@ class Article extends Model
     public function markAsFailed(string $errorMessage): void
     {
         $this->update([
-            'status' => 'failed',
+            'status' => self::STATUS_FAILED,
             'error_message' => $errorMessage,
         ]);
     }

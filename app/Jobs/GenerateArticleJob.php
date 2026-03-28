@@ -9,6 +9,7 @@ use App\Services\Agent\AgentEventService;
 use App\Services\Agent\AgentRunner;
 use App\Services\Content\ArticleGenerator;
 use App\Services\Image\ImageGenerator;
+use App\Services\SEO\DataForSEOService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -46,19 +47,23 @@ class GenerateArticleJob implements ShouldQueue
         ArticleGenerator $generator,
         ImageGenerator $imageGenerator,
         AgentRunner $agentRunner,
-        AgentEventService $eventService
+        AgentEventService $eventService,
+        DataForSEOService $dataForSEO
     ): void
     {
         Log::info("GenerateArticleJob: Starting for keyword '{$this->keyword->keyword}'");
 
+        $site = $this->keyword->site()->with(['settings', 'activeIntegration', 'team'])->firstOrFail();
+        $this->keyword->markAsGenerating();
+
         // Check if team can still generate articles
-        $team = $this->keyword->site->team;
+        $team = $site->team;
         if (!$team->canGenerateArticle()) {
             Log::warning("GenerateArticleJob: Team has reached article limit", [
                 'team_id' => $team->id,
                 'limit' => $team->articles_limit,
             ]);
-            $this->keyword->update(['status' => 'pending']);
+            $this->keyword->update(['status' => Keyword::STATUS_PENDING]);
             return;
         }
 
@@ -68,18 +73,34 @@ class GenerateArticleJob implements ShouldQueue
             'keyword_id' => $this->keyword->id,
             'title' => $this->keyword->keyword,
             'slug' => 'draft-' . time(),
-            'status' => 'generating',
+            'status' => Article::STATUS_GENERATING,
         ]);
 
         try {
             // Emit generation started event
             $eventService->started($article, 'orchestrator', 'Début de la génération de l\'article', 'Préparation du pipeline de génération');
 
-            // Phase 1: Research
+            // Phase 1: Fetch SERP data and Research
             $eventService->started($article, 'research', 'Recherche d\'informations sur le sujet', 'Analyse des sources et du contexte');
 
+            $serpUrls = [];
             try {
-                $researchData = $agentRunner->runResearchAgent($article, $this->keyword->keyword);
+                // Fetch SERP results from DataForSEO
+                $serpResults = $dataForSEO->getSerpResults(
+                    $this->keyword->keyword,
+                    $this->keyword->site->language ?? 'en',
+                    $this->keyword->site->location ?? 'United States',
+                    10
+                );
+                $serpUrls = $serpResults->pluck('url')->toArray();
+                Log::info("GenerateArticleJob: Fetched {$serpResults->count()} SERP results");
+            } catch (\Exception $e) {
+                Log::warning("GenerateArticleJob: DataForSEO SERP fetch failed", ['error' => $e->getMessage()]);
+                // Continue without SERP URLs
+            }
+
+            try {
+                $researchData = $agentRunner->runResearchAgent($article, $this->keyword->keyword, $serpUrls);
                 $eventService->completed($article, 'research', 'Recherche terminée', 'Informations collectées avec succès', $researchData);
             } catch (\Exception $e) {
                 $eventService->error($article, 'research', 'Échec de la recherche', $e->getMessage());
@@ -143,7 +164,9 @@ class GenerateArticleJob implements ShouldQueue
                 'content' => $finalContent,
                 'meta_title' => $generated->metaTitle,
                 'meta_description' => $generated->metaDescription,
-                'status' => 'ready',
+                'status' => $site->shouldAutoApproveGeneratedArticles()
+                    ? Article::STATUS_APPROVED
+                    : Article::STATUS_REVIEW,
                 'llm_used' => implode(', ', array_keys($generated->llmsUsed)),
                 'generation_cost' => $generated->totalCost,
                 'word_count' => str_word_count(strip_tags($finalContent)),
@@ -180,9 +203,11 @@ class GenerateArticleJob implements ShouldQueue
             $eventService->error($article, 'orchestrator', 'Échec de la génération', $e->getMessage());
 
             $article->update([
-                'status' => 'failed',
+                'status' => Article::STATUS_FAILED,
                 'error_message' => $e->getMessage(),
             ]);
+
+            $this->keyword->markAsFailed();
 
             Log::error("GenerateArticleJob: Failed", [
                 'keyword' => $this->keyword->keyword,

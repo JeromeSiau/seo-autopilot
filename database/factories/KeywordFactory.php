@@ -26,8 +26,8 @@ class KeywordFactory extends Factory
             'volume' => fake()->numberBetween(100, 10000),
             'difficulty' => fake()->numberBetween(1, 100),
             'cpc' => fake()->randomFloat(2, 0.1, 10),
-            'status' => fake()->randomElement(['pending', 'queued', 'scheduled', 'generating', 'completed']),
-            'source' => fake()->randomElement(['gsc', 'manual', 'discovery']),
+            'status' => fake()->randomElement(['pending', 'queued', 'scheduled', 'generating', 'completed', 'failed', 'skipped']),
+            'source' => fake()->randomElement(['search_console', 'ai_generated', 'manual', 'dataforseo']),
             'priority' => fake()->numberBetween(1, 10),
         ];
     }
@@ -44,12 +44,12 @@ class KeywordFactory extends Factory
     }
 
     /**
-     * Indicate that the keyword is processed.
+     * Indicate that the keyword is completed.
      */
-    public function processed(): static
+    public function completed(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => 'processed',
+            'status' => 'completed',
             'processed_at' => now(),
         ]);
     }

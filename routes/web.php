@@ -32,7 +32,9 @@ Route::get('/{locale}', [LandingController::class, 'index'])
     ->name('landing');
 
 // Google OAuth
-Route::get('/auth/google', [GoogleAuthController::class, 'redirect'])->name('auth.google');
+Route::get('/auth/google', [GoogleAuthController::class, 'redirect'])
+    ->middleware(['auth', 'verified', 'has.team'])
+    ->name('auth.google');
 Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])->name('auth.google.callback');
 
 // User preferences (locale, theme) - accessible to all users

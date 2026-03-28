@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('team_id')->constrained()->cascadeOnDelete();
             $table->foreignId('site_id')->nullable()->constrained()->cascadeOnDelete();
-            $table->enum('type', ['wordpress', 'webflow', 'shopify']);
+            $table->enum('type', ['wordpress', 'webflow', 'shopify', 'ghost']);
             $table->string('name');
             $table->text('credentials');
             $table->boolean('is_active')->default(true);

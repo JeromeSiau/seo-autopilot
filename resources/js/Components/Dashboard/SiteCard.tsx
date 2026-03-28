@@ -1,21 +1,11 @@
 import { Link } from '@inertiajs/react';
 import { ArrowRight, Settings, Play, Pause, AlertCircle, Circle } from 'lucide-react';
 import clsx from 'clsx';
+import { DashboardSite } from '@/types';
 import { useTranslations } from '@/hooks/useTranslations';
 
-interface Site {
-    id: number;
-    domain: string;
-    name: string;
-    autopilot_status: 'active' | 'paused' | 'not_configured' | 'error';
-    articles_per_week: number;
-    articles_in_review: number;
-    articles_this_week: number;
-    onboarding_complete: boolean;
-}
-
 interface Props {
-    site: Site;
+    site: DashboardSite;
 }
 
 const STATUS_CONFIG = {
@@ -55,7 +45,7 @@ const STATUS_CONFIG = {
 
 export default function SiteCard({ site }: Props) {
     const { t } = useTranslations();
-    const status = STATUS_CONFIG[site.autopilot_status];
+    const status = STATUS_CONFIG[site.autopilot_status] ?? STATUS_CONFIG.not_configured;
     const StatusIcon = status.icon;
 
     // Status labels with translations

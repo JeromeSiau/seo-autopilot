@@ -71,6 +71,18 @@ export interface Site {
     updated_at: string;
 }
 
+export interface DashboardSite {
+    id: number;
+    domain: string;
+    name: string;
+    autopilot_status: 'active' | 'paused' | 'not_configured' | 'error';
+    articles_per_week: number;
+    articles_in_review: number;
+    articles_this_week: number;
+    onboarding_complete: boolean;
+    is_generating: boolean;
+}
+
 export interface Keyword {
     id: number;
     site_id: number;
@@ -85,7 +97,7 @@ export interface Keyword {
     ctr: number | null;
     source: 'manual' | 'search_console' | 'ai_generated' | 'dataforseo' | 'llm';
     cluster_id: number | null;
-    status: 'pending' | 'queued' | 'generating' | 'completed' | 'failed';
+    status: 'pending' | 'queued' | 'generating' | 'completed' | 'scheduled' | 'failed' | 'skipped';
     queued_at: string | null;
     processed_at: string | null;
     site?: Site;

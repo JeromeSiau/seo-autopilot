@@ -36,6 +36,10 @@ class PublishArticleJob implements ShouldQueue
         ]);
 
         try {
+            if (!$this->article->published_remote_id && !$this->article->isApproved()) {
+                throw new \RuntimeException('Article must be approved before publishing.');
+            }
+
             $publisher = $publisherManager->getPublisher($this->integration);
 
             // Create publish request from article

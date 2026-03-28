@@ -3,13 +3,14 @@
 namespace App\Services\Crawler;
 
 use App\Models\Site;
-use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Process;
 
 class SiteIndexService
 {
     public function indexSite(Site $site, bool $delta = false): array
     {
+        $seedUrls = $this->buildSeedUrls($site);
         $command = [
             'uv', 'run',
             '--project', base_path('agents-python'),
@@ -17,6 +18,8 @@ class SiteIndexService
             '--siteId', (string) $site->id,
             '--siteUrl', $site->url,
             '--maxPages', '500',
+            '--seedUrls', json_encode($seedUrls, JSON_THROW_ON_ERROR),
+            '--storagePath', $this->getStorageDirectory(),
         ];
 
         if ($delta) {
@@ -27,6 +30,7 @@ class SiteIndexService
             'site_id' => $site->id,
             'domain' => $site->domain,
             'delta' => $delta,
+            'seed_urls_count' => count($seedUrls),
         ]);
 
         $result = Process::path(base_path('agents-python'))
@@ -65,7 +69,7 @@ class SiteIndexService
 
     public function getIndexPath(Site $site): string
     {
-        return storage_path("indexes/site_{$site->id}.sqlite");
+        return $this->getStorageDirectory() . DIRECTORY_SEPARATOR . "site_{$site->id}.sqlite";
     }
 
     public function hasIndex(Site $site): bool
@@ -107,5 +111,30 @@ class SiteIndexService
             Log::error('SiteIndexService: Failed to read SQLite', ['error' => $e->getMessage()]);
             return [];
         }
+    }
+
+    public function buildSeedUrls(Site $site, int $limit = 100): array
+    {
+        $urls = $site->pages()
+            ->whereNotNull('url')
+            ->orderByDesc('last_seen_at')
+            ->limit($limit)
+            ->pluck('url')
+            ->filter(fn (?string $url) => filled($url))
+            ->map(fn (string $url) => rtrim($url, '/'))
+            ->unique()
+            ->values()
+            ->all();
+
+        if (empty($urls)) {
+            return [$site->url];
+        }
+
+        return $urls;
+    }
+
+    private function getStorageDirectory(): string
+    {
+        return config('services.site_indexer.storage_path', storage_path('indexes'));
     }
 }

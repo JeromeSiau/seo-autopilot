@@ -247,7 +247,9 @@ PROMPT;
                 'meta_title' => $generated->metaTitle,
                 'meta_description' => $generated->metaDescription,
                 'images' => $generated->images,
-                'status' => 'ready',
+                'status' => $keyword->site->shouldAutoApproveGeneratedArticles()
+                    ? Article::STATUS_APPROVED
+                    : Article::STATUS_REVIEW,
                 'llm_used' => implode(', ', array_unique($this->llmsUsed)),
                 'generation_cost' => $generated->totalCost,
                 'word_count' => $generated->wordCount,
@@ -263,7 +265,7 @@ PROMPT;
                 'error' => $e->getMessage(),
             ]);
 
-            $keyword->update(['status' => 'pending']); // Reset for retry
+            $keyword->update(['status' => Keyword::STATUS_PENDING]); // Reset for retry
 
             throw $e;
         }

@@ -5,23 +5,29 @@ namespace App\Console\Commands;
 use App\Events\AgentActivityEvent;
 use App\Models\AgentEvent;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
 
 class ProcessAgentEvents extends Command
 {
+    private const HEARTBEAT_KEY = 'agents:process-events:last-seen';
+
     protected $signature = 'agents:process-events';
     protected $description = 'Process agent events from Redis queue and broadcast them';
 
     private bool $shouldRun = true;
+    private int $lastHeartbeatAt = 0;
 
     public function handle(): int
     {
         $this->info('Starting agent events processor...');
         $this->registerSignalHandlers();
+        $this->touchHeartbeat(force: true);
 
         while ($this->shouldRun) {
             try {
+                $this->touchHeartbeat();
                 $event = Redis::lpop('agent-events-queue');
 
                 if ($event) {
@@ -80,5 +86,17 @@ class ProcessAgentEvents extends Command
             Redis::rpush('agent-events-queue', $eventJson);
             sleep(1);
         }
+    }
+
+    private function touchHeartbeat(bool $force = false): void
+    {
+        $now = time();
+
+        if (!$force && ($now - $this->lastHeartbeatAt) < 1) {
+            return;
+        }
+
+        Cache::forever(self::HEARTBEAT_KEY, $now);
+        $this->lastHeartbeatAt = $now;
     }
 }

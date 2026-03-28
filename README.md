@@ -1,59 +1,95 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# SEO Autopilot
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Plateforme Laravel + Inertia pour piloter la génération SEO, la planification éditoriale, la publication CMS et l’orchestration d’agents Python.
 
-## About Laravel
+## Stack
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Backend: Laravel 12, Sanctum, Horizon, Reverb, Filament
+- Frontend: React, TypeScript, Inertia, Vite, Tailwind
+- Agents: Python, Crawl4AI, Redis, SQLite vector store local
+- Publication: WordPress, Webflow, Shopify, Ghost
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Flux principaux
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- Onboarding site: création du site, inventaire sitemap/GSC, configuration éditoriale, intégration CMS, lancement du content plan
+- Génération d’article: `pending -> queued -> generating -> completed` côté keyword et `draft -> generating -> review|approved -> published|failed` côté article
+- Publication automatique: uniquement pour les articles `approved`, avec `auto_publish=true` et une intégration active
+- Indexation site: Laravel transmet des `seed_urls` à l’agent Python depuis `site_pages`; la homepage ne sert que de fallback
 
-## Learning Laravel
+## Démarrage local
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+Prérequis:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- PHP 8.2+
+- Node.js 22+
+- `uv`
+- Redis
 
-## Laravel Sponsors
+Installation:
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```bash
+composer setup
+```
 
-### Premium Partners
+Développement:
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+```bash
+composer dev
+```
 
-## Contributing
+`composer dev` démarre maintenant:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- `php artisan serve`
+- `php artisan queue:listen --queue=default,crawl --tries=1 --timeout=900`
+- `php artisan reverb:start`
+- `php artisan pail --timeout=0`
+- `npm run dev`
+- `php artisan agents:process-events`
 
-## Code of Conduct
+## Vérifications locales
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+php artisan test
+npm run build
+uv run --project agents-python pytest
+php artisan agents:health
+```
 
-## Security Vulnerabilities
+## Variables utiles
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+- `QUEUE_CONNECTION`
+- `SITE_INDEXER_STORAGE_PATH`
+- `OPENROUTER_API_KEY`
+- `VOYAGE_API_KEY`
+- `GOOGLE_CLIENT_ID`
+- `GOOGLE_CLIENT_SECRET`
+- `DATAFORSEO_LOGIN`
+- `DATAFORSEO_PASSWORD`
+- `REPLICATE_API_KEY`
+- `REDIS_*`
 
-## License
+## Exploitation production
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Processus à faire tourner en continu:
+
+- worker queue Laravel sur `default,crawl`
+- `php artisan reverb:start`
+- `php artisan agents:process-events`
+
+Points de contrôle:
+
+- `php artisan agents:health` vérifie le heartbeat du pont Redis des agents
+- `storage/indexes` ou `SITE_INDEXER_STORAGE_PATH` contient les index SQLite des sites
+- les workers queue doivent avoir un `retry_after` supérieur au plus long job
+
+## CI
+
+- `.github/workflows/tests.yml` exécute `php artisan test`, `npm run build` et `uv run --project agents-python pytest`
+- `.github/workflows/dusk.yml` garde Dusk séparé, déclenché manuellement ou la nuit
+
+## Notes d’architecture
+
+- Les credentials d’intégration sont normalisés côté backend avec des clés provider-native
+- Les secrets stockés ne sont jamais renvoyés au frontend
+- Le dashboard utilise un payload canonique unique pour éviter la dérive backend/frontend
+- Les articles ne passent en `approved` automatiquement que si le site peut réellement auto-publier

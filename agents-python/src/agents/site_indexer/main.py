@@ -2,6 +2,7 @@
 """Site indexer agent - crawls and indexes a website."""
 import asyncio
 import hashlib
+import json
 import click
 from urllib.parse import urlparse
 from ..shared.crawler import ContentCrawler
@@ -21,14 +22,59 @@ def validate_url(url: str) -> str:
     return url.rstrip("/")
 
 
-async def run(site_id: int, site_url: str, max_pages: int = 100, delta: bool = False):
+def parse_seed_urls(seed_urls: str | None) -> list[str]:
+    if not seed_urls:
+        return []
+
+    try:
+        data = json.loads(seed_urls)
+    except json.JSONDecodeError as exc:
+        raise ValueError("seedUrls must be valid JSON") from exc
+
+    if not isinstance(data, list):
+        raise ValueError("seedUrls must decode to a list")
+
+    return [str(url).rstrip("/") for url in data if str(url).strip()]
+
+
+def build_crawl_targets(site_url: str, seed_urls: list[str], max_pages: int) -> list[str]:
+    site_host = urlparse(site_url).netloc.lower()
+    targets: list[str] = []
+
+    for candidate in seed_urls:
+        try:
+            validated = validate_url(candidate)
+        except ValueError:
+            continue
+
+        if urlparse(validated).netloc.lower() != site_host:
+            continue
+
+        if validated not in targets:
+            targets.append(validated)
+
+        if len(targets) >= max_pages:
+            break
+
+    return targets or [site_url]
+
+
+async def run(
+    site_id: int,
+    site_url: str,
+    max_pages: int = 100,
+    delta: bool = False,
+    seed_urls: list[str] | None = None,
+    storage_path: str | None = None,
+):
     """Main site indexer logic."""
     events = EventEmitter(site_id, AGENT_TYPE)
-    db = SiteIndexDB(site_id)
     crawler = ContentCrawler()
+    db = None
 
     try:
         validated_url = validate_url(site_url)
+        db = SiteIndexDB(site_id, storage_path=storage_path)
         await events.started("Starting site indexing", f"Indexing {validated_url}")
 
         # Get known URLs for delta mode
@@ -37,12 +83,9 @@ async def run(site_id: int, site_url: str, max_pages: int = 100, delta: bool = F
             known_urls = set(db.get_known_urls())
             print(f"Delta mode: {len(known_urls)} known URLs")
 
-        # For now, just crawl the homepage (deep crawl implementation depends on Crawl4AI API)
         await events.progress("Crawling site...")
-
-        # Simple implementation - crawl single URL
-        # TODO: Implement deep crawl when Crawl4AI API is verified
-        results = [await crawler.extract(validated_url)]
+        crawl_targets = build_crawl_targets(validated_url, seed_urls or [], max_pages)
+        results = [await crawler.extract(url) for url in crawl_targets]
 
         indexed_count = 0
         error_count = 0
@@ -90,7 +133,7 @@ async def run(site_id: int, site_url: str, max_pages: int = 100, delta: bool = F
 
         emit_json({
             "pages_indexed": indexed_count,
-            "discovered": len(results),
+            "discovered": len(crawl_targets),
             "errors": error_count,
         })
 
@@ -99,7 +142,8 @@ async def run(site_id: int, site_url: str, max_pages: int = 100, delta: bool = F
         emit_json({"success": False, "error": str(e)})
         raise
     finally:
-        db.close()
+        if db is not None:
+            db.close()
         await events.close()
 
 
@@ -108,9 +152,20 @@ async def run(site_id: int, site_url: str, max_pages: int = 100, delta: bool = F
 @click.option("--siteUrl", required=True, help="Site URL to index")
 @click.option("--maxPages", default=100, type=int, help="Maximum pages to index")
 @click.option("--delta", is_flag=True, help="Only index new/changed pages")
-def main(siteid: int, siteurl: str, maxpages: int, delta: bool):
+@click.option("--seedUrls", default=None, help="JSON array of seed URLs to index")
+@click.option("--storagePath", default=None, help="Custom storage directory for SQLite indexes")
+def main(siteid: int, siteurl: str, maxpages: int, delta: bool, seedurls: str | None, storagepath: str | None):
     """Site indexer - crawls and indexes a website."""
-    asyncio.run(run(siteid, siteurl, maxpages, delta))
+    asyncio.run(
+        run(
+            siteid,
+            siteurl,
+            maxpages,
+            delta,
+            parse_seed_urls(seedurls),
+            storagepath,
+        )
+    )
 
 
 if __name__ == "__main__":

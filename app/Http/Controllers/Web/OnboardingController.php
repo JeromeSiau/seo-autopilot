@@ -32,10 +32,7 @@ class OnboardingController extends Controller
 
     public function resume(Site $site)
     {
-        // Ensure user owns this site
-        if ($site->team_id !== auth()->user()->team_id) {
-            abort(403);
-        }
+        $this->authorize('view', $site);
 
         // Determine which step to resume from
         $step = 2; // Site already exists, skip step 1
@@ -148,6 +145,8 @@ class OnboardingController extends Controller
 
     public function storeStep2(Request $request, Site $site)
     {
+        $this->authorize('update', $site);
+
         if ($request->boolean('skip')) {
             return response()->json(['skipped' => true]);
         }
@@ -160,9 +159,7 @@ class OnboardingController extends Controller
      */
     public function getGscSites(Site $site, GoogleAuthService $authService, SearchConsoleService $gscService)
     {
-        if ($site->team_id !== auth()->user()->team_id) {
-            abort(403);
-        }
+        $this->authorize('view', $site);
 
         if (!$site->isGscConnected()) {
             return response()->json(['sites' => [], 'error' => 'GSC not connected']);
@@ -209,9 +206,7 @@ class OnboardingController extends Controller
      */
     public function selectGscProperty(Request $request, Site $site)
     {
-        if ($site->team_id !== auth()->user()->team_id) {
-            abort(403);
-        }
+        $this->authorize('update', $site);
 
         $validated = $request->validate([
             'property_id' => 'required|string|max:255',
@@ -227,9 +222,7 @@ class OnboardingController extends Controller
      */
     public function getGa4Properties(Site $site, GoogleAuthService $authService, GA4Service $ga4Service)
     {
-        if ($site->team_id !== auth()->user()->team_id) {
-            abort(403);
-        }
+        $this->authorize('view', $site);
 
         if (!$site->isGscConnected()) {
             return response()->json(['properties' => [], 'error' => 'Google not connected']);
@@ -270,9 +263,7 @@ class OnboardingController extends Controller
      */
     public function selectGa4Property(Request $request, Site $site)
     {
-        if ($site->team_id !== auth()->user()->team_id) {
-            abort(403);
-        }
+        $this->authorize('update', $site);
 
         $validated = $request->validate([
             'property_id' => 'required|string|max:255',
@@ -285,9 +276,7 @@ class OnboardingController extends Controller
 
     public function storeStep3(Request $request, Site $site)
     {
-        if ($site->team_id !== auth()->user()->team_id) {
-            abort(403);
-        }
+        $this->authorize('update', $site);
 
         $validated = $request->validate([
             'business_description' => 'required|string|max:2000',
@@ -305,6 +294,8 @@ class OnboardingController extends Controller
 
     public function storeStep4(Request $request, Site $site)
     {
+        $this->authorize('update', $site);
+
         $validated = $request->validate([
             'articles_per_week' => 'required|integer|min:1|max:30',
             'publish_days' => 'required|array|min:1',
@@ -322,6 +313,8 @@ class OnboardingController extends Controller
 
     public function storeStep5(Request $request, Site $site)
     {
+        $this->authorize('update', $site);
+
         if ($request->boolean('skip')) {
             return response()->json(['skipped' => true]);
         }
@@ -333,9 +326,7 @@ class OnboardingController extends Controller
 
     public function complete(Site $site)
     {
-        if ($site->team_id !== auth()->user()->team_id) {
-            abort(403);
-        }
+        $this->authorize('update', $site);
 
         $site->update(['onboarding_completed_at' => now()]);
 
@@ -351,9 +342,7 @@ class OnboardingController extends Controller
 
     public function generating(Site $site)
     {
-        if ($site->team_id !== auth()->user()->team_id) {
-            abort(403);
-        }
+        $this->authorize('view', $site);
 
         return Inertia::render('Onboarding/Generating', [
             'site' => $site->only(['id', 'name', 'domain']),

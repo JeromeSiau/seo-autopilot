@@ -28,8 +28,11 @@ class AutopilotPublishJob implements ShouldQueue
     ): void {
         Log::info('AutopilotPublishJob: Checking for articles to publish');
 
-        $articles = Article::where('status', 'ready')
-            ->whereHas('site.settings', fn($q) => $q->where('auto_publish', true))
+        $articles = Article::where('status', Article::STATUS_APPROVED)
+            ->whereHas('site.settings', fn($q) => $q
+                ->where('auto_publish', true)
+                ->where('autopilot_enabled', true))
+            ->with(['site.activeIntegration'])
             ->get();
 
         foreach ($articles as $article) {
@@ -52,10 +55,10 @@ class AutopilotPublishJob implements ShouldQueue
         CategoryMappingService $categoryMapping
     ): void {
         $site = $article->site;
-        $integration = $site->integration;
+        $integration = $site->activeIntegration;
 
         if (!$integration || !$integration->is_active) {
-            Log::info("AutopilotPublishJob: No integration for site {$site->id}, keeping as ready");
+            Log::info("AutopilotPublishJob: No active integration for site {$site->id}, keeping as approved");
             return;
         }
 

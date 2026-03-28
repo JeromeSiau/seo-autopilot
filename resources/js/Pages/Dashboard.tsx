@@ -2,22 +2,10 @@ import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link } from '@inertiajs/react';
 import { Plus, AlertTriangle, ArrowRight, Globe, Search, FileText, CheckCircle, TrendingUp, Zap, Sparkles, Loader2 } from 'lucide-react';
 import SiteCard from '@/Components/Dashboard/SiteCard';
-import { PageProps } from '@/types';
+import { DashboardSite, PageProps } from '@/types';
 import clsx from 'clsx';
 import { useTranslations } from '@/hooks/useTranslations';
 import { trans } from '@/utils/i18n';
-
-interface Site {
-    id: number;
-    domain: string;
-    name: string;
-    autopilot_status: 'active' | 'paused' | 'not_configured' | 'error';
-    articles_per_week: number;
-    articles_in_review: number;
-    articles_this_week: number;
-    onboarding_complete: boolean;
-    is_generating: boolean;
-}
 
 interface Action {
     type: 'review' | 'failed' | 'recommendation';
@@ -40,7 +28,7 @@ interface Stats {
 
 interface DashboardProps extends PageProps {
     stats: Stats;
-    sites: Site[];
+    sites: DashboardSite[];
     actionsRequired: Action[];
     unreadNotifications: number;
 }

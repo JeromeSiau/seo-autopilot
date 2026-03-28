@@ -37,7 +37,7 @@ class ArticleController extends Controller
 
     public function show(Request $request, Article $article): ArticleResource
     {
-        $this->authorize('view', $article->site);
+        $this->authorize('view', $article);
 
         $article->load(['keyword', 'site']);
 
@@ -46,7 +46,7 @@ class ArticleController extends Controller
 
     public function update(Request $request, Article $article): JsonResponse
     {
-        $this->authorize('update', $article->site);
+        $this->authorize('update', $article);
 
         $validated = $request->validate([
             'title' => 'sometimes|string|max:255',
@@ -65,7 +65,7 @@ class ArticleController extends Controller
 
     public function destroy(Request $request, Article $article): JsonResponse
     {
-        $this->authorize('delete', $article->site);
+        $this->authorize('delete', $article);
 
         $article->delete();
 
@@ -85,13 +85,13 @@ class ArticleController extends Controller
         }
 
         $validated = $request->validate([
-            'brand_voice_id' => 'nullable|exists:brand_voices,id',
             'generate_images' => 'boolean',
         ]);
 
+        $keyword->addToQueue();
+
         GenerateArticleJob::dispatch(
             $keyword,
-            $validated['brand_voice_id'] ?? null,
             $validated['generate_images'] ?? true,
         );
 
@@ -102,11 +102,11 @@ class ArticleController extends Controller
 
     public function publish(Request $request, Article $article): JsonResponse
     {
-        $this->authorize('update', $article->site);
+        $this->authorize('publish', $article);
 
-        if ($article->status !== 'ready') {
+        if (!$article->isApproved()) {
             return response()->json([
-                'message' => 'Article is not ready for publishing',
+                'message' => 'Article must be approved before publishing',
             ], 422);
         }
 
@@ -116,11 +116,9 @@ class ArticleController extends Controller
             'status' => 'in:publish,draft',
         ]);
 
-        $integration = Integration::findOrFail($validated['integration_id']);
-
-        if ($integration->team_id !== $request->user()->team_id) {
-            abort(403);
-        }
+        $integration = Integration::where('site_id', $article->site_id)
+            ->where('is_active', true)
+            ->findOrFail($validated['integration_id']);
 
         PublishArticleJob::dispatch(
             $article,

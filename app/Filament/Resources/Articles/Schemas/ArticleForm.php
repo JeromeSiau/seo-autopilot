@@ -31,7 +31,8 @@ class ArticleForm
                             ->options([
                                 'draft' => 'Draft',
                                 'generating' => 'Generating',
-                                'ready' => 'Ready',
+                                'review' => 'Review',
+                                'approved' => 'Approved',
                                 'published' => 'Published',
                                 'failed' => 'Failed',
                             ])

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Carbon;
 
 class Site extends Model
 {
@@ -104,6 +105,12 @@ class Site extends Model
         return $this->hasMany(Integration::class);
     }
 
+    public function activeIntegration(): HasOne
+    {
+        return $this->hasOne(Integration::class)
+            ->where('is_active', true);
+    }
+
     public function analytics(): HasManyThrough
     {
         return $this->hasManyThrough(ArticleAnalytic::class, Article::class);
@@ -186,9 +193,51 @@ class Site extends Model
         return $this->settings?->autopilot_enabled ?? false;
     }
 
+    public function hasActivePublishingIntegration(): bool
+    {
+        if ($this->relationLoaded('activeIntegration')) {
+            return $this->activeIntegration !== null;
+        }
+
+        return $this->activeIntegration()->exists();
+    }
+
+    public function shouldAutoApproveGeneratedArticles(): bool
+    {
+        return (bool) ($this->settings?->auto_publish)
+            && $this->hasActivePublishingIntegration();
+    }
+
     public function isOnboardingComplete(): bool
     {
         return $this->onboarding_completed_at !== null;
+    }
+
+    public function hasRecentAutopilotErrors(?Carbon $since = null): bool
+    {
+        $since ??= now()->subDay();
+
+        return $this->articles()
+            ->where('status', Article::STATUS_FAILED)
+            ->where('created_at', '>=', $since)
+            ->exists();
+    }
+
+    public function autopilotStatus(): string
+    {
+        if (!$this->isOnboardingComplete()) {
+            return 'not_configured';
+        }
+
+        if (!$this->isAutopilotActive()) {
+            return 'paused';
+        }
+
+        if ($this->hasRecentAutopilotErrors()) {
+            return 'error';
+        }
+
+        return 'active';
     }
 
     public function toBrandVoiceContext(): string

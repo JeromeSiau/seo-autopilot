@@ -29,7 +29,8 @@ class ArticlesTable
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'published' => 'success',
-                        'ready' => 'info',
+                        'approved' => 'success',
+                        'review' => 'info',
                         'generating' => 'warning',
                         'draft' => 'gray',
                         'failed' => 'danger',
@@ -59,7 +60,8 @@ class ArticlesTable
                     ->options([
                         'draft' => 'Draft',
                         'generating' => 'Generating',
-                        'ready' => 'Ready',
+                        'review' => 'Review',
+                        'approved' => 'Approved',
                         'published' => 'Published',
                         'failed' => 'Failed',
                     ]),

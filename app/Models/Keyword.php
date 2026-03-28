@@ -10,6 +10,25 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class Keyword extends Model
 {
     use HasFactory;
+
+    public const STATUS_PENDING = 'pending';
+    public const STATUS_QUEUED = 'queued';
+    public const STATUS_GENERATING = 'generating';
+    public const STATUS_COMPLETED = 'completed';
+    public const STATUS_SCHEDULED = 'scheduled';
+    public const STATUS_FAILED = 'failed';
+    public const STATUS_SKIPPED = 'skipped';
+
+    public const STATUSES = [
+        self::STATUS_PENDING,
+        self::STATUS_QUEUED,
+        self::STATUS_GENERATING,
+        self::STATUS_COMPLETED,
+        self::STATUS_SCHEDULED,
+        self::STATUS_FAILED,
+        self::STATUS_SKIPPED,
+    ];
+
     protected $fillable = [
         'site_id',
         'keyword',
@@ -53,12 +72,12 @@ class Keyword extends Model
 
     public function scopePending($query)
     {
-        return $query->where('status', 'pending');
+        return $query->where('status', self::STATUS_PENDING);
     }
 
     public function scopeScheduled($query)
     {
-        return $query->where('status', 'scheduled');
+        return $query->where('status', self::STATUS_SCHEDULED);
     }
 
     public function scopeQuickWins($query)
@@ -97,24 +116,35 @@ class Keyword extends Model
     public function markAsScheduled(?string $date = null): void
     {
         $this->update([
-            'status' => 'scheduled',
+            'status' => self::STATUS_SCHEDULED,
             'scheduled_for' => $date ?? now()->addDay(),
         ]);
     }
 
     public function markAsGenerating(): void
     {
-        $this->update(['status' => 'generating']);
+        $this->update(['status' => self::STATUS_GENERATING]);
     }
 
     public function markAsCompleted(): void
     {
-        $this->update(['status' => 'completed']);
+        $this->update([
+            'status' => self::STATUS_COMPLETED,
+            'processed_at' => now(),
+        ]);
+    }
+
+    public function markAsFailed(): void
+    {
+        $this->update([
+            'status' => self::STATUS_FAILED,
+            'processed_at' => now(),
+        ]);
     }
 
     public function scopeQueued($query)
     {
-        return $query->where('status', 'queued')
+        return $query->where('status', self::STATUS_QUEUED)
             ->orderByDesc('priority')
             ->orderBy('queued_at');
     }
@@ -122,7 +152,7 @@ class Keyword extends Model
     public function addToQueue(): void
     {
         $this->update([
-            'status' => 'queued',
+            'status' => self::STATUS_QUEUED,
             'queued_at' => now(),
             'priority' => (int) $this->calculateScore(),
         ]);

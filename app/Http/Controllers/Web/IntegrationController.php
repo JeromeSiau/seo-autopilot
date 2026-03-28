@@ -6,14 +6,21 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\IntegrationResource;
 use App\Http\Resources\SiteResource;
 use App\Models\Integration;
+use App\Services\Publisher\PublisherManager;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Crypt;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class IntegrationController extends Controller
 {
+    public function __construct(
+        private readonly PublisherManager $publisherManager,
+    ) {}
+
     public function index(Request $request): Response
     {
         $user = $request->user();
@@ -53,7 +60,7 @@ class IntegrationController extends Controller
     {
         $validated = $request->validate([
             'site_id' => ['required', 'exists:sites,id'],
-            'type' => ['required', 'in:wordpress,webflow,shopify'],
+            'type' => ['required', Rule::in($this->publisherManager->getSupportedTypes())],
             'name' => ['required', 'string', 'max:255'],
             'credentials' => ['required', 'array'],
         ]);
@@ -62,6 +69,12 @@ class IntegrationController extends Controller
 
         // Verify site belongs to team
         $site = $team->sites()->findOrFail($validated['site_id']);
+        $credentials = $this->publisherManager->normalizeCredentials($validated['type'], $validated['credentials']);
+        $errors = $this->publisherManager->validateCredentials($validated['type'], $credentials);
+
+        if (!empty($errors)) {
+            throw ValidationException::withMessages($errors);
+        }
 
         // Update or create - only one integration per site allowed
         Integration::updateOrCreate(
@@ -70,7 +83,7 @@ class IntegrationController extends Controller
                 'team_id' => $team->id,
                 'type' => $validated['type'],
                 'name' => $validated['name'],
-                'credentials' => $validated['credentials'],
+                'credentials' => $credentials,
                 'is_active' => true,
             ]
         );
@@ -105,7 +118,8 @@ class IntegrationController extends Controller
         }
 
         // Remove password fields for security
-        $safeCredentials = collect($credentials)->except(['password', 'api_token'])->toArray();
+        $safeCredentials = $this->publisherManager->getEditableCredentials($integration->type, $credentials);
+        $secretFields = $this->publisherManager->getCredentialPresence($integration->type, $credentials);
 
         // Build integration data with properly resolved site
         $integrationData = [
@@ -120,6 +134,7 @@ class IntegrationController extends Controller
                 'domain' => $integration->site->domain,
             ] : null,
             'credentials' => $safeCredentials,
+            'secret_fields' => $secretFields,
             'created_at' => $integration->created_at,
         ];
 
@@ -139,22 +154,20 @@ class IntegrationController extends Controller
 
         $updateData = ['name' => $validated['name']];
 
-        if (!empty($validated['credentials'])) {
-            // Get existing credentials - handle legacy double-encrypted data
-            $existingCredentials = $integration->credentials ?? [];
+        if (array_key_exists('credentials', $validated)) {
+            $existingCredentials = $this->resolveCredentials($integration->credentials ?? []);
+            $mergedCredentials = $this->publisherManager->mergeCredentials(
+                $integration->type,
+                $existingCredentials,
+                $validated['credentials'] ?? [],
+            );
+            $errors = $this->publisherManager->validateCredentials($integration->type, $mergedCredentials);
 
-            if (is_string($existingCredentials)) {
-                try {
-                    $decrypted = Crypt::decryptString($existingCredentials);
-                    $existingCredentials = json_decode($decrypted, true) ?? [];
-                } catch (\Exception $e) {
-                    $existingCredentials = [];
-                }
+            if (!empty($errors)) {
+                throw ValidationException::withMessages($errors);
             }
 
-            // Merge new credentials with existing ones (to preserve passwords if not changed)
-            $newCredentials = array_filter($validated['credentials'], fn($value) => $value !== '' && $value !== null);
-            $updateData['credentials'] = array_merge($existingCredentials, $newCredentials);
+            $updateData['credentials'] = $mergedCredentials;
         }
 
         $integration->update($updateData);
@@ -180,5 +193,19 @@ class IntegrationController extends Controller
 
         return redirect()->route('integrations.index')
             ->with('success', 'Integration deleted successfully.');
+    }
+
+    private function resolveCredentials(array|string $credentials): array
+    {
+        if (is_string($credentials)) {
+            try {
+                $decrypted = Crypt::decryptString($credentials);
+                return json_decode($decrypted, true) ?? [];
+            } catch (\Exception $e) {
+                return [];
+            }
+        }
+
+        return $credentials;
     }
 }

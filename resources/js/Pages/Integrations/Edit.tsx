@@ -1,6 +1,6 @@
 import AppLayout from '@/Layouts/AppLayout';
-import { Head, useForm, Link } from '@inertiajs/react';
-import { ArrowLeft, Plug, Globe } from 'lucide-react';
+import { Head, Link, useForm } from '@inertiajs/react';
+import { ArrowLeft, Globe, Plug } from 'lucide-react';
 import clsx from 'clsx';
 import { Integration, PageProps } from '@/types';
 import { FormEvent } from 'react';
@@ -9,31 +9,13 @@ import { useTranslations } from '@/hooks/useTranslations';
 interface IntegrationsEditProps extends PageProps {
     integration: Integration & {
         credentials?: Record<string, string>;
+        secret_fields?: Record<string, boolean>;
     };
 }
 
-const integrationTypes = [
-    {
-        type: 'wordpress',
-        fields: ['url', 'username', 'password'],
-    },
-    {
-        type: 'webflow',
-        fields: ['api_token', 'collection_id'],
-    },
-    {
-        type: 'shopify',
-        fields: ['shop_domain', 'api_token'],
-    },
-    {
-        type: 'ghost',
-        fields: ['url', 'admin_api_key'],
-    },
-];
-
 export default function IntegrationsEdit({ integration }: IntegrationsEditProps) {
     const { t } = useTranslations();
-    const integrationType = integrationTypes.find((i) => i.type === integration.type);
+    const secretFields = integration.secret_fields || {};
 
     const { data, setData, put, processing, errors } = useForm({
         name: integration.name,
@@ -57,13 +39,16 @@ export default function IntegrationsEdit({ integration }: IntegrationsEditProps)
         'transition-colors'
     );
 
+    const secretPlaceholder = (key: string, fallback: string) =>
+        secretFields[`has_${key}`] ? 'Leave empty to keep current' : fallback;
+
     return (
         <AppLayout
             header={
                 <div className="flex items-center gap-4">
                     <Link
                         href={route('integrations.index')}
-                        className="rounded-lg p-2 text-surface-400 hover:bg-surface-100 dark:hover:bg-surface-800 hover:text-surface-600 dark:hover:text-white transition-colors"
+                        className="rounded-lg p-2 text-surface-400 transition-colors hover:bg-surface-100 hover:text-surface-600 dark:hover:bg-surface-800 dark:hover:text-white"
                     >
                         <ArrowLeft className="h-5 w-5" />
                     </Link>
@@ -81,8 +66,7 @@ export default function IntegrationsEdit({ integration }: IntegrationsEditProps)
             <Head title={`${t?.integrations?.edit?.title ?? 'Edit'} ${integration.name}`} />
 
             <div className="mx-auto max-w-2xl">
-                <div className="bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 p-6">
-                    {/* Header */}
+                <div className="rounded-2xl border border-surface-200 bg-white p-6 dark:border-surface-800 dark:bg-surface-900/50 dark:backdrop-blur-xl">
                     <div className="mb-6 flex items-center gap-4">
                         <div className={clsx(
                             'flex h-12 w-12 items-center justify-center rounded-xl text-white',
@@ -105,13 +89,12 @@ export default function IntegrationsEdit({ integration }: IntegrationsEditProps)
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-6">
-                        {/* Connected Site (read-only) */}
                         {integration.site && (
                             <div>
                                 <label className="block text-sm font-medium text-surface-700 dark:text-surface-300">
                                     {t?.integrations?.edit?.connectedSite ?? 'Connected site'}
                                 </label>
-                                <div className="mt-1.5 flex items-center gap-3 rounded-xl bg-surface-50 dark:bg-surface-800/50 border border-surface-200 dark:border-surface-700 px-4 py-3">
+                                <div className="mt-1.5 flex items-center gap-3 rounded-xl border border-surface-200 bg-surface-50 px-4 py-3 dark:border-surface-700 dark:bg-surface-800/50">
                                     <Globe className="h-5 w-5 text-surface-400" />
                                     <div>
                                         <p className="font-medium text-surface-900 dark:text-white">{integration.site.name}</p>
@@ -121,7 +104,6 @@ export default function IntegrationsEdit({ integration }: IntegrationsEditProps)
                             </div>
                         )}
 
-                        {/* Integration Name */}
                         <div>
                             <label
                                 htmlFor="name"
@@ -142,7 +124,6 @@ export default function IntegrationsEdit({ integration }: IntegrationsEditProps)
                             )}
                         </div>
 
-                        {/* WordPress Fields */}
                         {integration.type === 'wordpress' && (
                             <>
                                 <div>
@@ -151,10 +132,8 @@ export default function IntegrationsEdit({ integration }: IntegrationsEditProps)
                                     </label>
                                     <input
                                         type="url"
-                                        value={data.credentials.url || ''}
-                                        onChange={(e) =>
-                                            handleCredentialChange('url', e.target.value)
-                                        }
+                                        value={data.credentials.site_url || ''}
+                                        onChange={(e) => handleCredentialChange('site_url', e.target.value)}
                                         placeholder={t?.integrations?.fields?.wordpress?.urlPlaceholder ?? 'https://yoursite.com'}
                                         className={inputClasses}
                                     />
@@ -166,9 +145,7 @@ export default function IntegrationsEdit({ integration }: IntegrationsEditProps)
                                     <input
                                         type="text"
                                         value={data.credentials.username || ''}
-                                        onChange={(e) =>
-                                            handleCredentialChange('username', e.target.value)
-                                        }
+                                        onChange={(e) => handleCredentialChange('username', e.target.value)}
                                         className={inputClasses}
                                     />
                                 </div>
@@ -178,11 +155,9 @@ export default function IntegrationsEdit({ integration }: IntegrationsEditProps)
                                     </label>
                                     <input
                                         type="password"
-                                        value={data.credentials.password || ''}
-                                        onChange={(e) =>
-                                            handleCredentialChange('password', e.target.value)
-                                        }
-                                        placeholder={t?.integrations?.fields?.wordpress?.passwordPlaceholder ?? 'Leave empty to keep current'}
+                                        value={data.credentials.app_password || ''}
+                                        onChange={(e) => handleCredentialChange('app_password', e.target.value)}
+                                        placeholder={secretPlaceholder('app_password', 'Enter an application password')}
                                         className={inputClasses}
                                     />
                                     <p className="mt-1.5 text-xs text-surface-500 dark:text-surface-400">
@@ -192,20 +167,29 @@ export default function IntegrationsEdit({ integration }: IntegrationsEditProps)
                             </>
                         )}
 
-                        {/* Webflow Fields */}
                         {integration.type === 'webflow' && (
                             <>
                                 <div>
                                     <label className="block text-sm font-medium text-surface-700 dark:text-surface-300">
-                                        {t?.integrations?.fields?.webflow?.apiToken ?? 'API Token'}
+                                        API Token
                                     </label>
                                     <input
                                         type="password"
                                         value={data.credentials.api_token || ''}
-                                        onChange={(e) =>
-                                            handleCredentialChange('api_token', e.target.value)
-                                        }
-                                        placeholder={t?.integrations?.fields?.webflow?.apiTokenPlaceholder ?? 'Leave empty to keep current'}
+                                        onChange={(e) => handleCredentialChange('api_token', e.target.value)}
+                                        placeholder={secretPlaceholder('api_token', 'Enter an API token')}
+                                        className={inputClasses}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-surface-700 dark:text-surface-300">
+                                        Site ID
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={data.credentials.site_id || ''}
+                                        onChange={(e) => handleCredentialChange('site_id', e.target.value)}
+                                        placeholder="The Webflow site identifier"
                                         className={inputClasses}
                                     />
                                 </div>
@@ -216,9 +200,7 @@ export default function IntegrationsEdit({ integration }: IntegrationsEditProps)
                                     <input
                                         type="text"
                                         value={data.credentials.collection_id || ''}
-                                        onChange={(e) =>
-                                            handleCredentialChange('collection_id', e.target.value)
-                                        }
+                                        onChange={(e) => handleCredentialChange('collection_id', e.target.value)}
                                         placeholder={t?.integrations?.fields?.webflow?.collectionIdPlaceholder ?? 'The CMS collection to publish to'}
                                         className={inputClasses}
                                     />
@@ -226,7 +208,6 @@ export default function IntegrationsEdit({ integration }: IntegrationsEditProps)
                             </>
                         )}
 
-                        {/* Shopify Fields */}
                         {integration.type === 'shopify' && (
                             <>
                                 <div>
@@ -236,31 +217,38 @@ export default function IntegrationsEdit({ integration }: IntegrationsEditProps)
                                     <input
                                         type="text"
                                         value={data.credentials.shop_domain || ''}
-                                        onChange={(e) =>
-                                            handleCredentialChange('shop_domain', e.target.value)
-                                        }
+                                        onChange={(e) => handleCredentialChange('shop_domain', e.target.value)}
                                         placeholder={t?.integrations?.fields?.shopify?.shopDomainPlaceholder ?? 'yourshop.myshopify.com'}
                                         className={inputClasses}
                                     />
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-surface-700 dark:text-surface-300">
-                                        {t?.integrations?.fields?.shopify?.apiToken ?? 'Admin API Token'}
+                                        Admin API Token
                                     </label>
                                     <input
                                         type="password"
-                                        value={data.credentials.api_token || ''}
-                                        onChange={(e) =>
-                                            handleCredentialChange('api_token', e.target.value)
-                                        }
-                                        placeholder={t?.integrations?.fields?.shopify?.apiTokenPlaceholder ?? 'Leave empty to keep current'}
+                                        value={data.credentials.access_token || ''}
+                                        onChange={(e) => handleCredentialChange('access_token', e.target.value)}
+                                        placeholder={secretPlaceholder('access_token', 'Enter an admin API token')}
+                                        className={inputClasses}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-surface-700 dark:text-surface-300">
+                                        Blog ID
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={data.credentials.blog_id || ''}
+                                        onChange={(e) => handleCredentialChange('blog_id', e.target.value)}
+                                        placeholder="Optional blog identifier"
                                         className={inputClasses}
                                     />
                                 </div>
                             </>
                         )}
 
-                        {/* Ghost Fields */}
                         {integration.type === 'ghost' && (
                             <>
                                 <div>
@@ -269,10 +257,8 @@ export default function IntegrationsEdit({ integration }: IntegrationsEditProps)
                                     </label>
                                     <input
                                         type="url"
-                                        value={data.credentials.url || ''}
-                                        onChange={(e) =>
-                                            handleCredentialChange('url', e.target.value)
-                                        }
+                                        value={data.credentials.blog_url || ''}
+                                        onChange={(e) => handleCredentialChange('blog_url', e.target.value)}
                                         placeholder={t?.integrations?.fields?.ghost?.urlPlaceholder ?? 'https://yoursite.ghost.io'}
                                         className={inputClasses}
                                     />
@@ -284,25 +270,19 @@ export default function IntegrationsEdit({ integration }: IntegrationsEditProps)
                                     <input
                                         type="password"
                                         value={data.credentials.admin_api_key || ''}
-                                        onChange={(e) =>
-                                            handleCredentialChange('admin_api_key', e.target.value)
-                                        }
-                                        placeholder={t?.integrations?.fields?.ghost?.adminApiKeyPlaceholder ?? 'Leave empty to keep current'}
+                                        onChange={(e) => handleCredentialChange('admin_api_key', e.target.value)}
+                                        placeholder={secretPlaceholder('admin_api_key', 'Enter an admin API key')}
                                         className={inputClasses}
                                     />
                                 </div>
                             </>
                         )}
 
-                        {/* Submit Buttons */}
-                        <div className="flex justify-end gap-3 pt-4 border-t border-surface-100 dark:border-surface-800">
+                        <div className="flex justify-end gap-3 border-t border-surface-100 pt-4 dark:border-surface-800">
                             <Link
                                 href={route('integrations.index')}
                                 className={clsx(
-                                    'inline-flex items-center rounded-xl px-4 py-2.5',
-                                    'text-sm font-semibold text-surface-700 dark:text-surface-300',
-                                    'border border-surface-300 dark:border-surface-700 bg-white dark:bg-surface-800',
-                                    'hover:bg-surface-50 dark:hover:bg-surface-700 transition-colors'
+                                    'inline-flex items-center rounded-xl border border-surface-300 bg-white px-4 py-2.5 text-sm font-semibold text-surface-700 transition-colors hover:bg-surface-50 dark:border-surface-700 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700'
                                 )}
                             >
                                 {t?.integrations?.edit?.cancel ?? 'Cancel'}
@@ -311,10 +291,9 @@ export default function IntegrationsEdit({ integration }: IntegrationsEditProps)
                                 type="submit"
                                 disabled={processing}
                                 className={clsx(
-                                    'inline-flex items-center rounded-xl px-4 py-2.5',
-                                    'bg-gradient-to-r from-primary-500 to-primary-600 text-white text-sm font-semibold',
-                                    'shadow-green dark:shadow-green-glow hover:shadow-green-lg hover:-translate-y-0.5',
-                                    'transition-all disabled:opacity-50 disabled:cursor-not-allowed'
+                                    'inline-flex items-center rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 px-4 py-2.5 text-sm font-semibold text-white',
+                                    'shadow-green transition-all hover:-translate-y-0.5 hover:shadow-green-lg dark:shadow-green-glow',
+                                    'disabled:cursor-not-allowed disabled:opacity-50'
                                 )}
                             >
                                 {processing ? (t?.integrations?.edit?.saving ?? 'Saving...') : (t?.integrations?.edit?.save ?? 'Save')}

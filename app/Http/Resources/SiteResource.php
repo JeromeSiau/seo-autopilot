@@ -43,23 +43,6 @@ class SiteResource extends JsonResource
 
     protected function getAutopilotStatus(): string
     {
-        // Not configured if onboarding not completed
-        if (!$this->onboarding_completed_at) {
-            return 'not_configured';
-        }
-
-        // Check if site has settings
-        $settings = $this->relationLoaded('settings') ? $this->settings : $this->settings()->first();
-
-        if (!$settings) {
-            return 'not_configured';
-        }
-
-        // Check autopilot enabled status
-        if ($settings->autopilot_enabled ?? false) {
-            return 'active';
-        }
-
-        return 'paused';
+        return $this->autopilotStatus();
     }
 }

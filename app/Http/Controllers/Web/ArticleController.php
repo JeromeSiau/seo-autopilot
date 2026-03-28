@@ -83,7 +83,6 @@ class ArticleController extends Controller
     {
         $validated = $request->validate([
             'keyword_id' => ['required', 'exists:keywords,id'],
-            'brand_voice_id' => ['nullable', 'exists:brand_voices,id'],
             'generate_images' => ['boolean'],
         ]);
 
@@ -97,11 +96,10 @@ class ArticleController extends Controller
             return back()->with('error', 'You have reached your article limit for this month.');
         }
 
-        $keyword->update(['status' => 'processing']);
+        $keyword->addToQueue();
 
         GenerateArticleJob::dispatch(
             $keyword,
-            $validated['brand_voice_id'] ?? null,
             $validated['generate_images'] ?? true,
         );
 
@@ -156,22 +154,31 @@ class ArticleController extends Controller
 
     public function approve(Article $article): RedirectResponse
     {
-        $this->authorize('update', $article);
+        $this->authorize('approve', $article);
 
-        $article->update(['status' => 'approved']);
+        if (!in_array($article->status, [Article::STATUS_DRAFT, Article::STATUS_REVIEW], true)) {
+            return back()->with('error', 'Only draft or review articles can be approved.');
+        }
+
+        $article->update(['status' => Article::STATUS_APPROVED]);
 
         return back()->with('success', 'Article approved for publishing.');
     }
 
     public function publish(Request $request, Article $article): RedirectResponse
     {
-        $this->authorize('update', $article);
+        $this->authorize('publish', $article);
+
+        if (!$article->isApproved()) {
+            return back()->with('error', 'Only approved articles can be published.');
+        }
 
         $validated = $request->validate([
             'integration_id' => ['required', 'exists:integrations,id'],
         ]);
 
         $integration = Integration::where('site_id', $article->site_id)
+            ->where('is_active', true)
             ->findOrFail($validated['integration_id']);
 
         PublishArticleJob::dispatch($article, $integration);

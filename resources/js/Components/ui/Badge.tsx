@@ -47,7 +47,8 @@ export function getStatusVariant(status: string): BadgeVariant {
         case 'pending':
             return 'default';
         case 'review':
-        case 'processing':
+        case 'queued':
+        case 'generating':
             return 'info';
         case 'approved':
             return 'secondary';

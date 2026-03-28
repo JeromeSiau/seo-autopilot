@@ -100,4 +100,8 @@ return [
         'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
     ],
 
+    'site_indexer' => [
+        'storage_path' => env('SITE_INDEXER_STORAGE_PATH', storage_path('indexes')),
+    ],
+
 ];

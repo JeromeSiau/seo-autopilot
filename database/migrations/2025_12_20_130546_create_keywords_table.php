@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('volume')->nullable();
             $table->integer('difficulty')->nullable();
             $table->decimal('cpc', 8, 2)->nullable();
-            $table->enum('status', ['pending', 'scheduled', 'generating', 'completed', 'skipped'])->default('pending');
+            $table->enum('status', ['pending', 'queued', 'generating', 'completed', 'scheduled', 'failed', 'skipped'])->default('pending');
             $table->string('cluster_id')->nullable();
             $table->enum('source', ['search_console', 'ai_generated', 'manual', 'dataforseo'])->default('manual');
             $table->integer('current_position')->nullable();

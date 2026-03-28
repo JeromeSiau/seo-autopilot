@@ -9,6 +9,7 @@ use App\Services\Publisher\PublisherManager;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Validation\Rule;
 
 class IntegrationController extends Controller
 {
@@ -18,7 +19,7 @@ class IntegrationController extends Controller
 
     public function index(Request $request): AnonymousResourceCollection
     {
-        $integrations = $request->user()->team->integrations()
+        $integrations = $request->user()->currentTeam->integrations()
             ->with('site')
             ->latest()
             ->paginate(20);
@@ -29,16 +30,20 @@ class IntegrationController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'type' => 'required|in:wordpress,webflow,shopify',
+            'type' => ['required', Rule::in($this->publisherManager->getSupportedTypes())],
             'name' => 'required|string|max:255',
-            'site_id' => 'nullable|exists:sites,id',
+            'site_id' => 'required|exists:sites,id',
             'credentials' => 'required|array',
         ]);
+
+        $team = $request->user()->currentTeam;
+        $site = $team->sites()->findOrFail($validated['site_id']);
+        $credentials = $this->publisherManager->normalizeCredentials($validated['type'], $validated['credentials']);
 
         // Validate credentials
         $errors = $this->publisherManager->validateCredentials(
             $validated['type'],
-            $validated['credentials']
+            $credentials
         );
 
         if (!empty($errors)) {
@@ -48,13 +53,15 @@ class IntegrationController extends Controller
             ], 422);
         }
 
-        $integration = $request->user()->team->integrations()->create([
-            'type' => $validated['type'],
-            'name' => $validated['name'],
-            'site_id' => $validated['site_id'],
-            'credentials' => $validated['credentials'],
-            'is_active' => true,
-        ]);
+        $integration = $team->integrations()->updateOrCreate(
+            ['site_id' => $site->id],
+            [
+                'type' => $validated['type'],
+                'name' => $validated['name'],
+                'credentials' => $credentials,
+                'is_active' => true,
+            ]
+        );
 
         return response()->json([
             'message' => 'Integration created successfully',
@@ -64,18 +71,20 @@ class IntegrationController extends Controller
 
     public function update(Request $request, Integration $integration): JsonResponse
     {
-        if ($integration->team_id !== $request->user()->team_id) {
-            abort(403);
-        }
+        $this->authorize('update', $integration);
 
         $validated = $request->validate([
             'name' => 'sometimes|string|max:255',
-            'site_id' => 'nullable|exists:sites,id',
             'credentials' => 'sometimes|array',
             'is_active' => 'sometimes|boolean',
         ]);
 
         if (isset($validated['credentials'])) {
+            $validated['credentials'] = $this->publisherManager->mergeCredentials(
+                $integration->type,
+                $this->resolveCredentials($integration->credentials),
+                $validated['credentials'],
+            );
             $errors = $this->publisherManager->validateCredentials(
                 $integration->type,
                 $validated['credentials']
@@ -99,9 +108,7 @@ class IntegrationController extends Controller
 
     public function destroy(Request $request, Integration $integration): JsonResponse
     {
-        if ($integration->team_id !== $request->user()->team_id) {
-            abort(403);
-        }
+        $this->authorize('delete', $integration);
 
         $integration->delete();
 
@@ -112,9 +119,7 @@ class IntegrationController extends Controller
 
     public function test(Request $request, Integration $integration): JsonResponse
     {
-        if ($integration->team_id !== $request->user()->team_id) {
-            abort(403);
-        }
+        $this->authorize('view', $integration);
 
         try {
             $publisher = $this->publisherManager->getPublisher($integration);
@@ -134,9 +139,7 @@ class IntegrationController extends Controller
 
     public function categories(Request $request, Integration $integration): JsonResponse
     {
-        if ($integration->team_id !== $request->user()->team_id) {
-            abort(403);
-        }
+        $this->authorize('view', $integration);
 
         try {
             $publisher = $this->publisherManager->getPublisher($integration);
@@ -151,5 +154,14 @@ class IntegrationController extends Controller
                 'error' => $e->getMessage(),
             ]);
         }
+    }
+
+    private function resolveCredentials(array|string $credentials): array
+    {
+        if (is_array($credentials)) {
+            return $credentials;
+        }
+
+        return [];
     }
 }

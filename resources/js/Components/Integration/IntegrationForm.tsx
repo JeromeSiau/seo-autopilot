@@ -312,8 +312,8 @@ export default function IntegrationForm({
                             <input
                                 id="wordpress-url"
                                 type="url"
-                                value={credentials.url || ''}
-                                onChange={(e) => handleCredentialChange('url', e.target.value)}
+                                value={credentials.site_url || ''}
+                                onChange={(e) => handleCredentialChange('site_url', e.target.value)}
                                 placeholder="https://votresite.com"
                                 required
                                 className="w-full px-4 py-2.5 rounded-xl border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 text-surface-900 dark:text-white placeholder-surface-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
@@ -340,8 +340,8 @@ export default function IntegrationForm({
                                 <input
                                     id="wordpress-password"
                                     type={showPassword ? 'text' : 'password'}
-                                    value={credentials.password || ''}
-                                    onChange={(e) => handleCredentialChange('password', e.target.value)}
+                                    value={credentials.app_password || ''}
+                                    onChange={(e) => handleCredentialChange('app_password', e.target.value)}
                                     required
                                     className="w-full px-4 py-2.5 pr-10 rounded-xl border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 text-surface-900 dark:text-white placeholder-surface-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
                                 />
@@ -388,6 +388,20 @@ export default function IntegrationForm({
                             </div>
                         </div>
                         <div>
+                            <label htmlFor="webflow-site-id" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
+                                Site ID
+                            </label>
+                            <input
+                                id="webflow-site-id"
+                                type="text"
+                                value={credentials.site_id || ''}
+                                onChange={(e) => handleCredentialChange('site_id', e.target.value)}
+                                placeholder="ID du site Webflow"
+                                required
+                                className="w-full px-4 py-2.5 rounded-xl border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 text-surface-900 dark:text-white placeholder-surface-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                            />
+                        </div>
+                        <div>
                             <label htmlFor="webflow-collection-id" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
                                 Collection ID
                             </label>
@@ -429,8 +443,8 @@ export default function IntegrationForm({
                                 <input
                                     id="shopify-api-token"
                                     type={showPassword ? 'text' : 'password'}
-                                    value={credentials.api_token || ''}
-                                    onChange={(e) => handleCredentialChange('api_token', e.target.value)}
+                                    value={credentials.access_token || ''}
+                                    onChange={(e) => handleCredentialChange('access_token', e.target.value)}
                                     required
                                     className="w-full px-4 py-2.5 pr-10 rounded-xl border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 text-surface-900 dark:text-white placeholder-surface-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
                                 />
@@ -443,6 +457,19 @@ export default function IntegrationForm({
                                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                 </button>
                             </div>
+                        </div>
+                        <div>
+                            <label htmlFor="shopify-blog-id" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
+                                Blog ID
+                            </label>
+                            <input
+                                id="shopify-blog-id"
+                                type="text"
+                                value={credentials.blog_id || ''}
+                                onChange={(e) => handleCredentialChange('blog_id', e.target.value)}
+                                placeholder="Optionnel"
+                                className="w-full px-4 py-2.5 rounded-xl border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 text-surface-900 dark:text-white placeholder-surface-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                            />
                         </div>
                     </>
                 )}

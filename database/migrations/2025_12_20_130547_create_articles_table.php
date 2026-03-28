@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('meta_title')->nullable();
             $table->text('meta_description')->nullable();
             $table->json('images')->nullable();
-            $table->enum('status', ['draft', 'generating', 'ready', 'published', 'failed'])->default('draft');
+            $table->enum('status', ['draft', 'generating', 'review', 'approved', 'published', 'failed'])->default('draft');
             $table->text('error_message')->nullable();
             $table->timestamp('published_at')->nullable();
             $table->string('published_url')->nullable();

@@ -2,10 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Site;
-use App\Models\Article;
-use App\Models\ContentPlanGeneration;
-use Illuminate\Http\Request;
+use App\Http\Resources\DashboardSiteResource;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
@@ -25,7 +22,7 @@ class DashboardController extends Controller
                 'articles as this_month_articles_count' => fn ($q) => $q->where('created_at', '>=', now()->startOfMonth()),
                 'articles as this_week_articles_count' => fn ($q) => $q->where('created_at', '>=', now()->startOfWeek()),
             ])
-            ->with(['settings'])
+            ->with(['settings', 'latestContentPlanGeneration'])
             ->get();
 
         // Calculate sites limit based on plan (1 for trial, or plan limit)
@@ -52,18 +49,6 @@ class DashboardController extends Controller
             'articles_used' => $articlesUsed,
             'articles_limit' => $team->articles_limit,
         ];
-
-        $sitesData = $sites->map(fn ($site) => [
-            'id' => $site->id,
-            'name' => $site->name,
-            'domain' => $site->domain,
-            'keywords_count' => $site->total_keywords_count,
-            'articles_count' => $site->total_articles_count,
-            'articles_in_review' => $site->review_articles_count,
-            'articles_this_week' => $site->this_week_articles_count,
-            'autopilot_enabled' => $site->settings?->autopilot_enabled ?? false,
-            'onboarding_completed' => $site->isOnboardingComplete(),
-        ]);
 
         $actionsRequired = [];
         foreach ($sites as $site) {
@@ -92,73 +77,8 @@ class DashboardController extends Controller
 
         return Inertia::render('Dashboard', [
             'stats' => $stats,
-            'sites' => $sitesData,
+            'sites' => DashboardSiteResource::collection($sites)->resolve(),
             'actionsRequired' => $actionsRequired,
         ]);
-    }
-
-    private function getAutopilotStatus(Site $site): string
-    {
-        if (!$site->isOnboardingComplete()) {
-            return 'not_configured';
-        }
-
-        if (!$site->isAutopilotActive()) {
-            return 'paused';
-        }
-
-        $hasErrors = $site->articles()
-            ->where('status', 'failed')
-            ->where('created_at', '>=', now()->subDay())
-            ->exists();
-
-        if ($hasErrors) {
-            return 'error';
-        }
-
-        return 'active';
-    }
-
-    private function getActionsRequired($sites): array
-    {
-        $actions = [];
-
-        foreach ($sites as $site) {
-            $reviewCount = $site->articles()->where('status', 'review')->count();
-            if ($reviewCount > 0) {
-                $actions[] = [
-                    'type' => 'review',
-                    'site_id' => $site->id,
-                    'site_domain' => $site->domain,
-                    'count' => $reviewCount,
-                    'message' => "{$reviewCount} article(s) en attente de review",
-                    'action_url' => route('sites.show', $site->id) . '?tab=review',
-                ];
-            }
-
-            $failedCount = $site->articles()->where('status', 'failed')->count();
-            if ($failedCount > 0) {
-                $actions[] = [
-                    'type' => 'failed',
-                    'site_id' => $site->id,
-                    'site_domain' => $site->domain,
-                    'count' => $failedCount,
-                    'message' => "Échec de publication ({$failedCount})",
-                    'action_url' => route('sites.show', $site->id) . '?tab=failed',
-                ];
-            }
-
-            if (!$site->isGscConnected() && $site->isOnboardingComplete()) {
-                $actions[] = [
-                    'type' => 'recommendation',
-                    'site_id' => $site->id,
-                    'site_domain' => $site->domain,
-                    'message' => "Connecter Google Search Console recommandé",
-                    'action_url' => route('auth.google', ['site_id' => $site->id]),
-                ];
-            }
-        }
-
-        return $actions;
     }
 }

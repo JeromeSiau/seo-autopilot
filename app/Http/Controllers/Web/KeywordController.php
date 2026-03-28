@@ -98,7 +98,7 @@ class KeywordController extends Controller
             return back()->with('error', 'Keyword is not pending.');
         }
 
-        $keyword->update(['status' => 'processing']);
+        $keyword->addToQueue();
 
         GenerateArticleJob::dispatch($keyword);
 
@@ -121,7 +121,7 @@ class KeywordController extends Controller
             ->get();
 
         foreach ($keywords as $keyword) {
-            $keyword->update(['status' => 'processing']);
+            $keyword->addToQueue();
             GenerateArticleJob::dispatch($keyword);
         }
 

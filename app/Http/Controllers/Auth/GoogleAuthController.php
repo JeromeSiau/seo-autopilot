@@ -25,11 +25,7 @@ class GoogleAuthController extends Controller
         ]);
 
         $site = Site::findOrFail($request->site_id);
-
-        // Verify user owns this site
-        if ($site->team_id !== $request->user()->team_id) {
-            abort(403);
-        }
+        $this->authorize('update', $site);
 
         // Store site_id in session for callback
         $state = encrypt([
@@ -114,25 +110,27 @@ class GoogleAuthController extends Controller
      */
     public function disconnect(Request $request, Site $site): RedirectResponse
     {
-        // Verify user owns this site
-        if ($site->team_id !== $request->user()->team_id) {
-            abort(403);
-        }
+        $this->authorize('update', $site);
 
-        // Revoke token if we have one
-        if ($site->gsc_token) {
+        $token = $site->gsc_token ?: $site->ga4_token;
+
+        if ($token) {
             try {
-                $this->googleAuth->revokeToken($site->gsc_token);
+                $this->googleAuth->revokeToken($token);
             } catch (\Exception $e) {
-                // Ignore revocation errors
+                // Ignore revocation errors.
             }
         }
 
-        // Clear tokens
         $site->update([
             'gsc_token' => null,
             'gsc_refresh_token' => null,
             'gsc_token_expires_at' => null,
+            'gsc_property_id' => null,
+            'ga4_token' => null,
+            'ga4_refresh_token' => null,
+            'ga4_token_expires_at' => null,
+            'ga4_property_id' => null,
         ]);
 
         return redirect()->route('sites.show', $site)
