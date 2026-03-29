@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SiteSetting extends Model
 {
+    protected $attributes = [
+        'publish_days' => '["mon","tue","wed","thu","fri","sat","sun"]',
+    ];
+
     protected $fillable = [
         'site_id',
         'autopilot_enabled',

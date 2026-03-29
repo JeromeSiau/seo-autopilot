@@ -13,7 +13,7 @@ return new class extends Migration
             $table->foreignId('site_id')->constrained()->cascadeOnDelete();
             $table->boolean('autopilot_enabled')->default(false);
             $table->unsignedTinyInteger('articles_per_week')->default(5);
-            $table->json('publish_days')->default('["mon","tue","wed","thu","fri","sat","sun"]');
+            $table->json('publish_days');
             $table->boolean('auto_publish')->default(true);
             $table->timestamps();
 
