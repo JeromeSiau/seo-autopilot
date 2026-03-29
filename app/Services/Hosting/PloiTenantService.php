@@ -51,14 +51,6 @@ class PloiTenantService
         return $response->json('data') ?? [];
     }
 
-    public function deleteCertificate(string $tenant): void
-    {
-        $response = $this->request()
-            ->delete($this->endpoint('/tenants/' . urlencode($tenant) . '/certificate'));
-
-        $this->ensureSuccess($response, 'Unable to delete tenant certificate.');
-    }
-
     private function request()
     {
         $token = config('services.ploi.token');
