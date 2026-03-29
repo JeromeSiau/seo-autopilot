@@ -12,6 +12,7 @@ use App\Services\Crawler\SiteCrawlerService;
 use App\Services\Google\GoogleAuthService;
 use App\Services\Google\SearchConsoleService;
 use App\Services\Google\GA4Service;
+use App\Services\Hosted\HostedSiteService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
@@ -20,6 +21,7 @@ class OnboardingController extends Controller
 {
     public function __construct(
         private readonly SiteCrawlerService $crawler,
+        private readonly HostedSiteService $hosting,
     ) {}
 
     public function create()
@@ -33,6 +35,28 @@ class OnboardingController extends Controller
     public function resume(Site $site)
     {
         $this->authorize('view', $site);
+
+        if ($site->isHosted()) {
+            $step = 3;
+
+            if ($site->business_description) {
+                $step = 4;
+            }
+
+            if ($site->settings) {
+                $step = 5;
+            }
+
+            if ($site->settings && $site->hosting?->staging_domain) {
+                $step = 6;
+            }
+
+            return Inertia::render('Onboarding/Wizard', [
+                'team' => auth()->user()->team,
+                'site' => $site->load(['settings', 'hosting', 'hostedPages']),
+                'resumeStep' => $step,
+            ]);
+        }
 
         // Determine which step to resume from
         $step = 2; // Site already exists, skip step 1
@@ -81,7 +105,7 @@ class OnboardingController extends Controller
 
         return Inertia::render('Onboarding/Wizard', [
             'team' => auth()->user()->team,
-            'site' => $site->load('settings'),
+            'site' => $site->load(['settings', 'hosting', 'hostedPages']),
             'resumeStep' => $step,
         ]);
     }
@@ -92,6 +116,7 @@ class OnboardingController extends Controller
             'domain' => ['required', 'string', 'max:255', new DomainFormat],
             'name' => 'required|string|max:255',
             'language' => 'required|string|size:2',
+            'mode' => 'required|string|in:external,hosted',
         ]);
 
         // Normalize domain (remove www. prefix)
@@ -107,6 +132,16 @@ class OnboardingController extends Controller
                     'domain' => ['Ce site est déjà enregistré. Contactez support@seo-autopilot.com si vous êtes le propriétaire.'],
                 ],
             ], 422);
+        }
+
+        if ($validated['mode'] === Site::MODE_HOSTED) {
+            $site = $this->hosting->createHostedSite(auth()->user()->currentTeam, $validated);
+
+            return response()->json([
+                'site_id' => $site->id,
+                'crawl_warning' => null,
+                'mode' => $site->mode,
+            ]);
         }
 
         // Créer le site avec status running
@@ -140,12 +175,17 @@ class OnboardingController extends Controller
         return response()->json([
             'site_id' => $site->id,
             'crawl_warning' => $crawlWarning,
+            'mode' => $site->mode,
         ]);
     }
 
     public function storeStep2(Request $request, Site $site)
     {
         $this->authorize('update', $site);
+
+        if ($site->isHosted()) {
+            return response()->json(['skipped' => true]);
+        }
 
         if ($request->boolean('skip')) {
             return response()->json(['skipped' => true]);
@@ -315,6 +355,12 @@ class OnboardingController extends Controller
     {
         $this->authorize('update', $site);
 
+        if ($site->isHosted()) {
+            return response()->json([
+                'redirect' => route('sites.hosting.show', ['site' => $site->id]),
+            ]);
+        }
+
         if ($request->boolean('skip')) {
             return response()->json(['skipped' => true]);
         }
@@ -345,7 +391,10 @@ class OnboardingController extends Controller
         $this->authorize('view', $site);
 
         return Inertia::render('Onboarding/Generating', [
-            'site' => $site->only(['id', 'name', 'domain']),
+            'site' => [
+                ...$site->only(['id', 'name', 'domain', 'mode']),
+                'hosting' => $site->hosting,
+            ],
         ]);
     }
 }

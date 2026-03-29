@@ -9,9 +9,9 @@ use App\Models\Integration;
 use App\Services\Publisher\PublisherManager;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Support\Facades\Crypt;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -69,6 +69,19 @@ class IntegrationController extends Controller
 
         // Verify site belongs to team
         $site = $team->sites()->findOrFail($validated['site_id']);
+
+        if ($site->isHosted()) {
+            throw ValidationException::withMessages([
+                'site_id' => 'Hosted blogs manage publishing automatically and cannot add CMS integrations.',
+            ]);
+        }
+
+        if ($validated['type'] === 'hosted') {
+            throw ValidationException::withMessages([
+                'type' => 'Hosted integrations are provisioned automatically.',
+            ]);
+        }
+
         $credentials = $this->publisherManager->normalizeCredentials($validated['type'], $validated['credentials']);
         $errors = $this->publisherManager->validateCredentials($validated['type'], $credentials);
 
@@ -101,6 +114,8 @@ class IntegrationController extends Controller
     public function edit(Integration $integration): Response
     {
         $this->authorize('update', $integration);
+
+        abort_if($integration->isHosted(), 404);
 
         $integration->load('site');
 
@@ -146,6 +161,7 @@ class IntegrationController extends Controller
     public function update(Request $request, Integration $integration): RedirectResponse
     {
         $this->authorize('update', $integration);
+        abort_if($integration->isHosted(), 404);
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -179,6 +195,7 @@ class IntegrationController extends Controller
     public function toggle(Integration $integration): RedirectResponse
     {
         $this->authorize('update', $integration);
+        abort_if($integration->isHosted(), 404);
 
         $integration->update(['is_active' => !$integration->is_active]);
 
@@ -188,6 +205,7 @@ class IntegrationController extends Controller
     public function destroy(Integration $integration): RedirectResponse
     {
         $this->authorize('delete', $integration);
+        abort_if($integration->isHosted(), 404);
 
         $integration->delete();
 

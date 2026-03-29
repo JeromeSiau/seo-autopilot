@@ -14,6 +14,7 @@ class ArticleResource extends JsonResource
             'title' => $this->title,
             'slug' => $this->slug,
             'content' => $this->when($request->routeIs('articles.show'), $this->content),
+            'excerpt' => $this->meta_description,
             'meta_title' => $this->meta_title,
             'meta_description' => $this->meta_description,
             'images' => $this->images,

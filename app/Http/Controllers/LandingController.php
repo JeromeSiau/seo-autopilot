@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\Hosted\HostedSiteResolver;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\File;
@@ -15,6 +16,8 @@ class LandingController extends Controller
 
     public function index(Request $request, ?string $locale = null)
     {
+        abort_if(app(HostedSiteResolver::class)->resolve($request), 404);
+
         // Determine locale
         $locale = $this->resolveLocale($request, $locale);
 

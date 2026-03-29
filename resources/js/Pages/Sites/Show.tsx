@@ -16,6 +16,7 @@ import {
     Users,
     AlertTriangle,
     TrendingDown,
+    Server,
 } from 'lucide-react';
 import { Button } from '@/Components/ui/Button';
 import { Card } from '@/Components/ui/Card';
@@ -41,6 +42,7 @@ interface SiteShowProps extends PageProps {
 
 export default function SiteShow({ site }: SiteShowProps) {
     const { t } = useTranslations();
+    const siteUrl = site.public_url || `https://${site.domain}`;
 
     const dayLabels: Record<string, string> = {
         mon: 'Mon',
@@ -83,20 +85,32 @@ export default function SiteShow({ site }: SiteShowProps) {
                         </div>
                         <div>
                             <h1 className="text-2xl font-bold text-surface-900 dark:text-white">{site.name}</h1>
-                            <a
-                                href={`https://${site.domain}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center gap-1 text-sm text-surface-500 dark:text-surface-400 hover:text-primary-600 dark:hover:text-primary-400"
-                            >
-                                {site.domain}
-                                <ExternalLink className="h-3 w-3" />
-                            </a>
+                            <div className="mt-1 flex items-center gap-2">
+                                <a
+                                    href={siteUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-1 text-sm text-surface-500 dark:text-surface-400 hover:text-primary-600 dark:hover:text-primary-400"
+                                >
+                                    {site.public_url ? site.public_url.replace(/^https?:\/\//, '') : site.domain}
+                                    <ExternalLink className="h-3 w-3" />
+                                </a>
+                                <Badge variant={site.mode === 'hosted' ? 'primary' : 'secondary'}>
+                                    {site.mode === 'hosted' ? 'Hosted' : 'External'}
+                                </Badge>
+                            </div>
                         </div>
                     </div>
-                    <Button as="link" href={route('sites.edit', { site: site.id })} variant="secondary" icon={Settings}>
-                        {t?.sites?.show?.settings ?? 'Settings'}
-                    </Button>
+                    <div className="flex items-center gap-3">
+                        {site.mode === 'hosted' && (
+                            <Button as="link" href={route('sites.hosting.show', { site: site.id })} variant="secondary" icon={Server}>
+                                Hosted blog
+                            </Button>
+                        )}
+                        <Button as="link" href={route('sites.edit', { site: site.id })} variant="secondary" icon={Settings}>
+                            {t?.sites?.show?.settings ?? 'Settings'}
+                        </Button>
+                    </div>
                 </div>
             }
         >
@@ -271,49 +285,86 @@ export default function SiteShow({ site }: SiteShowProps) {
                     {/* Connections */}
                     <Card>
                         <h2 className="mb-4 font-semibold text-surface-900 dark:text-white">{t?.sites?.show?.connections ?? 'Connections'}</h2>
-                        <div className="space-y-3">
-                            <div className="flex items-center justify-between">
-                                <span className="text-sm text-surface-600 dark:text-surface-400">{t?.sites?.show?.gsc ?? 'Google Search Console'}</span>
-                                {site.gsc_connected ? (
-                                    <span className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400">
-                                        <CheckCircle className="h-4 w-4" />
-                                        {t?.integrations?.connectedTo ? t.integrations.connectedTo.split(' ')[0] : 'Connected'}
-                                    </span>
-                                ) : (
-                                    <span className="flex items-center gap-1 text-sm text-surface-400">
-                                        <XCircle className="h-4 w-4" />
-                                        {t?.status?.notConfigured ?? 'Not connected'}
-                                    </span>
-                                )}
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <span className="text-sm text-surface-600 dark:text-surface-400">{t?.sites?.show?.ga4 ?? 'Google Analytics 4'}</span>
-                                {site.ga4_connected ? (
-                                    <span className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400">
-                                        <CheckCircle className="h-4 w-4" />
-                                        {t?.integrations?.connectedTo ? t.integrations.connectedTo.split(' ')[0] : 'Connected'}
-                                    </span>
-                                ) : (
-                                    <span className="flex items-center gap-1 text-sm text-surface-400">
-                                        <XCircle className="h-4 w-4" />
-                                        {t?.status?.notConfigured ?? 'Not connected'}
-                                    </span>
-                                )}
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <span className="text-sm text-surface-600 dark:text-surface-400">{t?.sites?.show?.cmsIntegrations ?? 'CMS Integrations'}</span>
-                                <span className="text-sm text-surface-600 dark:text-surface-400">{site.integrations_count || 0}</span>
-                            </div>
-                        </div>
-                        <div className="mt-4 border-t border-surface-100 dark:border-surface-800 pt-4">
-                            <Link
-                                href={route('integrations.index', { site_id: site.id })}
-                                className="flex items-center justify-center gap-1 text-sm text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300"
-                            >
-                                {t?.integrations?.title ?? 'Manage integrations'}
-                                <ArrowRight className="h-4 w-4" />
-                            </Link>
-                        </div>
+                        {site.mode === 'hosted' ? (
+                            <>
+                                <div className="space-y-3">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-sm text-surface-600 dark:text-surface-400">Hosted publishing</span>
+                                        <span className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400">
+                                            <CheckCircle className="h-4 w-4" />
+                                            Active
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-sm text-surface-600 dark:text-surface-400">Staging domain</span>
+                                        <span className="text-sm text-surface-600 dark:text-surface-400">
+                                            {site.hosting?.staging_domain ?? 'Not provisioned'}
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-sm text-surface-600 dark:text-surface-400">Custom domain</span>
+                                        <span className="text-sm text-surface-600 dark:text-surface-400">
+                                            {site.hosting?.custom_domain ?? 'Not connected'}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="mt-4 border-t border-surface-100 dark:border-surface-800 pt-4">
+                                    <Link
+                                        href={route('sites.hosting.show', { site: site.id })}
+                                        className="flex items-center justify-center gap-1 text-sm text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300"
+                                    >
+                                        Manage hosted blog
+                                        <ArrowRight className="h-4 w-4" />
+                                    </Link>
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <div className="space-y-3">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-sm text-surface-600 dark:text-surface-400">{t?.sites?.show?.gsc ?? 'Google Search Console'}</span>
+                                        {site.gsc_connected ? (
+                                            <span className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400">
+                                                <CheckCircle className="h-4 w-4" />
+                                                {t?.integrations?.connectedTo ? t.integrations.connectedTo.split(' ')[0] : 'Connected'}
+                                            </span>
+                                        ) : (
+                                            <span className="flex items-center gap-1 text-sm text-surface-400">
+                                                <XCircle className="h-4 w-4" />
+                                                {t?.status?.notConfigured ?? 'Not connected'}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-sm text-surface-600 dark:text-surface-400">{t?.sites?.show?.ga4 ?? 'Google Analytics 4'}</span>
+                                        {site.ga4_connected ? (
+                                            <span className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400">
+                                                <CheckCircle className="h-4 w-4" />
+                                                {t?.integrations?.connectedTo ? t.integrations.connectedTo.split(' ')[0] : 'Connected'}
+                                            </span>
+                                        ) : (
+                                            <span className="flex items-center gap-1 text-sm text-surface-400">
+                                                <XCircle className="h-4 w-4" />
+                                                {t?.status?.notConfigured ?? 'Not connected'}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-sm text-surface-600 dark:text-surface-400">{t?.sites?.show?.cmsIntegrations ?? 'CMS Integrations'}</span>
+                                        <span className="text-sm text-surface-600 dark:text-surface-400">{site.integrations_count || 0}</span>
+                                    </div>
+                                </div>
+                                <div className="mt-4 border-t border-surface-100 dark:border-surface-800 pt-4">
+                                    <Link
+                                        href={route('integrations.index', { site_id: site.id })}
+                                        className="flex items-center justify-center gap-1 text-sm text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300"
+                                    >
+                                        {t?.integrations?.title ?? 'Manage integrations'}
+                                        <ArrowRight className="h-4 w-4" />
+                                    </Link>
+                                </div>
+                            </>
+                        )}
                     </Card>
 
                     {/* Articles to watch */}
@@ -407,6 +458,15 @@ export default function SiteShow({ site }: SiteShowProps) {
                                 <Target className="h-4 w-4" />
                                 {t?.analytics?.title ?? 'Analytics'}
                             </Link>
+                            {site.mode === 'hosted' && (
+                                <Link
+                                    href={route('sites.hosting.show', { site: site.id })}
+                                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-surface-600 dark:text-surface-400 hover:bg-surface-50 dark:hover:bg-surface-800"
+                                >
+                                    <Server className="h-4 w-4" />
+                                    Hosted blog
+                                </Link>
+                            )}
                         </div>
                     </Card>
 

@@ -104,4 +104,21 @@ return [
         'storage_path' => env('SITE_INDEXER_STORAGE_PATH', storage_path('indexes')),
     ],
 
+    'ploi' => [
+        'token' => env('PLOI_API_TOKEN'),
+        'server_id' => env('PLOI_SERVER_ID'),
+        'site_id' => env('PLOI_SITE_ID'),
+        'webhook_token' => env('PLOI_WEBHOOK_TOKEN'),
+    ],
+
+    'hosted' => [
+        'staging_base_domain' => env('HOSTED_STAGING_BASE_DOMAIN'),
+        'public_ip' => env('HOSTED_PUBLIC_IP'),
+        'cname_target' => env('HOSTED_CNAME_TARGET'),
+        'primary_domains' => array_filter(array_map('trim', explode(',', (string) env(
+            'APP_PRIMARY_DOMAINS',
+            parse_url((string) env('APP_URL', ''), PHP_URL_HOST) ?: ''
+        )))),
+    ],
+
 ];

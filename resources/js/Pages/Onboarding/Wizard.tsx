@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Head, Link } from '@inertiajs/react';
-import { PageProps } from '@/types';
+import { PageProps, SiteMode } from '@/types';
 import { Check, X, AlertTriangle } from 'lucide-react';
 import clsx from 'clsx';
 import { useTranslations } from '@/hooks/useTranslations';
@@ -22,6 +22,7 @@ interface Site {
     id: number;
     domain: string;
     name: string;
+    mode: SiteMode;
     language: string;
     business_description?: string;
     gsc_connected?: boolean;
@@ -36,6 +37,9 @@ interface Site {
         publish_days: string[];
         auto_publish: boolean;
     };
+    hosting?: {
+        staging_domain?: string | null;
+    } | null;
 }
 
 interface WizardProps extends PageProps {
@@ -46,29 +50,45 @@ interface WizardProps extends PageProps {
 
 export default function Wizard({ team, site: initialSite, resumeStep }: WizardProps) {
     const { t } = useTranslations();
-
-    const STEPS = useMemo(() => [
-        { number: 1, title: t?.onboarding?.steps?.site?.name ?? 'Site', description: t?.onboarding?.steps?.site?.description ?? 'Basic info' },
-        { number: 2, title: t?.onboarding?.steps?.searchConsole?.name ?? 'Search Console', description: t?.onboarding?.steps?.searchConsole?.description ?? 'GSC connection' },
-        { number: 3, title: t?.onboarding?.steps?.business?.name ?? 'Business', description: t?.onboarding?.steps?.business?.description ?? 'Your activity' },
-        { number: 4, title: t?.onboarding?.steps?.config?.name ?? 'Configuration', description: t?.onboarding?.steps?.config?.description ?? 'Publishing rhythm' },
-        { number: 5, title: t?.onboarding?.steps?.publication?.name ?? 'Publication', description: t?.onboarding?.steps?.publication?.description ?? 'CMS integration' },
-        { number: 6, title: t?.onboarding?.steps?.launch?.name ?? 'Launch', description: t?.onboarding?.steps?.launch?.description ?? 'Activate autopilot' },
-    ], [t]);
+    const [siteMode, setSiteMode] = useState<SiteMode>(initialSite?.mode || 'external');
     const [currentStep, setCurrentStep] = useState(resumeStep || 1);
     const [siteId, setSiteId] = useState<number | null>(initialSite?.id || null);
     const [siteData, setSiteData] = useState({
         domain: initialSite?.domain || '',
         name: initialSite?.name || '',
         language: initialSite?.language || 'fr',
+        mode: initialSite?.mode || 'external',
     });
+    const effectiveMode = siteId ? siteMode : siteData.mode;
+
+    const STEPS = useMemo(() => {
+        if (effectiveMode === 'hosted') {
+            return [
+                { number: 1, title: t?.onboarding?.steps?.site?.name ?? 'Site', description: t?.onboarding?.steps?.site?.description ?? 'Basic info' },
+                { number: 3, title: t?.onboarding?.steps?.business?.name ?? 'Business', description: t?.onboarding?.steps?.business?.description ?? 'Your activity' },
+                { number: 4, title: t?.onboarding?.steps?.config?.name ?? 'Configuration', description: t?.onboarding?.steps?.config?.description ?? 'Publishing rhythm' },
+                { number: 5, title: 'Hosting', description: 'Staging and domain' },
+                { number: 6, title: t?.onboarding?.steps?.launch?.name ?? 'Launch', description: t?.onboarding?.steps?.launch?.description ?? 'Activate autopilot' },
+            ];
+        }
+
+        return [
+            { number: 1, title: t?.onboarding?.steps?.site?.name ?? 'Site', description: t?.onboarding?.steps?.site?.description ?? 'Basic info' },
+            { number: 2, title: t?.onboarding?.steps?.searchConsole?.name ?? 'Search Console', description: t?.onboarding?.steps?.searchConsole?.description ?? 'GSC connection' },
+            { number: 3, title: t?.onboarding?.steps?.business?.name ?? 'Business', description: t?.onboarding?.steps?.business?.description ?? 'Your activity' },
+            { number: 4, title: t?.onboarding?.steps?.config?.name ?? 'Configuration', description: t?.onboarding?.steps?.config?.description ?? 'Publishing rhythm' },
+            { number: 5, title: t?.onboarding?.steps?.publication?.name ?? 'Publication', description: t?.onboarding?.steps?.publication?.description ?? 'CMS integration' },
+            { number: 6, title: t?.onboarding?.steps?.launch?.name ?? 'Launch', description: t?.onboarding?.steps?.launch?.description ?? 'Activate autopilot' },
+        ];
+    }, [effectiveMode, t]);
     const [crawlStatus, setCrawlStatus] = useState<Site['crawl_status']>(initialSite?.crawl_status || 'pending');
     const [crawlPagesCount, setCrawlPagesCount] = useState(initialSite?.crawl_pages_count || 0);
     const [crawlWarning, setCrawlWarning] = useState<string | null>(null);
+    const currentStepIndex = Math.max(STEPS.findIndex((step) => step.number === currentStep), 0);
 
     // Écouter les updates de crawl en temps réel
     useEffect(() => {
-        if (!siteId) return;
+        if (!siteId || effectiveMode !== 'external') return;
 
         const channel = (window as any).Echo?.private(`site.${siteId}`);
         if (!channel) return;
@@ -83,10 +103,21 @@ export default function Wizard({ team, site: initialSite, resumeStep }: WizardPr
         return () => {
             channel.stopListening('.SiteCrawlProgress', handler);
         };
-    }, [siteId]);
+    }, [siteId, effectiveMode]);
 
-    const nextStep = () => setCurrentStep((s) => Math.min(s + 1, 6));
-    const prevStep = () => setCurrentStep((s) => Math.max(s - 1, 1));
+    const nextStep = () => {
+        const next = STEPS[currentStepIndex + 1];
+        if (next) {
+            setCurrentStep(next.number);
+        }
+    };
+
+    const prevStep = () => {
+        const previous = STEPS[currentStepIndex - 1];
+        if (previous) {
+            setCurrentStep(previous.number);
+        }
+    };
 
     return (
         <div className="min-h-screen bg-surface-50 dark:bg-surface-900 transition-colors">
@@ -158,22 +189,22 @@ export default function Wizard({ team, site: initialSite, resumeStep }: WizardPr
                     <div className="md:hidden">
                         <div className="flex items-center justify-between mb-3">
                             <span className="text-sm font-medium text-surface-700 dark:text-surface-300">
-                                Étape {currentStep} sur {STEPS.length}
+                                Étape {currentStepIndex + 1} sur {STEPS.length}
                             </span>
                             <span className="text-sm text-surface-500 dark:text-surface-400">
-                                {STEPS[currentStep - 1].title}
+                                {STEPS[currentStepIndex]?.title}
                             </span>
                         </div>
                         <div className="h-2 w-full rounded-full bg-surface-200 dark:bg-surface-800">
                             <div
                                 className="h-2 rounded-full bg-primary-500 dark:shadow-[0_0_10px_rgba(16,185,129,0.4)] transition-all duration-300"
-                                style={{ width: `${(currentStep / STEPS.length) * 100}%` }}
+                                style={{ width: `${((currentStepIndex + 1) / STEPS.length) * 100}%` }}
                             />
                         </div>
                     </div>
 
                     {/* Crawl Status Indicator */}
-                    {siteId && crawlStatus && crawlStatus !== 'pending' && (
+                    {effectiveMode === 'external' && siteId && crawlStatus && crawlStatus !== 'pending' && (
                         <div className="mt-4 flex justify-center">
                             <CrawlStatusIndicator
                                 status={crawlStatus}
@@ -206,17 +237,17 @@ export default function Wizard({ team, site: initialSite, resumeStep }: WizardPr
                             <Step1Site
                                 data={siteData}
                                 setData={setSiteData}
-                                onNext={(id, warning) => {
+                                onNext={(id, mode, warning) => {
                                     setSiteId(id);
-                                    setCrawlStatus('running');
-                                    if (warning) {
-                                        setCrawlWarning(warning);
-                                    }
-                                    nextStep();
+                                    setSiteMode(mode);
+                                    setSiteData((previous) => ({ ...previous, mode }));
+                                    setCrawlStatus(mode === 'hosted' ? 'completed' : 'running');
+                                    setCrawlWarning(warning ?? null);
+                                    setCurrentStep(mode === 'hosted' ? 3 : 2);
                                 }}
                             />
                         )}
-                        {currentStep === 2 && siteId && (
+                        {effectiveMode === 'external' && currentStep === 2 && siteId && (
                             <Step2GSC
                                 siteId={siteId}
                                 gscConnected={initialSite?.gsc_connected || false}
@@ -235,10 +266,16 @@ export default function Wizard({ team, site: initialSite, resumeStep }: WizardPr
                             <Step4Config siteId={siteId} team={team} onNext={nextStep} onBack={prevStep} />
                         )}
                         {currentStep === 5 && siteId && (
-                            <Step5Integration siteId={siteId} onNext={nextStep} onBack={prevStep} />
+                            <Step5Integration
+                                siteId={siteId}
+                                mode={effectiveMode}
+                                stagingDomain={initialSite?.hosting?.staging_domain}
+                                onNext={nextStep}
+                                onBack={prevStep}
+                            />
                         )}
                         {currentStep === 6 && siteId && (
-                            <Step6Launch siteId={siteId} onBack={prevStep} />
+                            <Step6Launch siteId={siteId} mode={effectiveMode} onBack={prevStep} />
                         )}
                     </div>
                 </div>

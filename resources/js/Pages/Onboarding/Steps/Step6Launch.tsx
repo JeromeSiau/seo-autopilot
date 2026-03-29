@@ -2,21 +2,29 @@ import { useState } from 'react';
 import { router } from '@inertiajs/react';
 import { Rocket, Check, ChevronLeft, Sparkles } from 'lucide-react';
 import clsx from 'clsx';
+import { SiteMode } from '@/types';
 
 interface Props {
     siteId: number;
+    mode: SiteMode;
     onBack: () => void;
 }
 
-const LAUNCH_ITEMS = [
-    'Analyse de votre site et Search Console',
-    'Découverte de mots-clés pertinents',
-    'Génération automatique d\'articles SEO',
-    'Publication selon votre planning',
-];
-
-export default function Step6Launch({ siteId, onBack }: Props) {
+export default function Step6Launch({ siteId, mode, onBack }: Props) {
     const [loading, setLoading] = useState(false);
+    const launchItems = mode === 'hosted'
+        ? [
+            'Génération du plan éditorial initial',
+            'Découverte de mots-clés pertinents',
+            'Création automatique d articles SEO',
+            'Publication sur votre blog heberge',
+        ]
+        : [
+            'Analyse de votre site et Search Console',
+            'Découverte de mots-clés pertinents',
+            'Génération automatique d articles SEO',
+            'Publication selon votre planning',
+        ];
 
     const handleLaunch = () => {
         setLoading(true);
@@ -37,7 +45,9 @@ export default function Step6Launch({ siteId, onBack }: Props) {
                     Prêt à lancer !
                 </h2>
                 <p className="mt-2 text-surface-500 dark:text-surface-400">
-                    Votre autopilot est configuré et prêt à démarrer
+                    {mode === 'hosted'
+                        ? 'Votre blog heberge et votre autopilot sont prêts a démarrer.'
+                        : 'Votre autopilot est configuré et prêt à démarrer'}
                 </p>
             </div>
 
@@ -50,7 +60,7 @@ export default function Step6Launch({ siteId, onBack }: Props) {
                     </h3>
                 </div>
                 <ul className="space-y-3">
-                    {LAUNCH_ITEMS.map((item, i) => (
+                    {launchItems.map((item, i) => (
                         <li key={i} className="flex items-center gap-3">
                             <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary-500">
                                 <Check className="h-3.5 w-3.5 text-white" />

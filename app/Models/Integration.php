@@ -65,4 +65,9 @@ class Integration extends Model
     {
         return $this->type === 'ghost';
     }
+
+    public function isHosted(): bool
+    {
+        return $this->type === 'hosted';
+    }
 }

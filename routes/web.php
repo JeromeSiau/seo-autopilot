@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Hosted\HostedPublicController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\PreferencesController;
 use App\Http\Controllers\ProfileController;
@@ -16,15 +17,24 @@ use App\Http\Controllers\Web\SettingsController;
 use App\Http\Controllers\Web\SiteController;
 use App\Http\Controllers\Web\StripeWebhookController;
 use App\Http\Controllers\Web\ContentPlanController;
+use App\Http\Controllers\Web\HostedSiteController;
 use App\Http\Controllers\Web\TeamController;
 use App\Http\Controllers\Web\TeamInvitationController;
 use App\Http\Controllers\Web\TeamMemberController;
+use App\Http\Controllers\Webhooks\PloiTenantCertificateController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 // Landing page with locale detection and redirect
-Route::get('/', [LandingController::class, 'redirect']);
+Route::get('/', [HostedPublicController::class, 'root']);
+Route::get('/blog', [HostedPublicController::class, 'blog'])->name('hosted.blog');
+Route::get('/blog/{slug}', [HostedPublicController::class, 'article'])->name('hosted.article');
+Route::get('/about', [HostedPublicController::class, 'about'])->name('hosted.about');
+Route::get('/legal', [HostedPublicController::class, 'legal'])->name('hosted.legal');
+Route::get('/sitemap.xml', [HostedPublicController::class, 'sitemap'])->name('hosted.sitemap');
+Route::get('/robots.txt', [HostedPublicController::class, 'robots'])->name('hosted.robots');
+Route::get('/feed.xml', [HostedPublicController::class, 'feed'])->name('hosted.feed');
 
 // Localized landing pages
 Route::get('/{locale}', [LandingController::class, 'index'])
@@ -43,6 +53,8 @@ Route::post('/preferences', [PreferencesController::class, 'update'])->name('pre
 // Stripe webhook (outside auth middleware)
 Route::post('/stripe/webhook', [StripeWebhookController::class, 'handleWebhook'])
     ->name('stripe.webhook');
+Route::post('/webhooks/ploi/tenant-certificate', PloiTenantCertificateController::class)
+    ->name('webhooks.ploi.tenant-certificate');
 
 // Routes that don't require a team (team creation flow)
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -81,6 +93,14 @@ Route::middleware(['auth', 'verified', 'has.team'])->group(function () {
 
     // Sites
     Route::resource('sites', SiteController::class);
+    Route::get('/sites/{site}/hosting', [HostedSiteController::class, 'show'])->name('sites.hosting.show');
+    Route::post('/sites/{site}/hosting/provision-staging', [HostedSiteController::class, 'provisionStaging'])->name('sites.hosting.provision-staging');
+    Route::post('/sites/{site}/hosting/domain', [HostedSiteController::class, 'storeDomain'])->name('sites.hosting.domain');
+    Route::post('/sites/{site}/hosting/verify-dns', [HostedSiteController::class, 'verifyDns'])->name('sites.hosting.verify-dns');
+    Route::patch('/sites/{site}/hosting/theme', [HostedSiteController::class, 'updateTheme'])->name('sites.hosting.theme');
+    Route::patch('/sites/{site}/hosting/pages/{kind}', [HostedSiteController::class, 'updatePage'])->name('sites.hosting.pages.update');
+    Route::post('/sites/{site}/exports/site', [HostedSiteController::class, 'exportSite'])->name('sites.export-site');
+    Route::get('/sites/{site}/exports/site/download', [HostedSiteController::class, 'downloadSiteExport'])->name('sites.download-site-export');
 
     // Keywords
     Route::get('/keywords', [KeywordController::class, 'index'])->name('keywords.index');
@@ -101,6 +121,7 @@ Route::middleware(['auth', 'verified', 'has.team'])->group(function () {
     Route::delete('/articles/{article}', [ArticleController::class, 'destroy'])->name('articles.destroy');
     Route::post('/articles/{article}/approve', [ArticleController::class, 'approve'])->name('articles.approve');
     Route::post('/articles/{article}/publish', [ArticleController::class, 'publish'])->name('articles.publish');
+    Route::get('/articles/{article}/exports/html', [HostedSiteController::class, 'downloadArticleHtml'])->name('articles.export-html');
 
     // Integrations
     Route::get('/integrations', [IntegrationController::class, 'index'])->name('integrations.index');

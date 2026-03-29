@@ -3,6 +3,7 @@
 namespace Tests\Feature\Integrations;
 
 use App\Models\Integration;
+use App\Models\Site;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -226,5 +227,27 @@ class IntegrationManagementTest extends TestCase
                 'admin_api_key',
             ],
         ];
+    }
+
+    public function test_web_cannot_add_cms_integration_to_hosted_site(): void
+    {
+        $user = $this->createUserWithTeam();
+        $site = $this->createSiteForUser($user, [
+            'mode' => Site::MODE_HOSTED,
+        ]);
+
+        $response = $this->actingAs($user)->post(route('integrations.store'), [
+            'site_id' => $site->id,
+            'type' => 'wordpress',
+            'name' => 'Blocked integration',
+            'credentials' => [
+                'site_url' => 'https://example.com',
+                'username' => 'editor',
+                'app_password' => 'secret',
+            ],
+        ]);
+
+        $response->assertSessionHasErrors('site_id');
+        $this->assertDatabaseCount('integrations', 0);
     }
 }

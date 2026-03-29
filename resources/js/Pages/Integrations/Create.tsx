@@ -13,8 +13,9 @@ interface IntegrationsCreateProps extends PageProps {
 
 export default function IntegrationsCreate({ sites, selectedSiteId }: IntegrationsCreateProps) {
     const { t } = useTranslations();
+    const externalSites = sites.filter((site) => site.mode !== 'hosted');
     // Use the selected site from query params or the first site
-    const siteId = selectedSiteId || sites[0]?.id;
+    const siteId = selectedSiteId || externalSites[0]?.id;
 
     if (!siteId) {
         return (
@@ -36,13 +37,13 @@ export default function IntegrationsCreate({ sites, selectedSiteId }: Integratio
                 <Head title={t?.integrations?.addIntegration ?? 'Add an integration'} />
                 <div className="mx-auto max-w-lg text-center py-12">
                     <p className="text-surface-500 dark:text-surface-400">
-                        {t?.integrations?.createSiteFirst ?? 'You must create a site before adding an integration.'}
+                        No external site is available for CMS integration. Hosted blogs manage publishing from their hosting dashboard.
                     </p>
                     <Link
-                        href={route('sites.create')}
+                        href={route('sites.index')}
                         className="mt-4 inline-flex items-center gap-2 text-primary-600 dark:text-primary-400 hover:underline"
                     >
-                        {t?.integrations?.createSite ?? 'Create a site'}
+                        Go to sites
                     </Link>
                 </div>
             </AppLayout>
@@ -51,7 +52,7 @@ export default function IntegrationsCreate({ sites, selectedSiteId }: Integratio
 
     const handleSuccess = () => {
         // Check if onboarding not completed for this site
-        const site = sites.find((s) => s.id === siteId);
+        const site = externalSites.find((s) => s.id === siteId);
         if (site && !site.onboarding_completed_at) {
             router.visit(route('onboarding.resume', siteId));
         } else {
@@ -83,7 +84,7 @@ export default function IntegrationsCreate({ sites, selectedSiteId }: Integratio
 
             <div className="mx-auto max-w-lg">
                 {/* Site selector if multiple sites */}
-                {sites.length > 1 && (
+                {externalSites.length > 1 && (
                     <div className="mb-6">
                         <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
                             {t?.integrations?.site ?? 'Site'}
@@ -95,7 +96,7 @@ export default function IntegrationsCreate({ sites, selectedSiteId }: Integratio
                             }
                             className="w-full px-4 py-2.5 rounded-xl border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
                         >
-                            {sites.map((site) => (
+                            {externalSites.map((site) => (
                                 <option key={site.id} value={site.id}>
                                     {site.name} ({site.domain})
                                 </option>

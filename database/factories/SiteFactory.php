@@ -16,7 +16,15 @@ class SiteFactory extends Factory
             'team_id' => Team::factory(),
             'name' => fake()->company(),
             'domain' => fake()->domainName(),
+            'mode' => Site::MODE_EXTERNAL,
             'language' => 'en',
         ];
+    }
+
+    public function hosted(): static
+    {
+        return $this->state(fn () => [
+            'mode' => Site::MODE_HOSTED,
+        ]);
     }
 }

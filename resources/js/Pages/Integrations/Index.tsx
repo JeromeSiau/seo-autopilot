@@ -1,6 +1,6 @@
 import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link, router } from '@inertiajs/react';
-import { Plug, Plus, Settings, Trash2, CheckCircle, XCircle, Globe, ExternalLink } from 'lucide-react';
+import { Plug, Plus, Settings, Trash2, CheckCircle, XCircle, Globe, ExternalLink, Server } from 'lucide-react';
 import clsx from 'clsx';
 import { Integration, PageProps } from '@/types';
 import { format } from 'date-fns';
@@ -43,6 +43,10 @@ const PLATFORM_CONFIG = {
                 <path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
             </svg>
         ),
+    },
+    hosted: {
+        color: 'bg-primary-600',
+        icon: <Server className="h-6 w-6" />,
     },
 };
 
@@ -154,20 +158,22 @@ export default function IntegrationsIndex({ integrations }: IntegrationsIndexPro
                                             </span>
                                         </div>
                                     </div>
-                                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <Link
-                                            href={route('integrations.edit', { integration: integration.id })}
-                                            className="rounded-lg p-2 text-surface-400 hover:bg-surface-100 dark:hover:bg-surface-800 hover:text-surface-600 dark:hover:text-surface-300 transition-colors"
-                                        >
-                                            <Settings className="h-4 w-4" />
-                                        </Link>
-                                        <button
-                                            onClick={(e) => handleDelete(e, integration)}
-                                            className="rounded-lg p-2 text-surface-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-colors"
-                                        >
-                                            <Trash2 className="h-4 w-4" />
-                                        </button>
-                                    </div>
+                                    {integration.type !== 'hosted' && (
+                                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <Link
+                                                href={route('integrations.edit', { integration: integration.id })}
+                                                className="rounded-lg p-2 text-surface-400 hover:bg-surface-100 dark:hover:bg-surface-800 hover:text-surface-600 dark:hover:text-surface-300 transition-colors"
+                                            >
+                                                <Settings className="h-4 w-4" />
+                                            </Link>
+                                            <button
+                                                onClick={(e) => handleDelete(e, integration)}
+                                                className="rounded-lg p-2 text-surface-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
 
                                 {/* Status & Toggle */}
@@ -185,23 +191,27 @@ export default function IntegrationsIndex({ integrations }: IntegrationsIndexPro
                                             </span>
                                         )}
                                     </div>
-                                    <button
-                                        onClick={(e) => handleToggle(e, integration)}
-                                        className={clsx(
-                                            'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent',
-                                            'transition-colors duration-200 ease-in-out',
-                                            'focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:ring-offset-2 dark:focus:ring-offset-surface-900',
-                                            integration.is_active ? 'bg-primary-500' : 'bg-surface-200 dark:bg-surface-700'
-                                        )}
-                                    >
-                                        <span
+                                    {integration.type === 'hosted' ? (
+                                        <span className="text-xs text-surface-400">Managed by hosted blog</span>
+                                    ) : (
+                                        <button
+                                            onClick={(e) => handleToggle(e, integration)}
                                             className={clsx(
-                                                'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0',
-                                                'transition duration-200 ease-in-out',
-                                                integration.is_active ? 'translate-x-5' : 'translate-x-0'
+                                                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent',
+                                                'transition-colors duration-200 ease-in-out',
+                                                'focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:ring-offset-2 dark:focus:ring-offset-surface-900',
+                                                integration.is_active ? 'bg-primary-500' : 'bg-surface-200 dark:bg-surface-700'
                                             )}
-                                        />
-                                    </button>
+                                        >
+                                            <span
+                                                className={clsx(
+                                                    'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0',
+                                                    'transition duration-200 ease-in-out',
+                                                    integration.is_active ? 'translate-x-5' : 'translate-x-0'
+                                                )}
+                                            />
+                                        </button>
+                                    )}
                                 </div>
 
                                 {/* Connected Site */}
@@ -212,6 +222,15 @@ export default function IntegrationsIndex({ integrations }: IntegrationsIndexPro
                                             <span className="text-surface-500 dark:text-surface-400">{t?.integrations?.connectedTo ?? 'Connected to'}</span>
                                             <span className="font-medium text-surface-700 dark:text-surface-300">{integration.site.domain}</span>
                                         </div>
+                                        {integration.type === 'hosted' && integration.site.id && (
+                                            <Link
+                                                href={route('sites.hosting.show', { site: integration.site.id })}
+                                                className="mt-3 inline-flex items-center gap-1 text-sm text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300"
+                                            >
+                                                Manage hosted blog
+                                                <ExternalLink className="h-4 w-4" />
+                                            </Link>
+                                        )}
                                     </div>
                                 )}
 

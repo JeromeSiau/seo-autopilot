@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\SiteResource;
 use App\Models\Site;
 use App\Rules\DomainFormat;
+use App\Services\Hosted\HostedSiteService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -13,6 +14,10 @@ use Inertia\Response;
 
 class SiteController extends Controller
 {
+    public function __construct(
+        private readonly HostedSiteService $hosting,
+    ) {}
+
     public function index(Request $request): Response
     {
         $user = $request->user();
@@ -24,6 +29,7 @@ class SiteController extends Controller
 
         $sites = $team->sites()
             ->withCount(['keywords', 'articles'])
+            ->with('hosting')
             ->latest()
             ->paginate(12);
 
@@ -74,6 +80,8 @@ class SiteController extends Controller
         $site->load([
             'keywords' => fn($q) => $q->orderByDesc('score')->limit(10),
             'settings',
+            'hosting',
+            'hostedPages',
         ]);
 
         return Inertia::render('Sites/Show', [
@@ -86,7 +94,7 @@ class SiteController extends Controller
         $this->authorize('update', $site);
 
         return Inertia::render('Sites/Edit', [
-            'site' => (new SiteResource($site))->response()->getData(true)['data'],
+            'site' => (new SiteResource($site->load(['hosting', 'hostedPages'])))->response()->getData(true)['data'],
         ]);
     }
 
@@ -141,7 +149,7 @@ class SiteController extends Controller
         $canRegenerate = !$lastGeneration || $lastGeneration->status !== 'running';
 
         return Inertia::render('Sites/ContentPlan', [
-            'site' => (new SiteResource($site))->response()->getData(true)['data'],
+            'site' => (new SiteResource($site->load('hosting')))->response()->getData(true)['data'],
             'stats' => $stats,
             'canRegenerate' => $canRegenerate,
         ]);

@@ -41,10 +41,62 @@ export interface UserTeam {
     role: 'owner' | 'admin' | 'member';
 }
 
+export type SiteMode = 'external' | 'hosted';
+export type IntegrationType = 'wordpress' | 'webflow' | 'shopify' | 'ghost' | 'hosted';
+export type HostedPageKind = 'home' | 'about' | 'legal';
+
+export interface HostedThemeSettings {
+    brand_name?: string;
+    hero_title?: string;
+    hero_description?: string;
+    accent_color?: string;
+    surface_color?: string;
+    text_color?: string;
+    heading_font?: string;
+    body_font?: string;
+    footer_text?: string;
+    social_links?: Record<string, string>;
+}
+
+export interface SiteHosting {
+    id?: number;
+    site_id?: number;
+    staging_domain?: string | null;
+    custom_domain?: string | null;
+    canonical_domain?: string | null;
+    domain_status: 'none' | 'dns_pending' | 'tenant_pending' | 'ssl_pending' | 'active' | 'error';
+    ssl_status: 'none' | 'pending' | 'active' | 'error';
+    template_key: 'editorial' | 'magazine' | 'minimal';
+    theme_settings?: HostedThemeSettings | null;
+    ploi_tenant_id?: string | null;
+    staging_certificate_requested_at?: string | null;
+    custom_domain_verified_at?: string | null;
+    custom_certificate_requested_at?: string | null;
+    last_error?: string | null;
+    last_exported_at?: string | null;
+    created_at?: string;
+    updated_at?: string;
+}
+
+export interface HostedPage {
+    id?: number;
+    site_id?: number;
+    kind: HostedPageKind;
+    title: string;
+    body_html?: string | null;
+    meta_title?: string | null;
+    meta_description?: string | null;
+    is_published: boolean;
+    created_at?: string;
+    updated_at?: string;
+}
+
 export interface Site {
     id: number;
     team_id: number;
     domain: string;
+    mode: SiteMode;
+    public_url?: string | null;
     name: string;
     language: string;
     business_description?: string;
@@ -67,6 +119,13 @@ export interface Site {
     articles_in_review?: number;
     articles_this_week?: number;
     onboarding_complete?: boolean;
+    hosting?: SiteHosting | null;
+    hosted_pages?: HostedPage[];
+    site_export_available?: boolean;
+    dns_expectation?: {
+        type: string;
+        value: string | null;
+    } | null;
     created_at: string;
     updated_at: string;
 }
@@ -119,7 +178,7 @@ export interface Article {
     status: 'draft' | 'generating' | 'review' | 'approved' | 'published' | 'failed';
     published_url: string | null;
     published_at: string | null;
-    published_via: string | null;
+    published_via: IntegrationType | string | null;
     generation_cost: number;
     site?: Site;
     keyword?: Keyword;
@@ -130,7 +189,7 @@ export interface Article {
 export interface Integration {
     id: number;
     site_id: number;
-    type: 'wordpress' | 'webflow' | 'shopify' | 'ghost';
+    type: IntegrationType;
     name: string;
     is_active: boolean;
     site?: Site;

@@ -4,6 +4,7 @@ namespace App\Services\Publisher;
 
 use App\Models\Integration;
 use App\Services\Publisher\Contracts\PublisherInterface;
+use App\Services\Publisher\Providers\HostedPublisher;
 use App\Services\Publisher\Providers\ShopifyPublisher;
 use App\Services\Publisher\Providers\WebflowPublisher;
 use App\Services\Publisher\Providers\WordPressPublisher;
@@ -32,6 +33,7 @@ class PublisherManager
             'webflow' => new WebflowPublisher($integration),
             'shopify' => new ShopifyPublisher($integration),
             'ghost' => new GhostPublisher($integration),
+            'hosted' => new HostedPublisher($integration),
             default => throw new \InvalidArgumentException("Unknown integration type: {$integration->type}"),
         };
     }
@@ -41,7 +43,7 @@ class PublisherManager
      */
     public function getSupportedTypes(): array
     {
-        return ['wordpress', 'webflow', 'shopify', 'ghost'];
+        return ['wordpress', 'webflow', 'shopify', 'ghost', 'hosted'];
     }
 
     /**
@@ -54,6 +56,7 @@ class PublisherManager
             'webflow' => ['api_token', 'site_id', 'collection_id'],
             'shopify' => ['shop_domain', 'access_token', 'blog_id'],
             'ghost' => ['blog_url', 'admin_api_key'],
+            'hosted' => [],
             default => [],
         };
     }
@@ -90,6 +93,7 @@ class PublisherManager
                 'blog_url' => $credentials['blog_url'] ?? $credentials['url'] ?? null,
                 'admin_api_key' => $credentials['admin_api_key'] ?? null,
             ],
+            'hosted' => [],
             default => [],
         };
 
@@ -172,6 +176,7 @@ class PublisherManager
             'ghost' => [
                 'blog_url' => $credentials['blog_url'] ?? '',
             ],
+            'hosted' => [],
             default => [],
         };
     }

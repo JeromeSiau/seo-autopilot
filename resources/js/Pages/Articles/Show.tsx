@@ -9,6 +9,7 @@ import {
     Check,
     FileText,
     Clock,
+    Download,
 } from 'lucide-react';
 import { Button } from '@/Components/ui/Button';
 import { Card, CardHeader } from '@/Components/ui/Card';
@@ -129,6 +130,15 @@ export default function ArticleShow({ article, integrations }: ArticleShowProps)
                                     icon={Edit}
                                 >
                                     {t?.articles?.show?.edit ?? 'Edit'}
+                                </Button>
+                                <Button
+                                    as="link"
+                                    href={route('articles.export-html', { article: article.id })}
+                                    variant="secondary"
+                                    size="sm"
+                                    icon={Download}
+                                >
+                                    Download HTML
                                 </Button>
                             </div>
                         </div>

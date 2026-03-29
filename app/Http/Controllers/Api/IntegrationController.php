@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class IntegrationController extends Controller
 {
@@ -38,6 +39,19 @@ class IntegrationController extends Controller
 
         $team = $request->user()->currentTeam;
         $site = $team->sites()->findOrFail($validated['site_id']);
+
+        if ($site->isHosted()) {
+            throw ValidationException::withMessages([
+                'site_id' => 'Hosted blogs manage publishing automatically and cannot add CMS integrations.',
+            ]);
+        }
+
+        if ($validated['type'] === 'hosted') {
+            throw ValidationException::withMessages([
+                'type' => 'Hosted integrations are provisioned automatically.',
+            ]);
+        }
+
         $credentials = $this->publisherManager->normalizeCredentials($validated['type'], $validated['credentials']);
 
         // Validate credentials
@@ -72,6 +86,7 @@ class IntegrationController extends Controller
     public function update(Request $request, Integration $integration): JsonResponse
     {
         $this->authorize('update', $integration);
+        abort_if($integration->isHosted(), 404);
 
         $validated = $request->validate([
             'name' => 'sometimes|string|max:255',
@@ -109,6 +124,7 @@ class IntegrationController extends Controller
     public function destroy(Request $request, Integration $integration): JsonResponse
     {
         $this->authorize('delete', $integration);
+        abort_if($integration->isHosted(), 404);
 
         $integration->delete();
 

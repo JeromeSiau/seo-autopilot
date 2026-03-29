@@ -13,10 +13,20 @@ use Illuminate\Support\Carbon;
 class Site extends Model
 {
     use HasFactory;
+
+    public const MODE_EXTERNAL = 'external';
+    public const MODE_HOSTED = 'hosted';
+
+    public const MODES = [
+        self::MODE_EXTERNAL,
+        self::MODE_HOSTED,
+    ];
+
     protected $fillable = [
         'team_id',
         'name',
         'domain',
+        'mode',
         'language',
         'gsc_token',
         'gsc_refresh_token',
@@ -54,6 +64,7 @@ class Site extends Model
         'ga4_refresh_token' => 'encrypted',
         'ga4_token_expires_at' => 'datetime',
         'topics' => 'array',
+        'mode' => 'string',
         'last_crawled_at' => 'datetime',
         'crawl_pages_count' => 'integer',
         'onboarding_completed_at' => 'datetime',
@@ -119,6 +130,16 @@ class Site extends Model
     public function settings(): HasOne
     {
         return $this->hasOne(SiteSetting::class);
+    }
+
+    public function hosting(): HasOne
+    {
+        return $this->hasOne(SiteHosting::class);
+    }
+
+    public function hostedPages(): HasMany
+    {
+        return $this->hasMany(HostedPage::class);
     }
 
     public function autopilotLogs(): HasMany
@@ -193,6 +214,16 @@ class Site extends Model
         return $this->settings?->autopilot_enabled ?? false;
     }
 
+    public function isHosted(): bool
+    {
+        return $this->mode === self::MODE_HOSTED;
+    }
+
+    public function isExternal(): bool
+    {
+        return !$this->isHosted();
+    }
+
     public function hasActivePublishingIntegration(): bool
     {
         if ($this->relationLoaded('activeIntegration')) {
@@ -206,6 +237,34 @@ class Site extends Model
     {
         return (bool) ($this->settings?->auto_publish)
             && $this->hasActivePublishingIntegration();
+    }
+
+    public function getPrimaryHostedDomain(): ?string
+    {
+        if (!$this->hosting) {
+            return null;
+        }
+
+        return $this->hosting->canonical_domain
+            ?? $this->hosting->custom_domain
+            ?? $this->hosting->staging_domain;
+    }
+
+    public function getPublicUrlAttribute(): string
+    {
+        if ($this->isHosted()) {
+            $domain = $this->relationLoaded('hosting')
+                ? $this->getPrimaryHostedDomain()
+                : $this->hosting()?->first()?->canonical_domain
+                    ?? $this->hosting()?->first()?->custom_domain
+                    ?? $this->hosting()?->first()?->staging_domain;
+
+            if ($domain) {
+                return "https://{$domain}";
+            }
+        }
+
+        return $this->url;
     }
 
     public function isOnboardingComplete(): bool

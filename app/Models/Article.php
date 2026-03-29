@@ -61,13 +61,24 @@ class Article extends Model
     {
         parent::boot();
 
-        static::creating(function ($article) {
-            if (empty($article->slug)) {
+        static::saving(function ($article) {
+            if (empty($article->slug) && $article->title) {
                 $article->slug = Str::slug($article->title);
             }
-        });
 
-        static::saving(function ($article) {
+            if ($article->site_id && (
+                !$article->slug
+                || $article->isDirty('slug')
+                || $article->isDirty('title')
+                || $article->isDirty('site_id')
+            )) {
+                $article->slug = static::generateUniqueSlug(
+                    $article->site_id,
+                    $article->slug ?: $article->title,
+                    $article->exists ? $article->id : null,
+                );
+            }
+
             if ($article->isDirty('content') && $article->content) {
                 $article->word_count = str_word_count(strip_tags($article->content));
             }
@@ -222,5 +233,24 @@ class Article extends Model
             return null;
         }
         return round(($this->estimated_value / $this->generation_cost) * 100, 2);
+    }
+
+    protected static function generateUniqueSlug(int $siteId, string $source, ?int $ignoreId = null): string
+    {
+        $baseSlug = Str::slug($source);
+        $baseSlug = $baseSlug !== '' ? $baseSlug : 'article';
+        $slug = $baseSlug;
+        $suffix = 2;
+
+        while (static::query()
+            ->where('site_id', $siteId)
+            ->when($ignoreId, fn ($query) => $query->whereKeyNot($ignoreId))
+            ->where('slug', $slug)
+            ->exists()) {
+            $slug = "{$baseSlug}-{$suffix}";
+            $suffix++;
+        }
+
+        return $slug;
     }
 }

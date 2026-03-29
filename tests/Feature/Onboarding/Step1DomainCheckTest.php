@@ -43,6 +43,7 @@ class Step1DomainCheckTest extends TestCase
             'domain' => 'example.com',
             'name' => 'My Site',
             'language' => 'fr',
+            'mode' => Site::MODE_EXTERNAL,
         ]);
 
         $response->assertStatus(422);
@@ -57,8 +58,37 @@ class Step1DomainCheckTest extends TestCase
             'domain' => 'brand-new-domain-' . time() . '.com',
             'name' => 'My Site',
             'language' => 'fr',
+            'mode' => Site::MODE_EXTERNAL,
         ]);
 
         $response->assertStatus(200);
+    }
+
+    public function test_creates_hosted_site_with_default_hosting_and_pages(): void
+    {
+        $user = $this->createUserWithTeam();
+
+        $response = $this->actingAs($user)->post(route('onboarding.step1'), [
+            'domain' => 'hosted-' . time() . '.com',
+            'name' => 'Hosted Site',
+            'language' => 'fr',
+            'mode' => Site::MODE_HOSTED,
+        ]);
+
+        $response->assertOk()
+            ->assertJson([
+                'mode' => Site::MODE_HOSTED,
+            ]);
+
+        $site = Site::query()
+            ->with(['hosting', 'hostedPages', 'integrations'])
+            ->latest('id')
+            ->firstOrFail();
+
+        $this->assertTrue($site->isHosted());
+        $this->assertSame('completed', $site->crawl_status);
+        $this->assertNotNull($site->hosting);
+        $this->assertCount(3, $site->hostedPages);
+        $this->assertSame('hosted', $site->integrations->first()?->type);
     }
 }
