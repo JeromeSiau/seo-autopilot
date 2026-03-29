@@ -24,7 +24,7 @@ class VoyageProviderTest extends TestCase
         $this->assertCount(1024, $embedding);
         Http::assertSent(fn($request) =>
             $request->url() === 'https://api.voyageai.com/v1/embeddings' &&
-            $request['model'] === 'voyage-3.5-lite'
+            $request['model'] === 'voyage-4'
         );
     }
 

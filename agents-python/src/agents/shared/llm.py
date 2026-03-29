@@ -5,7 +5,7 @@ from typing import Any
 from openai import AsyncOpenAI
 from .config import config
 
-DEFAULT_MODEL = "deepseek/deepseek-chat"
+DEFAULT_MODEL = "deepseek/deepseek-v3.2"
 
 class LLMClient:
     """Async LLM client for OpenRouter."""

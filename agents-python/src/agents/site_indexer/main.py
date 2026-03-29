@@ -74,8 +74,13 @@ async def run(
 
     try:
         validated_url = validate_url(site_url)
+        embedder = VoyageEmbedder()
         db = SiteIndexDB(site_id, storage_path=storage_path)
+        model_changed = db.sync_embedding_model(embedder.model_name)
         await events.started("Starting site indexing", f"Indexing {validated_url}")
+
+        if model_changed:
+            await events.progress(f"Embedding model changed to {embedder.model_name}; rebuilding index")
 
         # Get known URLs for delta mode
         known_urls = set()
@@ -89,7 +94,6 @@ async def run(
 
         indexed_count = 0
         error_count = 0
-        embedder = VoyageEmbedder()
 
         for i, page in enumerate(results):
             if not page["success"]:

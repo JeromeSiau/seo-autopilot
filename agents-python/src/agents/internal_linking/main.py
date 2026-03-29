@@ -35,6 +35,26 @@ async def run(article_id: int, site_id: int, content: str):
         conn = sqlite3.connect(str(index_path))
         conn.row_factory = sqlite3.Row
 
+        try:
+            metadata = {
+                row["key"]: row["value"]
+                for row in conn.execute("SELECT key, value FROM metadata")
+            }
+        except sqlite3.OperationalError:
+            metadata = {}
+
+        if metadata.get("embedding_model") != embedder.model_name:
+            conn.close()
+            await events.completed("Site index embeddings are outdated; reindex required")
+            emit_json({
+                "success": True,
+                "links": [],
+                "reason": "site_index_reindex_required",
+                "expected_embedding_model": embedder.model_name,
+                "current_embedding_model": metadata.get("embedding_model"),
+            })
+            return
+
         await events.progress("Generating content embedding...")
         content_embedding = await embedder.embed(content[:8000], "query")
 
@@ -71,7 +91,7 @@ async def run(article_id: int, site_id: int, content: str):
             {pages_text}
 
             Retourne: {{ "suggestions": [{{ "anchor_text": "...", "target_url": "...", "context": "..." }}] }}
-        ''', model="anthropic/claude-3.5-haiku")
+        ''', model="anthropic/claude-haiku-4.5")
 
         await events.completed(f"Found {len(suggestions.get('suggestions', []))} link opportunities")
 

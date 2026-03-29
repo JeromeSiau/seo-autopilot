@@ -11,18 +11,22 @@ class OpenRouterProvider implements LLMProviderInterface
 {
     private const API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
-    // Pricing per 1M tokens (December 2025)
+    // Pricing per 1M tokens (March 2026)
     private const PRICING = [
         // DeepSeek
         'deepseek/deepseek-v3.2' => ['input' => 0.26, 'output' => 0.38],
         // Anthropic
+        'anthropic/claude-sonnet-4.6' => ['input' => 3.00, 'output' => 15.00],
         'anthropic/claude-sonnet-4-5' => ['input' => 3.00, 'output' => 15.00],
         'anthropic/claude-sonnet-4' => ['input' => 3.00, 'output' => 15.00],
+        'anthropic/claude-haiku-4.5' => ['input' => 1.00, 'output' => 5.00],
         'anthropic/claude-haiku-3.5' => ['input' => 0.80, 'output' => 4.00],
         // Google
         'google/gemini-2.5-flash' => ['input' => 0.15, 'output' => 0.60],
         'google/gemini-2.5-pro' => ['input' => 1.25, 'output' => 10.00],
         // OpenAI
+        'openai/gpt-4.1' => ['input' => 2.00, 'output' => 8.00],
+        'openai/gpt-4.1-mini' => ['input' => 0.40, 'output' => 1.60],
         'openai/gpt-4o' => ['input' => 2.50, 'output' => 10.00],
         'openai/gpt-4o-mini' => ['input' => 0.15, 'output' => 0.60],
     ];

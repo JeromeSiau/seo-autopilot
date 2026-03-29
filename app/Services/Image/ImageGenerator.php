@@ -151,7 +151,7 @@ Respond with ONLY the image prompt, nothing else. Keep it under 200 words.
 PROMPT;
 
         $response = $this->llm->complete('openrouter', $prompt, [
-            'model' => 'openai/gpt-4o-mini',
+            'model' => 'openai/gpt-4.1-mini',
             'temperature' => 0.8,
             'max_tokens' => 300,
         ]);

@@ -161,7 +161,7 @@ PROMPT;
 
         try {
             $response = $this->llm->completeJson('openrouter', $prompt, [], [
-                'model' => 'openai/gpt-4o-mini',
+                'model' => 'openai/gpt-4.1-mini',
                 'temperature' => 0.8,
             ]);
 
@@ -316,7 +316,7 @@ PROMPT;
 
         try {
             $response = $this->llm->completeJson('openrouter', $prompt, [], [
-                'model' => 'openai/gpt-4o',
+                'model' => 'openai/gpt-4.1',
                 'temperature' => 0.3,
             ]);
 

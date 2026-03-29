@@ -45,7 +45,7 @@ async def run(article_id: int, keyword: str, urls: list[str]):
             3. topics_covered: Sujets couverts par tous
             4. gaps: Sujets manquants ou mal couverts
             5. recommendations: 3 recommandations pour se différencier
-        ''', model="google/gemini-2.0-flash-exp")
+        ''', model="google/gemini-2.5-flash")
 
         await events.completed(f"Analysis complete: {len(valid)} competitors analyzed")
 

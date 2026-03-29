@@ -15,10 +15,28 @@ export default defineConfig({
     build: {
         rollupOptions: {
             output: {
-                manualChunks: {
-                    vendor: ['react', 'react-dom'],
-                    inertia: ['@inertiajs/react'],
-                    ui: ['lucide-react', '@headlessui/react', 'clsx'],
+                manualChunks(id) {
+                    if (!id.includes('node_modules')) {
+                        return undefined;
+                    }
+
+                    if (id.includes('/react/') || id.includes('/react-dom/')) {
+                        return 'vendor';
+                    }
+
+                    if (id.includes('/@inertiajs/react/')) {
+                        return 'inertia';
+                    }
+
+                    if (
+                        id.includes('/lucide-react/')
+                        || id.includes('/@headlessui/react/')
+                        || id.includes('/clsx/')
+                    ) {
+                        return 'ui';
+                    }
+
+                    return undefined;
                 },
             },
         },

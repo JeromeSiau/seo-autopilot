@@ -4,7 +4,7 @@ import httpx
 from .config import config
 
 VOYAGE_API_URL = "https://api.voyageai.com/v1/embeddings"
-VOYAGE_MODEL = "voyage-3"
+VOYAGE_MODEL = "voyage-4"
 MAX_BATCH_SIZE = 128
 
 class VoyageEmbedder:
@@ -14,6 +14,7 @@ class VoyageEmbedder:
         if not config.voyage_api_key:
             raise ValueError("VOYAGE_API_KEY is required")
         self.api_key = config.voyage_api_key
+        self.model_name = VOYAGE_MODEL
 
     async def embed(self, text: str, input_type: str = "document") -> list[float]:
         """Generate embedding for a single text.
@@ -34,7 +35,7 @@ class VoyageEmbedder:
                 },
                 json={
                     "input": [text],
-                    "model": VOYAGE_MODEL,
+                    "model": self.model_name,
                     "input_type": input_type,
                 },
                 timeout=30.0,
@@ -76,7 +77,7 @@ class VoyageEmbedder:
                     },
                     json={
                         "input": batch,
-                        "model": VOYAGE_MODEL,
+                        "model": self.model_name,
                         "input_type": input_type,
                     },
                     timeout=60.0,

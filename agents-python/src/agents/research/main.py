@@ -44,7 +44,7 @@ async def analyze_content(llm: LLMClient, keyword: str, sources: list[dict]) -> 
         {sources_text}
 
         Retourne un JSON avec ces 5 clés.
-    ''', model="google/gemini-2.0-flash-exp")
+    ''', model="google/gemini-2.5-flash")
 
     return {
         "topics": result.get("topics", []),

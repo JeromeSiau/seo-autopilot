@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Log;
 class VoyageProvider
 {
     private const API_URL = 'https://api.voyageai.com/v1/embeddings';
-    private const MODEL = 'voyage-3.5-lite';
+    private const MODEL = 'voyage-4';
     private const DIMENSION = 1024;
     private const MAX_BATCH_SIZE = 128;
 

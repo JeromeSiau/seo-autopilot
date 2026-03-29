@@ -28,6 +28,11 @@ class SiteIndexDB:
     def _init_db(self):
         conn = self._get_conn()
         conn.executescript('''
+            CREATE TABLE IF NOT EXISTS metadata (
+                key TEXT PRIMARY KEY,
+                value TEXT NOT NULL
+            );
+
             CREATE TABLE IF NOT EXISTS pages (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 url TEXT UNIQUE NOT NULL,
@@ -52,6 +57,25 @@ class SiteIndexDB:
             CREATE INDEX IF NOT EXISTS idx_pages_url ON pages(url);
         ''')
         conn.commit()
+
+    def sync_embedding_model(self, model: str) -> bool:
+        """Ensure the index uses a single embedding model."""
+        conn = self._get_conn()
+        cursor = conn.execute('SELECT value FROM metadata WHERE key = ?', ('embedding_model',))
+        row = cursor.fetchone()
+        existing_model = row[0] if row is not None else None
+
+        if existing_model and existing_model != model:
+            conn.execute('DELETE FROM embeddings')
+            conn.execute('DELETE FROM pages')
+
+        conn.execute('''
+            INSERT INTO metadata (key, value) VALUES (?, ?)
+            ON CONFLICT(key) DO UPDATE SET value = excluded.value
+        ''', ('embedding_model', model))
+        conn.commit()
+
+        return existing_model is not None and existing_model != model
 
     def upsert_page(self, url: str, title: str = "", h1: str = "", meta_description: str = "",
                     content: str = "", category: str = "", tags: list[str] | None = None,

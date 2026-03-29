@@ -98,7 +98,7 @@ Respond with JSON:
 PROMPT;
 
         $response = $this->llm->completeJson('openrouter', $prompt, [], [
-            'model' => 'openai/gpt-4o-mini',
+            'model' => 'openai/gpt-4.1-mini',
             'temperature' => 0.1,
         ]);
 
