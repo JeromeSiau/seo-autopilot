@@ -6,6 +6,7 @@ use App\Models\Article;
 use App\Models\Integration;
 use App\Services\Publisher\DTOs\PublishRequest;
 use App\Services\Publisher\PublisherManager;
+use App\Services\Webhooks\WebhookDispatcher;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -27,7 +28,7 @@ class PublishArticleJob implements ShouldQueue
         public readonly array $options = [],
     ) {}
 
-    public function handle(PublisherManager $publisherManager): void
+    public function handle(PublisherManager $publisherManager, WebhookDispatcher $webhooks): void
     {
         Log::info("PublishArticleJob: Starting", [
             'article_id' => $this->article->id,
@@ -81,6 +82,15 @@ class PublishArticleJob implements ShouldQueue
                 Log::info("PublishArticleJob: Success", [
                     'article_id' => $this->article->id,
                     'url' => $result->url,
+                ]);
+
+                $webhooks->dispatch($this->article->site->team, 'article.published', [
+                    'team_id' => $this->article->site->team_id,
+                    'site_id' => $this->article->site_id,
+                    'article_id' => $this->article->id,
+                    'title' => $this->article->title,
+                    'published_url' => $result->url,
+                    'integration_type' => $this->integration->type,
                 ]);
             } else {
                 throw new \RuntimeException($result->error ?? 'Unknown publish error');

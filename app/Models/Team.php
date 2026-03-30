@@ -73,6 +73,11 @@ class Team extends Model
         return $this->hasMany(TeamInvitation::class);
     }
 
+    public function webhookEndpoints(): HasMany
+    {
+        return $this->hasMany(WebhookEndpoint::class);
+    }
+
     public function billingPlan(): BelongsTo
     {
         return $this->belongsTo(Plan::class, 'plan_id');

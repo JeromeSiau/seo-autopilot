@@ -7,6 +7,8 @@
                 <h1 class="page-title">{{ $pageTitle }}</h1>
                 {!! $pageContentHtml !!}
             </article>
+
+            @include('hosted.partials.sections', ['sections' => $sections ?? []])
         </div>
     </section>
 @endsection

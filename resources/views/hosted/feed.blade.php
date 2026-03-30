@@ -5,15 +5,15 @@
         <link>{{ $baseUrl === '' ? 'index.html' : $baseUrl }}</link>
         <description>{{ $site->business_description ?: "Latest articles from {$site->name}." }}</description>
         <language>{{ $site->language }}</language>
-@foreach ($articles as $article)
+@foreach ($items as $item)
         <item>
-            <title><![CDATA[{{ $article->title }}]]></title>
-            <link>{{ $baseUrl === '' ? 'blog/' . $article->slug . '.html' : $baseUrl . '/blog/' . $article->slug }}</link>
-            <guid>{{ $baseUrl === '' ? 'blog/' . $article->slug . '.html' : $baseUrl . '/blog/' . $article->slug }}</guid>
-            @if (!empty($article->published_at))
-            <pubDate>{{ $article->published_at->toRssString() }}</pubDate>
+            <title><![CDATA[{{ $item['title'] }}]]></title>
+            <link>{{ $item['link'] }}</link>
+            <guid>{{ $item['guid'] }}</guid>
+            @if (!empty($item['published_at']))
+            <pubDate>{{ $item['published_at']->toRssString() }}</pubDate>
             @endif
-            <description><![CDATA[{{ $article->meta_description ?: \Illuminate\Support\Str::limit(strip_tags((string) $article->content), 180) }}]]></description>
+            <description><![CDATA[{{ $item['description'] }}]]></description>
         </item>
 @endforeach
     </channel>

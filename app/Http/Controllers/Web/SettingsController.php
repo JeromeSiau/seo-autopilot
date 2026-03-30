@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Web\WebhookEndpointController;
+use App\Http\Resources\WebhookDeliveryResource;
+use App\Http\Resources\WebhookEndpointResource;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -96,9 +99,46 @@ class SettingsController extends Controller
 
     public function notifications(Request $request): Response
     {
+        $team = $request->user()->currentTeam;
+        $endpointIds = $team->webhookEndpoints()->pluck('id');
+
         return Inertia::render('Settings/Notifications', [
-            'settings' => $request->user()->notification_settings ?? [],
+            'settings' => [
+                'email_frequency' => $request->user()->notification_email_frequency ?? 'daily',
+                'immediate_failures' => (bool) $request->user()->notification_immediate_failures,
+                'immediate_quota' => (bool) $request->user()->notification_immediate_quota,
+            ],
+            'webhookEndpoints' => WebhookEndpointResource::collection(
+                $team->webhookEndpoints()->latest()->get()
+            )->resolve(),
+            'recentWebhookDeliveries' => WebhookDeliveryResource::collection(
+                \App\Models\WebhookDelivery::query()
+                    ->whereIn('webhook_endpoint_id', $endpointIds)
+                    ->with('endpoint:id,url')
+                    ->latest('created_at')
+                    ->limit(20)
+                    ->get()
+            )->resolve(),
+            'availableWebhookEvents' => WebhookEndpointController::AVAILABLE_EVENTS,
+            'canManageWebhooks' => $request->user()->isOwnerOrAdminOfTeam($team),
         ]);
+    }
+
+    public function updateNotifications(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'email_frequency' => ['required', 'string', 'in:never,daily,weekly'],
+            'immediate_failures' => ['boolean'],
+            'immediate_quota' => ['boolean'],
+        ]);
+
+        $request->user()->update([
+            'notification_email_frequency' => $validated['email_frequency'],
+            'notification_immediate_failures' => $validated['immediate_failures'] ?? false,
+            'notification_immediate_quota' => $validated['immediate_quota'] ?? false,
+        ]);
+
+        return back()->with('success', 'Notification settings updated.');
     }
 
     private function getPlans(): array

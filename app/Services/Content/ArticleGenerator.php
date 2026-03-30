@@ -29,6 +29,7 @@ class ArticleGenerator
         $this->totalCost = 0;
         $this->llmsUsed = [];
         $this->llm->resetCosts();
+        $keyword->loadMissing(['site.brandAssets', 'site.brandRules']);
 
         Log::info("Starting article generation for keyword: {$keyword->keyword}");
 
@@ -36,7 +37,7 @@ class ArticleGenerator
         $research = $this->performResearch($keyword);
 
         // Step 2: Generate Outline
-        $outline = $this->generateOutline($keyword, $research);
+        $outline = $this->generateOutline($keyword, $research, $keyword->site);
 
         // Step 3: Write Content (section by section)
         $content = $this->writeContent($outline, $research, $keyword->site);
@@ -96,16 +97,20 @@ PROMPT;
         return ResearchData::fromArray($data);
     }
 
-    private function generateOutline(Keyword $keyword, ResearchData $research): ArticleOutline
+    private function generateOutline(Keyword $keyword, ResearchData $research, \App\Models\Site $site): ArticleOutline
     {
         Log::info("Step 2: Generating outline for '{$keyword->keyword}'");
 
         $researchContext = $research->toPromptContext();
+        $brandContext = $site->toBrandVoiceContext();
 
         $prompt = <<<PROMPT
 You are an expert SEO content strategist. Create a detailed article outline optimized for the keyword: "{$keyword->keyword}"
 
 {$researchContext}
+
+Brand Context:
+{$brandContext}
 
 Generate a JSON outline with:
 1. title: SEO-optimized H1 title (include keyword naturally)
@@ -194,6 +199,7 @@ PROMPT;
     private function polishArticle(string $content, ArticleOutline $outline, Keyword $keyword): array
     {
         Log::info("Step 4: Polishing article");
+        $brandContext = $keyword->site->toBrandVoiceContext();
 
         $prompt = <<<PROMPT
 You are an SEO editor. Review and polish this article for the keyword: "{$keyword->keyword}"
@@ -209,6 +215,9 @@ Provide a JSON response with:
 5. seo_score: A score from 0-100 assessing SEO optimization
 
 Keep the HTML structure intact. Only make minor improvements to flow and readability.
+
+Brand Context:
+{$brandContext}
 PROMPT;
 
         $response = $this->llm->executeStep('polish', $prompt);

@@ -10,8 +10,14 @@ use App\Http\Resources\SiteResource;
 use App\Jobs\GenerateArticleJob;
 use App\Jobs\PublishArticleJob;
 use App\Models\Article;
+use App\Models\HostedAuthor;
+use App\Models\HostedCategory;
+use App\Models\HostedTag;
 use App\Models\Integration;
 use App\Models\Keyword;
+use App\Services\Content\ArticleScoringService;
+use App\Services\Hosted\HostedSiteService;
+use App\Services\Webhooks\WebhookDispatcher;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -107,11 +113,37 @@ class ArticleController extends Controller
             ->with('success', 'Article generation started.');
     }
 
-    public function show(Article $article): Response
+    public function show(Request $request, Article $article): Response
     {
         $this->authorize('view', $article);
 
-        $article->load(['site', 'keyword']);
+        $article->load([
+            'site.brandAssets',
+            'site.brandRules',
+            'site.hostedAuthors',
+            'site.hostedCategories',
+            'site.hostedTags',
+            'site.team.users',
+            'keyword',
+            'analytics',
+            'score',
+            'citations',
+            'agentEvents',
+            'hostedAuthor',
+            'hostedCategory',
+            'hostedTags',
+            'editorialComments.user',
+            'assignments.user',
+            'approvalRequests.requestedBy',
+            'approvalRequests.requestedTo',
+            'refreshRecommendations',
+            'refreshRuns',
+        ]);
+
+        if (!$article->score) {
+            app(ArticleScoringService::class)->scoreAndSave($article);
+            $article->load('score');
+        }
 
         $integrations = Integration::where('site_id', $article->site_id)
             ->where('is_active', true)
@@ -120,6 +152,17 @@ class ArticleController extends Controller
         return Inertia::render('Articles/Show', [
             'article' => (new ArticleResource($article))->resolve(),
             'integrations' => IntegrationResource::collection($integrations)->resolve(),
+            'teamMembers' => $article->site->team->users
+                ->map(fn ($member) => [
+                    'id' => $member->id,
+                    'name' => $member->name,
+                    'email' => $member->email,
+                    'role' => $member->id === $article->site->team->owner_id ? 'owner' : $member->pivot->role,
+                    'joined_at' => $member->pivot->created_at,
+                ])
+                ->values()
+                ->all(),
+            'currentUserRole' => $request->user()->roleForTeam($article->site->team),
         ]);
     }
 
@@ -147,12 +190,75 @@ class ArticleController extends Controller
         ]);
 
         $article->update($validated);
+        app(ArticleScoringService::class)->scoreAndSave($article->fresh([
+            'site.brandAssets',
+            'site.brandRules',
+            'keyword',
+            'citations',
+            'agentEvents',
+        ]));
 
         return redirect()->route('articles.show', $article)
             ->with('success', 'Article updated successfully.');
     }
 
-    public function approve(Article $article): RedirectResponse
+    public function updateHostedMetadata(Request $request, Article $article): RedirectResponse
+    {
+        $this->authorize('update', $article);
+        abort_unless($article->site->isHosted(), 404);
+
+        $validated = $request->validate([
+            'hosted_author_id' => ['nullable', 'integer'],
+            'hosted_category_id' => ['nullable', 'integer'],
+            'hosted_tag_ids' => ['nullable', 'array'],
+            'hosted_tag_ids.*' => ['integer'],
+        ]);
+
+        $authorId = $validated['hosted_author_id'] ?? null;
+        $categoryId = $validated['hosted_category_id'] ?? null;
+        $tagIds = collect($validated['hosted_tag_ids'] ?? [])->filter()->map(fn ($value) => (int) $value)->unique()->values();
+
+        if ($authorId !== null) {
+            HostedAuthor::query()
+                ->where('site_id', $article->site_id)
+                ->findOrFail($authorId);
+        }
+
+        if ($categoryId !== null) {
+            HostedCategory::query()
+                ->where('site_id', $article->site_id)
+                ->findOrFail($categoryId);
+        }
+
+        $ownedTagIds = HostedTag::query()
+            ->where('site_id', $article->site_id)
+            ->whereIn('id', $tagIds)
+            ->pluck('id');
+
+        if ($ownedTagIds->count() !== $tagIds->count()) {
+            abort(404);
+        }
+
+        $article->update([
+            'hosted_author_id' => $authorId,
+            'hosted_category_id' => $categoryId,
+        ]);
+        $article->hostedTags()->sync($tagIds->all());
+
+        if ($article->site->isHosted()) {
+            app(HostedSiteService::class)->syncStaticPages($article->site->fresh([
+                'hosting',
+                'hostedPages',
+                'hostedAuthors',
+                'hostedCategories',
+                'hostedTags',
+            ]));
+        }
+
+        return back()->with('success', 'Hosted metadata updated.');
+    }
+
+    public function approve(Article $article, WebhookDispatcher $webhooks): RedirectResponse
     {
         $this->authorize('approve', $article);
 
@@ -161,6 +267,14 @@ class ArticleController extends Controller
         }
 
         $article->update(['status' => Article::STATUS_APPROVED]);
+
+        $webhooks->dispatch($article->site->team, 'article.approved', [
+            'team_id' => $article->site->team_id,
+            'site_id' => $article->site_id,
+            'article_id' => $article->id,
+            'title' => $article->title,
+            'status' => $article->status,
+        ]);
 
         return back()->with('success', 'Article approved for publishing.');
     }

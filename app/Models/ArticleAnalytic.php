@@ -18,6 +18,7 @@ class ArticleAnalytic extends Model
         'page_views',
         'avg_time_on_page',
         'bounce_rate',
+        'conversions',
     ];
 
     protected $casts = [
@@ -30,6 +31,7 @@ class ArticleAnalytic extends Model
         'page_views' => 'integer',
         'avg_time_on_page' => 'decimal:2',
         'bounce_rate' => 'decimal:2',
+        'conversions' => 'integer',
     ];
 
     public function article(): BelongsTo
@@ -71,6 +73,7 @@ class ArticleAnalytic extends Model
                 'page_views' => $data['pageViews'] ?? null,
                 'avg_time_on_page' => $data['avgTimeOnPage'] ?? null,
                 'bounce_rate' => $data['bounceRate'] ?? null,
+                'conversions' => $data['conversions'] ?? null,
             ]
         );
     }

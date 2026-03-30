@@ -7,9 +7,12 @@ use App\Models\Keyword;
 use App\Models\ScheduledArticle;
 use App\Services\Agent\AgentEventService;
 use App\Services\Agent\AgentRunner;
+use App\Services\Content\ArticleCitationService;
 use App\Services\Content\ArticleGenerator;
+use App\Services\Content\ArticleScoringService;
 use App\Services\Image\ImageGenerator;
 use App\Services\SEO\DataForSEOService;
+use App\Services\Webhooks\WebhookDispatcher;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -45,10 +48,13 @@ class GenerateArticleJob implements ShouldQueue
 
     public function handle(
         ArticleGenerator $generator,
+        ArticleCitationService $citationService,
+        ArticleScoringService $scoringService,
         ImageGenerator $imageGenerator,
         AgentRunner $agentRunner,
         AgentEventService $eventService,
-        DataForSEOService $dataForSEO
+        DataForSEOService $dataForSEO,
+        WebhookDispatcher $webhooks
     ): void
     {
         Log::info("GenerateArticleJob: Starting for keyword '{$this->keyword->keyword}'");
@@ -173,7 +179,41 @@ class GenerateArticleJob implements ShouldQueue
                 'generation_time_seconds' => $generated->generationTimeSeconds,
             ]);
 
+            $referenceUrls = array_values(array_unique(array_filter(array_merge(
+                $serpUrls,
+                $researchData['competitor_urls'] ?? [],
+            ))));
+
+            $citationService->syncReferences(
+                $article->fresh(['site.brandAssets']),
+                $referenceUrls,
+                $site->brandAssets ?? collect(),
+            );
+
+            $scoringService->scoreAndSave($article->fresh([
+                'site.brandAssets',
+                'site.brandRules',
+                'keyword',
+                'citations',
+                'agentEvents',
+            ]));
+
             $this->keyword->markAsCompleted();
+
+            $basePayload = [
+                'team_id' => $site->team_id,
+                'site_id' => $site->id,
+                'article_id' => $article->id,
+                'keyword_id' => $this->keyword->id,
+                'title' => $article->title,
+                'status' => $article->status,
+            ];
+            $webhooks->dispatch($site->team, 'article.generated', $basePayload);
+            $webhooks->dispatch(
+                $site->team,
+                $article->status === Article::STATUS_APPROVED ? 'article.approved' : 'article.ready_for_review',
+                $basePayload
+            );
 
             $eventService->completed($article, 'orchestrator', 'Article prêt', 'Génération terminée avec succès');
 

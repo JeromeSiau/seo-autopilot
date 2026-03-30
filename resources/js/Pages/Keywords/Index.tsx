@@ -2,12 +2,15 @@ import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import { Search, TrendingUp, Eye, Clock, CheckCircle, Loader2, ChevronLeft, ChevronRight, Hash, Target, Zap, BarChart3 } from 'lucide-react';
 import clsx from 'clsx';
-import { Keyword, Site, PaginatedData, PageProps } from '@/types';
+import { CampaignRun, Keyword, Site, PaginatedData, PageProps } from '@/types';
 import { useTranslations } from '@/hooks/useTranslations';
+import { useState } from 'react';
+import { Button } from '@/Components/ui/Button';
 
 interface KeywordsIndexProps extends PageProps {
     keywords: PaginatedData<Keyword>;
     sites: Site[];
+    campaignRuns: CampaignRun[];
     filters: {
         site_id?: number;
         status?: string;
@@ -35,8 +38,9 @@ const STATUS_CONFIG: Record<string, { labelKey: string; color: string; icon: typ
     completed: { labelKey: 'completed', color: 'bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-400', icon: CheckCircle },
 };
 
-export default function KeywordsIndex({ keywords, sites, filters, stats }: KeywordsIndexProps) {
+export default function KeywordsIndex({ keywords, sites, campaignRuns, filters, stats }: KeywordsIndexProps) {
     const { t } = useTranslations();
+    const [selectedKeywordIds, setSelectedKeywordIds] = useState<number[]>([]);
 
     const getDifficultyColor = (difficulty: number | null) => {
         if (!difficulty) return 'bg-surface-100 text-surface-500 dark:bg-surface-800 dark:text-surface-400';
@@ -54,21 +58,59 @@ export default function KeywordsIndex({ keywords, sites, filters, stats }: Keywo
         return colors[color as keyof typeof colors] || colors.primary;
     };
 
+    const selectableKeywords = keywords.data.filter((keyword) => keyword.status === 'pending').map((keyword) => keyword.id);
+    const allVisiblePendingSelected = selectableKeywords.length > 0 && selectableKeywords.every((id) => selectedKeywordIds.includes(id));
+
+    const toggleKeywordSelection = (keywordId: number) => {
+        setSelectedKeywordIds((current) =>
+            current.includes(keywordId) ? current.filter((id) => id !== keywordId) : [...current, keywordId]
+        );
+    };
+
+    const toggleSelectAll = () => {
+        if (allVisiblePendingSelected) {
+            setSelectedKeywordIds((current) => current.filter((id) => !selectableKeywords.includes(id)));
+            return;
+        }
+
+        setSelectedKeywordIds((current) => Array.from(new Set([...current, ...selectableKeywords])));
+    };
+
+    const runBulkGeneration = () => {
+        if (selectedKeywordIds.length === 0) {
+            return;
+        }
+
+        router.post(
+            route('keywords.generate-bulk'),
+            { keyword_ids: selectedKeywordIds },
+            {
+                preserveScroll: true,
+                onFinish: () => setSelectedKeywordIds([]),
+            }
+        );
+    };
+
     return (
         <AppLayout
             header={
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-4">
                     <div>
                         <h1 className="font-display text-2xl font-bold text-surface-900 dark:text-white">{t?.keywords?.title ?? 'Keywords'}</h1>
                         <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
                             {t?.keywords?.subtitle ?? 'Automatically discovered by Autopilot'}
                         </p>
                     </div>
-                    <div className="flex items-center gap-2">
-                        <Target className="h-5 w-5 text-primary-500 dark:text-primary-400" />
-                        <span className="text-sm font-medium text-surface-700 dark:text-surface-300">
-                            {stats.total} {t?.keywords?.tracked ?? 'keywords tracked'}
-                        </span>
+                    <div className="flex flex-wrap items-center justify-end gap-3">
+                        <div className="flex items-center gap-2">
+                            <Target className="h-5 w-5 text-primary-500 dark:text-primary-400" />
+                            <span className="text-sm font-medium text-surface-700 dark:text-surface-300">
+                                {stats.total} {t?.keywords?.tracked ?? 'keywords tracked'}
+                            </span>
+                        </div>
+                        <Button onClick={runBulkGeneration} disabled={selectedKeywordIds.length === 0} icon={Zap}>
+                            Generate {selectedKeywordIds.length > 0 ? `(${selectedKeywordIds.length})` : 'Selected'}
+                        </Button>
                     </div>
                 </div>
             }
@@ -175,6 +217,59 @@ export default function KeywordsIndex({ keywords, sites, filters, stats }: Keywo
                 </div>
             </div>
 
+            {campaignRuns.length > 0 && (
+                <div className="mt-6 bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 p-5">
+                    <div className="flex items-center gap-2">
+                        <BarChart3 className="h-5 w-5 text-primary-500 dark:text-primary-400" />
+                        <h2 className="font-display text-lg font-semibold text-surface-900 dark:text-white">Recent Campaign Runs</h2>
+                        <Link
+                            href={route('campaigns.index')}
+                            className="ml-auto inline-flex items-center gap-1 text-sm font-medium text-primary-600 hover:underline dark:text-primary-400"
+                        >
+                            Open campaigns
+                        </Link>
+                    </div>
+                    <div className="mt-4 grid gap-3 lg:grid-cols-2">
+                        {campaignRuns.map((run) => (
+                            <div key={run.id} className="rounded-xl border border-surface-200 dark:border-surface-800 p-4">
+                                <div className="flex items-start justify-between gap-3">
+                                    <div>
+                                        <p className="font-medium text-surface-900 dark:text-white">{run.name}</p>
+                                        <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
+                                            {run.site?.name ?? 'Unknown site'} · {run.input_type}
+                                        </p>
+                                    </div>
+                                    <span className={clsx(
+                                        'rounded-full px-2.5 py-1 text-xs font-medium',
+                                        run.status === 'dispatched' || run.status === 'completed'
+                                            ? 'bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-400'
+                                            : run.status === 'failed'
+                                                ? 'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400'
+                                                : 'bg-surface-100 text-surface-600 dark:bg-surface-800 dark:text-surface-400'
+                                    )}>
+                                        {run.status}
+                                    </span>
+                                </div>
+                                <div className="mt-3 grid grid-cols-3 gap-3 text-sm">
+                                    <div>
+                                        <p className="text-surface-500 dark:text-surface-400">Processed</p>
+                                        <p className="font-medium text-surface-900 dark:text-white">{run.processed_count}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-surface-500 dark:text-surface-400">Queued</p>
+                                        <p className="font-medium text-surface-900 dark:text-white">{run.succeeded_count}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-surface-500 dark:text-surface-400">Failed</p>
+                                        <p className="font-medium text-surface-900 dark:text-white">{run.failed_count}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
             {/* Keywords Table / Empty State */}
             <div className="mt-6">
                 {keywords.data.length === 0 ? (
@@ -195,6 +290,14 @@ export default function KeywordsIndex({ keywords, sites, filters, stats }: Keywo
                             <table className="w-full">
                                 <thead>
                                     <tr className="border-b border-surface-100 dark:border-surface-800 bg-surface-50/50 dark:bg-surface-800/50">
+                                        <th className="px-4 py-4 text-center">
+                                            <input
+                                                type="checkbox"
+                                                checked={allVisiblePendingSelected}
+                                                onChange={toggleSelectAll}
+                                                className="rounded border-surface-300 text-primary-600 focus:ring-primary-500"
+                                            />
+                                        </th>
                                         <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-surface-500 dark:text-surface-400">
                                             {t?.keywords?.tableKeyword ?? 'Keyword'}
                                         </th>
@@ -218,9 +321,22 @@ export default function KeywordsIndex({ keywords, sites, filters, stats }: Keywo
                                 <tbody className="divide-y divide-surface-100 dark:divide-surface-800">
                                     {keywords.data.map((keyword) => {
                                         const statusConfig = STATUS_CONFIG[keyword.status as keyof typeof STATUS_CONFIG] || STATUS_CONFIG.pending;
+                                        const isSelectable = keyword.status === 'pending';
                                         const StatusIcon = statusConfig.icon;
                                         return (
                                             <tr key={keyword.id} className="hover:bg-surface-50/50 dark:hover:bg-surface-800/50 transition-colors">
+                                                <td className="px-4 py-4 text-center">
+                                                    {isSelectable ? (
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={selectedKeywordIds.includes(keyword.id)}
+                                                            onChange={() => toggleKeywordSelection(keyword.id)}
+                                                            className="rounded border-surface-300 text-primary-600 focus:ring-primary-500"
+                                                        />
+                                                    ) : (
+                                                        <span className="text-surface-300 dark:text-surface-600">—</span>
+                                                    )}
+                                                </td>
                                                 <td className="px-6 py-4">
                                                     <div>
                                                         <p className="font-medium text-surface-900 dark:text-white">{keyword.keyword}</p>

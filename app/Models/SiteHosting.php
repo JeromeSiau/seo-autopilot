@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class SiteHosting extends Model
 {
@@ -54,6 +55,16 @@ class SiteHosting extends Model
     public function site(): BelongsTo
     {
         return $this->belongsTo(Site::class);
+    }
+
+    public function exportRuns(): HasMany
+    {
+        return $this->hasMany(HostedExportRun::class, 'site_hosting_id')->latest('created_at');
+    }
+
+    public function deployEvents(): HasMany
+    {
+        return $this->hasMany(HostedDeployEvent::class, 'site_hosting_id')->latest('occurred_at');
     }
 
     public function getEffectiveDomainAttribute(): ?string

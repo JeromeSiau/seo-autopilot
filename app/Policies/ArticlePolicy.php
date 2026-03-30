@@ -44,7 +44,7 @@ class ArticlePolicy
      */
     public function delete(User $user, Article $article): bool
     {
-        return $user->currentTeam?->id === $article->site->team_id;
+        return $this->isOwnerOrAdmin($user, $article);
     }
 
     /**
@@ -52,7 +52,7 @@ class ArticlePolicy
      */
     public function publish(User $user, Article $article): bool
     {
-        return $user->currentTeam?->id === $article->site->team_id;
+        return $this->isOwnerOrAdmin($user, $article);
     }
 
     /**
@@ -60,6 +60,30 @@ class ArticlePolicy
      */
     public function approve(User $user, Article $article): bool
     {
+        return $this->isOwnerOrAdmin($user, $article);
+    }
+
+    public function assign(User $user, Article $article): bool
+    {
+        return $this->isOwnerOrAdmin($user, $article);
+    }
+
+    public function comment(User $user, Article $article): bool
+    {
         return $user->currentTeam?->id === $article->site->team_id;
+    }
+
+    public function requestApproval(User $user, Article $article): bool
+    {
+        return $user->currentTeam?->id === $article->site->team_id;
+    }
+
+    protected function isOwnerOrAdmin(User $user, Article $article): bool
+    {
+        if ($user->currentTeam?->id !== $article->site->team_id) {
+            return false;
+        }
+
+        return $user->isOwnerOrAdminOfTeam($article->site->team);
     }
 }

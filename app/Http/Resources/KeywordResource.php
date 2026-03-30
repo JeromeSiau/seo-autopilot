@@ -16,11 +16,15 @@ class KeywordResource extends JsonResource
             'difficulty' => $this->difficulty,
             'cpc' => $this->cpc,
             'score' => $this->score,
+            'priority' => $this->priority,
+            'position' => $this->current_position,
+            'impressions' => $this->impressions,
             'source' => $this->source,
             'status' => $this->status,
             'cluster_id' => $this->cluster_id,
             'is_quick_win' => $this->isQuickWin(),
             'article' => new ArticleResource($this->whenLoaded('article')),
+            'site' => $this->whenLoaded('site', fn () => (new SiteResource($this->site))->resolve()),
             'created_at' => $this->created_at,
         ];
     }

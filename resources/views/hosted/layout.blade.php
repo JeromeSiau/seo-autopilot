@@ -7,16 +7,32 @@
     @if (!empty($metaDescription))
         <meta name="description" content="{{ $metaDescription }}">
     @endif
+    @if (!empty($metaRobots))
+        <meta name="robots" content="{{ $metaRobots }}">
+    @endif
     @if (!empty($currentUrl))
         <link rel="canonical" href="{{ $currentUrl }}">
         <meta property="og:url" content="{{ $currentUrl }}">
+        <meta name="twitter:url" content="{{ $currentUrl }}">
     @endif
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="{{ $metaTitle ?? ($pageTitle ?? $site->name) }}">
-    @if (!empty($metaDescription))
-        <meta property="og:description" content="{{ $metaDescription }}">
+    <meta property="og:type" content="{{ $ogType ?? 'website' }}">
+    <meta property="og:title" content="{{ $socialTitle ?? ($metaTitle ?? ($pageTitle ?? $site->name)) }}">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="{{ $socialTitle ?? ($metaTitle ?? ($pageTitle ?? $site->name)) }}">
+    @if (!empty($metaDescription) || !empty($socialDescription))
+        <meta property="og:description" content="{{ $socialDescription ?? $metaDescription }}">
+        <meta name="twitter:description" content="{{ $socialDescription ?? $metaDescription }}">
     @endif
     <meta property="og:site_name" content="{{ $theme['brand_name'] ?? $site->name }}">
+    @if (!empty($socialImageUrl))
+        <meta property="og:image" content="{{ $socialImageUrl }}">
+        <meta name="twitter:image" content="{{ $socialImageUrl }}">
+    @endif
+    @if (!empty($structuredData))
+        @foreach ($structuredData as $schema)
+            <script type="application/ld+json">{!! json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
+        @endforeach
+    @endif
     <style>{!! $css !!}</style>
 </head>
 <body>
@@ -28,8 +44,12 @@
 
 <header class="site-header">
     <div class="container brand">
-        <a href="{{ $navigation[0]['href'] }}" style="display:flex; align-items:center; gap:14px;">
-            <span class="brand-mark" aria-hidden="true"></span>
+        <a href="{{ $homeHref ?? '/' }}" style="display:flex; align-items:center; gap:14px;">
+            @if (!empty($brandLogoUrl))
+                <img src="{{ $brandLogoUrl }}" alt="{{ $brandName }} logo" class="brand-logo">
+            @else
+                <span class="brand-mark" aria-hidden="true"></span>
+            @endif
             <div>
                 <strong style="display:block; font-size:1rem;">{{ $brandName }}</strong>
                 <span class="muted">Hosted by SEO Autopilot</span>
@@ -40,6 +60,9 @@
             @foreach ($navigation as $item)
                 <a
                     href="{{ $item['href'] }}"
+                    @if (!empty($item['openInNewTab']))
+                        target="_blank" rel="noopener noreferrer"
+                    @endif
                     @if (($item['path'] ?? null) === ($currentPath ?? null))
                         style="color:var(--hosted-accent); font-weight:700;"
                     @endif
@@ -62,13 +85,26 @@
             <span>{{ $footerText }}</span>
         </div>
 
-        @if ($socialLinks->isNotEmpty())
-            <div style="display:flex; gap:16px; flex-wrap:wrap;">
+        <div style="display:flex; gap:16px; flex-wrap:wrap; align-items:flex-start;">
+            @if (!empty($footerNavigation))
+                @foreach ($footerNavigation as $item)
+                    <a
+                        href="{{ $item['href'] }}"
+                        @if (!empty($item['openInNewTab']))
+                            target="_blank" rel="noopener noreferrer"
+                        @endif
+                    >
+                        {{ $item['label'] }}
+                    </a>
+                @endforeach
+            @endif
+
+            @if ($socialLinks->isNotEmpty())
                 @foreach ($socialLinks as $network => $url)
                     <a href="{{ $url }}" target="_blank" rel="noopener noreferrer">{{ ucfirst((string) $network) }}</a>
                 @endforeach
-            </div>
-        @endif
+            @endif
+        </div>
     </div>
 </footer>
 </body>

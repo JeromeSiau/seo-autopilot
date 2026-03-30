@@ -17,6 +17,7 @@ import {
     AlertTriangle,
     TrendingDown,
     Server,
+    BookOpen,
 } from 'lucide-react';
 import { Button } from '@/Components/ui/Button';
 import { Card } from '@/Components/ui/Card';
@@ -102,6 +103,9 @@ export default function SiteShow({ site }: SiteShowProps) {
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
+                        <Button as="link" href={route('sites.brand-kit.show', { site: site.id })} variant="secondary" icon={BookOpen}>
+                            Brand Kit
+                        </Button>
                         {site.mode === 'hosted' && (
                             <Button as="link" href={route('sites.hosting.show', { site: site.id })} variant="secondary" icon={Server}>
                                 Hosted blog

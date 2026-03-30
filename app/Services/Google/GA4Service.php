@@ -167,6 +167,7 @@ class GA4Service
                 ['name' => 'screenPageViews'],
                 ['name' => 'averageSessionDuration'],
                 ['name' => 'bounceRate'],
+                ['name' => 'conversions'],
             ],
             'dimensionFilter' => [
                 'filter' => [
@@ -192,6 +193,7 @@ class GA4Service
                 'pageviews' => (int) ($metrics['screenPageViews'] ?? 0),
                 'avg_duration' => round((float) ($metrics['averageSessionDuration'] ?? 0), 1),
                 'bounce_rate' => round((float) ($metrics['bounceRate'] ?? 0) * 100, 2),
+                'conversions' => (int) ($metrics['conversions'] ?? 0),
             ];
         });
     }

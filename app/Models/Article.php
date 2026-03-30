@@ -5,7 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class Article extends Model
@@ -30,6 +33,8 @@ class Article extends Model
 
     protected $fillable = [
         'site_id',
+        'hosted_author_id',
+        'hosted_category_id',
         'keyword_id',
         'title',
         'slug',
@@ -103,6 +108,22 @@ class Article extends Model
         return $this->belongsTo(Keyword::class);
     }
 
+    public function hostedAuthor(): BelongsTo
+    {
+        return $this->belongsTo(HostedAuthor::class, 'hosted_author_id');
+    }
+
+    public function hostedCategory(): BelongsTo
+    {
+        return $this->belongsTo(HostedCategory::class, 'hosted_category_id');
+    }
+
+    public function hostedTags(): BelongsToMany
+    {
+        return $this->belongsToMany(HostedTag::class, 'article_hosted_tag')
+            ->withTimestamps();
+    }
+
     public function analytics(): HasMany
     {
         return $this->hasMany(ArticleAnalytic::class);
@@ -111,6 +132,41 @@ class Article extends Model
     public function agentEvents(): HasMany
     {
         return $this->hasMany(AgentEvent::class);
+    }
+
+    public function citations(): HasMany
+    {
+        return $this->hasMany(ArticleCitation::class);
+    }
+
+    public function score(): HasOne
+    {
+        return $this->hasOne(ArticleScore::class);
+    }
+
+    public function editorialComments(): HasMany
+    {
+        return $this->hasMany(EditorialComment::class)->latest();
+    }
+
+    public function assignments(): HasMany
+    {
+        return $this->hasMany(ArticleAssignment::class);
+    }
+
+    public function approvalRequests(): HasMany
+    {
+        return $this->hasMany(ApprovalRequest::class)->latest();
+    }
+
+    public function refreshRecommendations(): HasMany
+    {
+        return $this->hasMany(RefreshRecommendation::class)->latest();
+    }
+
+    public function refreshRuns(): HasMany
+    {
+        return $this->hasMany(ArticleRefreshRun::class)->latest();
     }
 
     public function scopeDraft($query)
@@ -221,6 +277,55 @@ class Article extends Model
         return $avg ? round($avg, 1) : null;
     }
 
+    public function getTotalSessionsAttribute(): int
+    {
+        return (int) $this->analytics()->sum('sessions');
+    }
+
+    public function getTotalPageViewsAttribute(): int
+    {
+        return (int) $this->analytics()->sum('page_views');
+    }
+
+    public function getTotalConversionsAttribute(): int
+    {
+        return (int) $this->analytics()->sum('conversions');
+    }
+
+    public function getEstimatedConversionsAttribute(): float
+    {
+        if ($this->total_conversions > 0) {
+            return (float) $this->total_conversions;
+        }
+
+        $baseline = $this->total_sessions > 0 ? $this->total_sessions : $this->total_clicks;
+
+        return round($baseline * 0.02, 1);
+    }
+
+    public function getConversionSourceAttribute(): string
+    {
+        return $this->total_conversions > 0 ? 'tracked' : 'modeled';
+    }
+
+    public function getConversionRateAttribute(): ?float
+    {
+        $baseline = $this->total_sessions > 0 ? $this->total_sessions : $this->total_clicks;
+
+        if ($baseline <= 0) {
+            return null;
+        }
+
+        return round(($this->estimated_conversions / $baseline) * 100, 2);
+    }
+
+    public function latestRefreshRun(): ?ArticleRefreshRun
+    {
+        return $this->relationLoaded('refreshRuns')
+            ? $this->refreshRuns->first()
+            : $this->refreshRuns()->latest()->first();
+    }
+
     public function getEstimatedValueAttribute(): float
     {
         $cpc = $this->keyword?->cpc ?? 0.5;
@@ -233,6 +338,25 @@ class Article extends Model
             return null;
         }
         return round(($this->estimated_value / $this->generation_cost) * 100, 2);
+    }
+
+    public function getFeaturedImageUrlAttribute(): ?string
+    {
+        $featured = $this->images['featured'] ?? null;
+
+        if (!is_array($featured)) {
+            return null;
+        }
+
+        if (!empty($featured['url'])) {
+            return $featured['url'];
+        }
+
+        if (!empty($featured['local_path'])) {
+            return Storage::disk('public')->url($featured['local_path']);
+        }
+
+        return null;
     }
 
     protected static function generateUniqueSlug(int $siteId, string $source, ?int $ignoreId = null): string

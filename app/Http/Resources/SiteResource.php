@@ -3,6 +3,11 @@
 namespace App\Http\Resources;
 
 use App\Http\Resources\KeywordResource;
+use App\Http\Resources\HostedAuthorResource;
+use App\Http\Resources\HostedCategoryResource;
+use App\Http\Resources\HostedNavigationItemResource;
+use App\Http\Resources\HostedRedirectResource;
+use App\Http\Resources\HostedTagResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -33,10 +38,16 @@ class SiteResource extends JsonResource
             'integrations_count' => $this->whenCounted('integrations'),
             'published_articles_count' => $this->whenCounted('articles', $this->published_articles_count),
             'pending_keywords_count' => $this->whenCounted('keywords', $this->pending_keywords_count),
-            'keywords' => KeywordResource::collection($this->whenLoaded('keywords')),
+            'keywords' => $this->whenLoaded('keywords', fn () => KeywordResource::collection($this->keywords)),
             'settings' => $this->whenLoaded('settings'),
             'hosting' => $this->whenLoaded('hosting'),
             'hosted_pages' => $this->whenLoaded('hostedPages'),
+            'hosted_redirects' => $this->whenLoaded('hostedRedirects', fn () => HostedRedirectResource::collection($this->hostedRedirects)->resolve()),
+            'hosted_authors' => $this->whenLoaded('hostedAuthors', fn () => HostedAuthorResource::collection($this->hostedAuthors)->resolve()),
+            'hosted_categories' => $this->whenLoaded('hostedCategories', fn () => HostedCategoryResource::collection($this->hostedCategories)->resolve()),
+            'hosted_tags' => $this->whenLoaded('hostedTags', fn () => HostedTagResource::collection($this->hostedTags)->resolve()),
+            'hosted_assets' => $this->whenLoaded('hostedAssets', fn () => HostedAssetResource::collection($this->hostedAssets)->resolve()),
+            'hosted_navigation_items' => $this->whenLoaded('hostedNavigationItems', fn () => HostedNavigationItemResource::collection($this->hostedNavigationItems)->resolve()),
             'autopilot_status' => $this->getAutopilotStatus(),
             'onboarding_completed_at' => $this->onboarding_completed_at,
             'onboarding_complete' => (bool) $this->onboarding_completed_at,

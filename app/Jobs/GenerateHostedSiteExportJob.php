@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\HostedExportRun;
 use App\Models\Site;
 use App\Services\Hosted\HostedExportService;
 use App\Services\Hosted\HostedSiteService;
@@ -17,15 +18,35 @@ class GenerateHostedSiteExportJob implements ShouldQueue
 
     public function __construct(
         public readonly Site $site,
+        public readonly ?int $exportRunId = null,
     ) {}
 
     public function handle(HostedExportService $exports, HostedSiteService $hosting): void
     {
-        $targetPath = $hosting->hostedSiteExportPath($this->site);
-        $exports->createSiteExport($this->site->fresh(['hosting', 'hostedPages']), $targetPath);
+        $site = $this->site->fresh(['hosting', 'hostedPages']);
+        $targetPath = $hosting->hostedSiteExportPath($site);
+        $run = $this->exportRunId
+            ? HostedExportRun::query()->find($this->exportRunId)
+            : $hosting->queueSiteExport($site);
 
-        $this->site->hosting?->update([
+        if (!$run) {
+            $run = $hosting->queueSiteExport($site);
+        }
+
+        $hosting->startSiteExportRun($site, $run, $targetPath);
+
+        try {
+            $exports->createSiteExport($site, $targetPath);
+            $hosting->completeSiteExportRun($site, $run, $targetPath);
+        } catch (\Throwable $exception) {
+            $hosting->failSiteExportRun($site, $run, $exception);
+
+            throw $exception;
+        }
+
+        $site->hosting?->update([
             'last_exported_at' => now(),
+            'last_error' => null,
         ]);
     }
 }

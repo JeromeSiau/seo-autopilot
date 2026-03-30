@@ -26,6 +26,11 @@ class Notification extends Model
     public const TYPE_PUBLISH_FAILED = 'publish_failed';
     public const TYPE_QUOTA_WARNING = 'quota_warning';
     public const TYPE_KEYWORDS_FOUND = 'keywords_found';
+    public const TYPE_EDITORIAL_COMMENT = 'editorial_comment';
+    public const TYPE_ASSIGNMENT = 'assignment';
+    public const TYPE_APPROVAL_REQUESTED = 'approval_requested';
+    public const TYPE_APPROVAL_DECIDED = 'approval_decided';
+    public const TYPE_AI_VISIBILITY_ALERT = 'ai_visibility_alert';
 
     public function user(): BelongsTo
     {

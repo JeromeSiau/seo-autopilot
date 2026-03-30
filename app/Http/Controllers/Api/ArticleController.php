@@ -39,7 +39,14 @@ class ArticleController extends Controller
     {
         $this->authorize('view', $article);
 
-        $article->load(['keyword', 'site']);
+        $article->load([
+            'keyword',
+            'site',
+            'score',
+            'citations',
+            'refreshRecommendations',
+            'refreshRuns',
+        ]);
 
         return new ArticleResource($article);
     }

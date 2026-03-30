@@ -185,6 +185,7 @@ class AnalyticsSyncService
                     'page_views' => $row['pageviews'] ?? 0,
                     'avg_time_on_page' => $row['avg_duration'] ?? 0,
                     'bounce_rate' => $row['bounce_rate'] ?? 0,
+                    'conversions' => $row['conversions'] ?? 0,
                 ]
             );
 
@@ -217,7 +218,8 @@ class AnalyticsSyncService
                 AVG(position) as avg_position,
                 AVG(ctr) as avg_ctr,
                 SUM(sessions) as total_sessions,
-                SUM(pageviews) as total_pageviews
+                SUM(page_views) as total_pageviews,
+                SUM(conversions) as total_conversions
             ')
             ->first();
 
@@ -248,6 +250,7 @@ class AnalyticsSyncService
                 'avg_ctr' => round($totals->avg_ctr ?? 0, 2),
                 'sessions' => (int) ($totals->total_sessions ?? 0),
                 'pageviews' => (int) ($totals->total_pageviews ?? 0),
+                'conversions' => (int) ($totals->total_conversions ?? 0),
             ],
             'daily_trend' => $dailyTrend,
             'top_articles' => $topArticles,

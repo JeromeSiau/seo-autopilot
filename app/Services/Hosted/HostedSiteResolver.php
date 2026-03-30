@@ -26,7 +26,7 @@ class HostedSiteResolver
                 ->where('staging_domain', $host)
                 ->orWhere('custom_domain', $host)
             )
-            ->with(['hosting', 'hostedPages'])
+            ->with(['hosting', 'hostedPages.socialImageAsset', 'hostedRedirects', 'hostedAuthors', 'hostedCategories', 'hostedTags', 'hostedAssets', 'hostedNavigationItems'])
             ->first();
     }
 

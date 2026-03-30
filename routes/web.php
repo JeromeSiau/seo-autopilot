@@ -8,11 +8,17 @@ use App\Http\Controllers\PreferencesController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Web\AnalyticsController;
 use App\Http\Controllers\Web\ArticleController;
+use App\Http\Controllers\Web\ArticleWorkflowController;
 use App\Http\Controllers\Web\BillingController;
+use App\Http\Controllers\Web\BrandKitController;
+use App\Http\Controllers\Web\CampaignController;
 use App\Http\Controllers\Web\IntegrationController;
 use App\Http\Controllers\Web\KeywordController;
+use App\Http\Controllers\Web\NeedsRefreshController;
 use App\Http\Controllers\Web\NotificationController;
 use App\Http\Controllers\Web\OnboardingController;
+use App\Http\Controllers\Web\RefreshRecommendationController;
+use App\Http\Controllers\Web\ReviewQueueController;
 use App\Http\Controllers\Web\SettingsController;
 use App\Http\Controllers\Web\SiteController;
 use App\Http\Controllers\Web\StripeWebhookController;
@@ -21,6 +27,7 @@ use App\Http\Controllers\Web\HostedSiteController;
 use App\Http\Controllers\Web\TeamController;
 use App\Http\Controllers\Web\TeamInvitationController;
 use App\Http\Controllers\Web\TeamMemberController;
+use App\Http\Controllers\Web\WebhookEndpointController;
 use App\Http\Controllers\Webhooks\PloiTenantCertificateController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -30,6 +37,9 @@ use Inertia\Inertia;
 Route::get('/', [HostedPublicController::class, 'root']);
 Route::get('/blog', [HostedPublicController::class, 'blog'])->name('hosted.blog');
 Route::get('/blog/{slug}', [HostedPublicController::class, 'article'])->name('hosted.article');
+Route::get('/authors/{slug}', [HostedPublicController::class, 'author'])->name('hosted.author');
+Route::get('/categories/{slug}', [HostedPublicController::class, 'category'])->name('hosted.category');
+Route::get('/tags/{slug}', [HostedPublicController::class, 'tag'])->name('hosted.tag');
 Route::get('/about', [HostedPublicController::class, 'about'])->name('hosted.about');
 Route::get('/legal', [HostedPublicController::class, 'legal'])->name('hosted.legal');
 Route::get('/sitemap.xml', [HostedPublicController::class, 'sitemap'])->name('hosted.sitemap');
@@ -93,17 +103,48 @@ Route::middleware(['auth', 'verified', 'has.team'])->group(function () {
 
     // Sites
     Route::resource('sites', SiteController::class);
+    Route::get('/sites/{site}/brand-kit', [BrandKitController::class, 'show'])->name('sites.brand-kit.show');
+    Route::post('/sites/{site}/brand-kit/import-hosted-pages', [BrandKitController::class, 'importHostedPages'])->name('sites.brand-kit.import-hosted-pages');
+    Route::post('/sites/{site}/brand-kit/import-published-articles', [BrandKitController::class, 'importPublishedArticles'])->name('sites.brand-kit.import-published-articles');
+    Route::post('/sites/{site}/brand-assets', [BrandKitController::class, 'storeAsset'])->name('sites.brand-assets.store');
+    Route::patch('/sites/{site}/brand-assets/{brandAsset}', [BrandKitController::class, 'updateAsset'])->name('sites.brand-assets.update');
+    Route::delete('/sites/{site}/brand-assets/{brandAsset}', [BrandKitController::class, 'destroyAsset'])->name('sites.brand-assets.destroy');
+    Route::post('/sites/{site}/brand-rules', [BrandKitController::class, 'storeRule'])->name('sites.brand-rules.store');
+    Route::patch('/sites/{site}/brand-rules/{brandRule}', [BrandKitController::class, 'updateRule'])->name('sites.brand-rules.update');
+    Route::delete('/sites/{site}/brand-rules/{brandRule}', [BrandKitController::class, 'destroyRule'])->name('sites.brand-rules.destroy');
     Route::get('/sites/{site}/hosting', [HostedSiteController::class, 'show'])->name('sites.hosting.show');
     Route::post('/sites/{site}/hosting/provision-staging', [HostedSiteController::class, 'provisionStaging'])->name('sites.hosting.provision-staging');
     Route::post('/sites/{site}/hosting/domain', [HostedSiteController::class, 'storeDomain'])->name('sites.hosting.domain');
     Route::post('/sites/{site}/hosting/verify-dns', [HostedSiteController::class, 'verifyDns'])->name('sites.hosting.verify-dns');
     Route::patch('/sites/{site}/hosting/theme', [HostedSiteController::class, 'updateTheme'])->name('sites.hosting.theme');
     Route::patch('/sites/{site}/hosting/pages/{kind}', [HostedSiteController::class, 'updatePage'])->name('sites.hosting.pages.update');
+    Route::post('/sites/{site}/hosting/custom-pages', [HostedSiteController::class, 'storeCustomPage'])->name('sites.hosting.custom-pages.store');
+    Route::patch('/sites/{site}/hosting/custom-pages/{hostedPage}', [HostedSiteController::class, 'updateCustomPage'])->name('sites.hosting.custom-pages.update');
+    Route::delete('/sites/{site}/hosting/custom-pages/{hostedPage}', [HostedSiteController::class, 'destroyCustomPage'])->name('sites.hosting.custom-pages.destroy');
+    Route::post('/sites/{site}/hosting/authors', [HostedSiteController::class, 'storeAuthor'])->name('sites.hosting.authors.store');
+    Route::patch('/sites/{site}/hosting/authors/{hostedAuthor}', [HostedSiteController::class, 'updateAuthor'])->name('sites.hosting.authors.update');
+    Route::delete('/sites/{site}/hosting/authors/{hostedAuthor}', [HostedSiteController::class, 'destroyAuthor'])->name('sites.hosting.authors.destroy');
+    Route::post('/sites/{site}/hosting/categories', [HostedSiteController::class, 'storeCategory'])->name('sites.hosting.categories.store');
+    Route::patch('/sites/{site}/hosting/categories/{hostedCategory}', [HostedSiteController::class, 'updateCategory'])->name('sites.hosting.categories.update');
+    Route::delete('/sites/{site}/hosting/categories/{hostedCategory}', [HostedSiteController::class, 'destroyCategory'])->name('sites.hosting.categories.destroy');
+    Route::post('/sites/{site}/hosting/tags', [HostedSiteController::class, 'storeTag'])->name('sites.hosting.tags.store');
+    Route::patch('/sites/{site}/hosting/tags/{hostedTag}', [HostedSiteController::class, 'updateTag'])->name('sites.hosting.tags.update');
+    Route::delete('/sites/{site}/hosting/tags/{hostedTag}', [HostedSiteController::class, 'destroyTag'])->name('sites.hosting.tags.destroy');
+    Route::post('/sites/{site}/hosting/assets', [HostedSiteController::class, 'storeAsset'])->name('sites.hosting.assets.store');
+    Route::patch('/sites/{site}/hosting/assets/{hostedAsset}', [HostedSiteController::class, 'updateAsset'])->name('sites.hosting.assets.update');
+    Route::delete('/sites/{site}/hosting/assets/{hostedAsset}', [HostedSiteController::class, 'destroyAsset'])->name('sites.hosting.assets.destroy');
+    Route::post('/sites/{site}/hosting/navigation-items', [HostedSiteController::class, 'storeNavigationItem'])->name('sites.hosting.navigation-items.store');
+    Route::patch('/sites/{site}/hosting/navigation-items/{hostedNavigationItem}', [HostedSiteController::class, 'updateNavigationItem'])->name('sites.hosting.navigation-items.update');
+    Route::delete('/sites/{site}/hosting/navigation-items/{hostedNavigationItem}', [HostedSiteController::class, 'destroyNavigationItem'])->name('sites.hosting.navigation-items.destroy');
+    Route::post('/sites/{site}/hosting/redirects', [HostedSiteController::class, 'storeRedirect'])->name('sites.hosting.redirects.store');
+    Route::patch('/sites/{site}/hosting/redirects/{hostedRedirect}', [HostedSiteController::class, 'updateRedirect'])->name('sites.hosting.redirects.update');
+    Route::delete('/sites/{site}/hosting/redirects/{hostedRedirect}', [HostedSiteController::class, 'destroyRedirect'])->name('sites.hosting.redirects.destroy');
     Route::post('/sites/{site}/exports/site', [HostedSiteController::class, 'exportSite'])->name('sites.export-site');
     Route::get('/sites/{site}/exports/site/download', [HostedSiteController::class, 'downloadSiteExport'])->name('sites.download-site-export');
 
     // Keywords
     Route::get('/keywords', [KeywordController::class, 'index'])->name('keywords.index');
+    Route::get('/campaigns', [CampaignController::class, 'index'])->name('campaigns.index');
     Route::get('/keywords/create', [KeywordController::class, 'create'])->name('keywords.create');
     Route::post('/keywords', [KeywordController::class, 'store'])->name('keywords.store');
     Route::post('/keywords/discover', [KeywordController::class, 'discover'])->name('keywords.discover');
@@ -113,14 +154,24 @@ Route::middleware(['auth', 'verified', 'has.team'])->group(function () {
 
     // Articles
     Route::get('/articles', [ArticleController::class, 'index'])->name('articles.index');
+    Route::get('/articles/needs-refresh', [NeedsRefreshController::class, 'index'])->name('articles.needs-refresh');
     Route::get('/articles/create', [ArticleController::class, 'create'])->name('articles.create');
     Route::post('/articles', [ArticleController::class, 'store'])->name('articles.store');
+    Route::get('/articles/review-queue', [ReviewQueueController::class, 'index'])->name('articles.review-queue');
     Route::get('/articles/{article}', [ArticleController::class, 'show'])->name('articles.show');
     Route::get('/articles/{article}/edit', [ArticleController::class, 'edit'])->name('articles.edit');
     Route::patch('/articles/{article}', [ArticleController::class, 'update'])->name('articles.update');
+    Route::patch('/articles/{article}/hosted-metadata', [ArticleController::class, 'updateHostedMetadata'])->name('articles.hosted-metadata.update');
     Route::delete('/articles/{article}', [ArticleController::class, 'destroy'])->name('articles.destroy');
     Route::post('/articles/{article}/approve', [ArticleController::class, 'approve'])->name('articles.approve');
     Route::post('/articles/{article}/publish', [ArticleController::class, 'publish'])->name('articles.publish');
+    Route::post('/articles/{article}/comments', [ArticleWorkflowController::class, 'storeComment'])->name('articles.comments.store');
+    Route::patch('/articles/{article}/comments/{editorialComment}/resolve', [ArticleWorkflowController::class, 'resolveComment'])->name('articles.comments.resolve');
+    Route::post('/articles/{article}/assignments', [ArticleWorkflowController::class, 'storeAssignment'])->name('articles.assignments.store');
+    Route::delete('/articles/{article}/assignments/{articleAssignment}', [ArticleWorkflowController::class, 'destroyAssignment'])->name('articles.assignments.destroy');
+    Route::post('/articles/{article}/approval-requests', [ArticleWorkflowController::class, 'requestApproval'])->name('articles.approval-requests.store');
+    Route::post('/articles/{article}/approval-requests/{approvalRequest}/approve', [ArticleWorkflowController::class, 'approveRequest'])->name('articles.approval-requests.approve');
+    Route::post('/articles/{article}/approval-requests/{approvalRequest}/reject', [ArticleWorkflowController::class, 'rejectRequest'])->name('articles.approval-requests.reject');
     Route::get('/articles/{article}/exports/html', [HostedSiteController::class, 'downloadArticleHtml'])->name('articles.export-html');
 
     // Integrations
@@ -134,13 +185,25 @@ Route::middleware(['auth', 'verified', 'has.team'])->group(function () {
 
     // Analytics
     Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
+    Route::get('/analytics/ai-visibility', [AnalyticsController::class, 'aiVisibility'])->name('analytics.ai-visibility.index');
     Route::post('/analytics/{site}/sync', [AnalyticsController::class, 'sync'])->name('analytics.sync');
+    Route::post('/analytics/{site}/ai-visibility/sync', [AnalyticsController::class, 'syncAiVisibility'])->name('analytics.ai-visibility.sync');
+    Route::post('/analytics/{site}/refresh-detect', [AnalyticsController::class, 'detectRefresh'])->name('analytics.refresh.detect');
+    Route::post('/refresh-recommendations/{refreshRecommendation}/accept', [RefreshRecommendationController::class, 'accept'])->name('refresh-recommendations.accept');
+    Route::post('/refresh-recommendations/{refreshRecommendation}/dismiss', [RefreshRecommendationController::class, 'dismiss'])->name('refresh-recommendations.dismiss');
+    Route::post('/refresh-recommendations/{refreshRecommendation}/execute', [RefreshRecommendationController::class, 'execute'])->name('refresh-recommendations.execute');
+    Route::post('/refresh-recommendations/{refreshRecommendation}/apply', [RefreshRecommendationController::class, 'apply'])->name('refresh-recommendations.apply');
 
     // Settings
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
     Route::get('/settings/team', [SettingsController::class, 'team'])->name('settings.team');
     Route::get('/settings/api-keys', [SettingsController::class, 'apiKeys'])->name('settings.api-keys');
     Route::get('/settings/notifications', [SettingsController::class, 'notifications'])->name('settings.notifications');
+    Route::post('/settings/notifications', [SettingsController::class, 'updateNotifications'])->name('settings.notifications.update');
+    Route::post('/settings/webhooks', [WebhookEndpointController::class, 'store'])->name('settings.webhooks.store');
+    Route::patch('/settings/webhooks/{webhookEndpoint}', [WebhookEndpointController::class, 'update'])->name('settings.webhooks.update');
+    Route::delete('/settings/webhooks/{webhookEndpoint}', [WebhookEndpointController::class, 'destroy'])->name('settings.webhooks.destroy');
+    Route::post('/settings/webhooks/{webhookEndpoint}/test', [WebhookEndpointController::class, 'test'])->name('settings.webhooks.test');
 
     // Billing
     Route::get('/billing', [BillingController::class, 'index'])->name('settings.billing');
@@ -177,3 +240,6 @@ require __DIR__.'/auth.php';
 
 // Invitation accept - needs to work for non-authenticated users
 Route::get('/invitations/{token}/accept', [TeamInvitationController::class, 'accept'])->name('invitations.accept');
+Route::get('/{pageSlug}', [HostedPublicController::class, 'customPage'])
+    ->where('pageSlug', '[a-z0-9]+(?:-[a-z0-9]+)*')
+    ->name('hosted.page');

@@ -169,4 +169,20 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->notifications()->whereNull('read_at')->count();
     }
+
+    public function roleForTeam(Team $team): ?string
+    {
+        if ($team->owner_id === $this->id) {
+            return 'owner';
+        }
+
+        return $this->teams()
+            ->where('team_id', $team->id)
+            ->first()?->pivot?->role;
+    }
+
+    public function isOwnerOrAdminOfTeam(Team $team): bool
+    {
+        return in_array($this->roleForTeam($team), ['owner', 'admin'], true);
+    }
 }

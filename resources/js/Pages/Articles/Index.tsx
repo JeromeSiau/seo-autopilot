@@ -5,6 +5,7 @@ import {
     Search, ChevronLeft, ChevronRight, Hash, Eye, Send, BookOpen
 } from 'lucide-react';
 import clsx from 'clsx';
+import { Button } from '@/Components/ui/Button';
 import { Article, Site, PaginatedData, PageProps } from '@/types';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -78,6 +79,9 @@ export default function ArticlesIndex({ articles, sites, filters, stats }: Artic
                         </p>
                     </div>
                     <div className="flex items-center gap-2">
+                        <Button as="link" href={route('articles.review-queue')} variant="secondary" size="sm">
+                            Review Queue
+                        </Button>
                         <BookOpen className="h-5 w-5 text-primary-500" />
                         <span className="text-sm font-medium text-surface-700 dark:text-surface-300">
                             {stats.total} {t?.articles?.generated ?? 'articles générés'}

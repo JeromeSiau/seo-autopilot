@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\CampaignRunResource;
 use App\Http\Resources\KeywordResource;
 use App\Http\Resources\SiteResource;
 use App\Jobs\DiscoverKeywordsJob;
 use App\Jobs\GenerateArticleJob;
+use App\Models\CampaignRun;
 use App\Models\Keyword;
+use App\Services\Campaign\CampaignRunService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -50,12 +53,19 @@ class KeywordController extends Controller
             ->orderByDesc('score')
             ->paginate(25)
             ->withQueryString();
+        $campaignRuns = CampaignRun::query()
+            ->whereIn('site_id', $siteIds)
+            ->with(['site', 'creator'])
+            ->latest()
+            ->limit(8)
+            ->get();
 
         return Inertia::render('Keywords/Index', [
             'keywords' => KeywordResource::collection($keywords)->response()->getData(true),
             'sites' => SiteResource::collection($team->sites()->get())->resolve(),
             'filters' => $request->only(['site_id', 'status', 'search']),
             'stats' => $stats,
+            'campaignRuns' => CampaignRunResource::collection($campaignRuns)->resolve(),
         ]);
     }
 
@@ -105,7 +115,7 @@ class KeywordController extends Controller
         return back()->with('success', 'Article generation started.');
     }
 
-    public function generateBulk(Request $request): RedirectResponse
+    public function generateBulk(Request $request, CampaignRunService $campaignRuns): RedirectResponse
     {
         $validated = $request->validate([
             'keyword_ids' => ['required', 'array'],
@@ -118,14 +128,17 @@ class KeywordController extends Controller
         $keywords = Keyword::whereIn('id', $validated['keyword_ids'])
             ->whereIn('site_id', $siteIds)
             ->where('status', 'pending')
+            ->with('site')
             ->get();
 
-        foreach ($keywords as $keyword) {
-            $keyword->addToQueue();
-            GenerateArticleJob::dispatch($keyword);
-        }
+        $runs = $keywords
+            ->groupBy('site_id')
+            ->map(function ($siteKeywords) use ($campaignRuns, $request) {
+                $site = $siteKeywords->first()->site;
+                return $campaignRuns->dispatchKeywordGenerationCampaign($site, $siteKeywords, $request->user());
+            });
 
-        return back()->with('success', "Started generation for {$keywords->count()} keywords.");
+        return back()->with('success', "Started generation for {$keywords->count()} keywords across {$runs->count()} campaign run(s).");
     }
 
     public function discover(Request $request): RedirectResponse

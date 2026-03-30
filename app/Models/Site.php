@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 
 class Site extends Model
 {
@@ -142,6 +143,71 @@ class Site extends Model
         return $this->hasMany(HostedPage::class);
     }
 
+    public function hostedRedirects(): HasMany
+    {
+        return $this->hasMany(HostedRedirect::class)->orderBy('source_path');
+    }
+
+    public function hostedAuthors(): HasMany
+    {
+        return $this->hasMany(HostedAuthor::class)->orderBy('sort_order')->orderBy('name');
+    }
+
+    public function hostedCategories(): HasMany
+    {
+        return $this->hasMany(HostedCategory::class)->orderBy('sort_order')->orderBy('name');
+    }
+
+    public function hostedTags(): HasMany
+    {
+        return $this->hasMany(HostedTag::class)->orderBy('sort_order')->orderBy('name');
+    }
+
+    public function hostedAssets(): HasMany
+    {
+        return $this->hasMany(HostedAsset::class)->latest();
+    }
+
+    public function hostedNavigationItems(): HasMany
+    {
+        return $this->hasMany(HostedNavigationItem::class)->orderBy('placement')->orderBy('sort_order')->orderBy('id');
+    }
+
+    public function brandAssets(): HasMany
+    {
+        return $this->hasMany(BrandAsset::class);
+    }
+
+    public function brandRules(): HasMany
+    {
+        return $this->hasMany(BrandRule::class);
+    }
+
+    public function aiPrompts(): HasMany
+    {
+        return $this->hasMany(AiPrompt::class);
+    }
+
+    public function aiPromptSets(): HasMany
+    {
+        return $this->hasMany(AiPromptSet::class);
+    }
+
+    public function aiVisibilityChecks(): HasMany
+    {
+        return $this->hasMany(AiVisibilityCheck::class);
+    }
+
+    public function aiVisibilityAlerts(): HasMany
+    {
+        return $this->hasMany(AiVisibilityAlert::class);
+    }
+
+    public function refreshRecommendations(): HasMany
+    {
+        return $this->hasMany(RefreshRecommendation::class);
+    }
+
     public function autopilotLogs(): HasMany
     {
         return $this->hasMany(AutopilotLog::class);
@@ -160,6 +226,11 @@ class Site extends Model
     public function contentPlanGenerations(): HasMany
     {
         return $this->hasMany(ContentPlanGeneration::class);
+    }
+
+    public function campaignRuns(): HasMany
+    {
+        return $this->hasMany(CampaignRun::class);
     }
 
     public function latestContentPlanGeneration(): HasOne
@@ -301,11 +372,15 @@ class Site extends Model
 
     public function toBrandVoiceContext(): string
     {
-        if (!$this->tone && !$this->writing_style) {
-            return 'Write in a professional, engaging tone.';
+        $context = '';
+
+        if ($this->business_description) {
+            $context .= "Business: {$this->business_description}\n";
         }
 
-        $context = '';
+        if ($this->target_audience) {
+            $context .= "Target Audience: {$this->target_audience}\n";
+        }
 
         if ($this->writing_style) {
             $context .= "Writing Style: {$this->writing_style}\n";
@@ -329,6 +404,31 @@ class Site extends Model
             $context .= "\nExample excerpts from existing content:\n";
             foreach (array_slice($this->brand_examples, 0, 3) as $example) {
                 $context .= "---\n{$example}\n";
+            }
+        }
+
+        $brandRules = $this->relationLoaded('brandRules')
+            ? $this->brandRules
+            : $this->brandRules()->active()->orderByDesc('priority')->get();
+
+        if ($brandRules->isNotEmpty()) {
+            $context .= "\nBrand rules:\n";
+
+            foreach ($brandRules->take(6) as $rule) {
+                $context .= '- [' . Str::headline($rule->category) . "] {$rule->label}: {$rule->value}\n";
+            }
+        }
+
+        $brandAssets = $this->relationLoaded('brandAssets')
+            ? $this->brandAssets
+            : $this->brandAssets()->active()->orderByDesc('priority')->get();
+
+        if ($brandAssets->isNotEmpty()) {
+            $context .= "\nReference brand assets:\n";
+
+            foreach ($brandAssets->take(3) as $asset) {
+                $summary = Str::limit(trim(preg_replace('/\s+/', ' ', $asset->content)), 220);
+                $context .= '- [' . Str::headline($asset->type) . "] {$asset->title}: {$summary}\n";
             }
         }
 

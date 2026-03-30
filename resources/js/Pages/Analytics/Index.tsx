@@ -8,6 +8,9 @@ import {
     Eye,
     Target,
     Info,
+    Radar,
+    RefreshCw,
+    Sparkles,
 } from 'lucide-react';
 import clsx from 'clsx';
 import {
@@ -20,10 +23,11 @@ import {
     ResponsiveContainer,
     Legend,
 } from 'recharts';
-import { Site, AnalyticsData, PageProps } from '@/types';
+import { Site, AnalyticsData, PageProps, AiVisibilityPayload, RefreshRecommendationListItem, BusinessSummary } from '@/types';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useTranslations } from '@/hooks/useTranslations';
+import { Button } from '@/Components/ui/Button';
 
 interface AnalyticsIndexProps extends PageProps {
     sites: Site[];
@@ -54,6 +58,9 @@ interface AnalyticsIndexProps extends PageProps {
     dateRange: string;
     connectedSitesCount: number;
     totalSitesCount: number;
+    aiVisibility: AiVisibilityPayload;
+    refreshRecommendations: RefreshRecommendationListItem[];
+    businessSummary: BusinessSummary;
 }
 
 export default function AnalyticsIndex({
@@ -66,6 +73,9 @@ export default function AnalyticsIndex({
     dateRange,
     connectedSitesCount,
     totalSitesCount,
+    aiVisibility,
+    refreshRecommendations,
+    businessSummary,
 }: AnalyticsIndexProps) {
     const { t } = useTranslations();
 
@@ -86,8 +96,32 @@ export default function AnalyticsIndex({
         });
     };
 
+    const handleAiVisibilitySync = () => {
+        if (!selectedSite) {
+            return;
+        }
+
+        router.post(route('analytics.ai-visibility.sync', { site: selectedSite.id }), {}, { preserveScroll: true });
+    };
+
+    const handleRefreshDetect = () => {
+        if (!selectedSite) {
+            return;
+        }
+
+        router.post(route('analytics.refresh.detect', { site: selectedSite.id }), {}, { preserveScroll: true });
+    };
+
+    const handleRefreshAction = (recommendationId: number, action: 'accept' | 'dismiss' | 'execute') => {
+        router.post(route(`refresh-recommendations.${action}`, { refreshRecommendation: recommendationId }), {}, { preserveScroll: true });
+    };
+
     const isAggregatedView = !selectedSite && connectedSitesCount > 0;
-    const hasData = selectedSite?.gsc_connected || isAggregatedView;
+    const hasVisibilityData =
+        aiVisibility.summary.total_prompts > 0 ||
+        aiVisibility.top_prompts.length > 0 ||
+        refreshRecommendations.length > 0;
+    const hasData = Boolean(selectedSite?.gsc_connected || isAggregatedView || hasVisibilityData);
 
     const getColorClasses = (color: string) => {
         const colors = {
@@ -139,6 +173,26 @@ export default function AnalyticsIndex({
                                 <Info className="h-3.5 w-3.5" />
                                 {connectedSitesCount}/{totalSitesCount} sites connectés
                             </div>
+                        )}
+                        {selectedSite && (
+                            <>
+                                <Link href={route('articles.needs-refresh', { site_id: selectedSite.id })}>
+                                    <Button variant="secondary" size="sm" icon={RefreshCw}>
+                                        Open refresh planner
+                                    </Button>
+                                </Link>
+                                <Link href={route('analytics.ai-visibility.index', { site_id: selectedSite.id })}>
+                                    <Button variant="secondary" size="sm" icon={Sparkles}>
+                                        Open AI visibility
+                                    </Button>
+                                </Link>
+                                <Button variant="secondary" size="sm" icon={Radar} onClick={handleAiVisibilitySync}>
+                                    Sync AI visibility
+                                </Button>
+                                <Button variant="secondary" size="sm" icon={RefreshCw} onClick={handleRefreshDetect}>
+                                    Detect refreshes
+                                </Button>
+                            </>
                         )}
                         <select
                             value={selectedSite?.id || ''}
@@ -262,6 +316,34 @@ export default function AnalyticsIndex({
                         })}
                     </div>
 
+                    <div className="mt-6 grid gap-4 lg:grid-cols-4">
+                        <BusinessMetricCard
+                            label="Traffic value"
+                            value={formatBusinessCurrency(businessSummary.totals.traffic_value)}
+                            delta={businessSummary.deltas.traffic_value.percentage}
+                            tone="emerald"
+                        />
+                        <BusinessMetricCard
+                            label="Estimated conversions"
+                            value={businessSummary.totals.estimated_conversions.toLocaleString()}
+                            delta={businessSummary.deltas.estimated_conversions.percentage}
+                            tone="indigo"
+                            caption={businessSummary.totals.conversion_source === 'tracked' ? 'GA4 tracked' : 'Modeled fallback'}
+                        />
+                        <BusinessMetricCard
+                            label="Blended ROI"
+                            value={businessSummary.totals.roi !== null && businessSummary.totals.roi !== undefined ? `${businessSummary.totals.roi.toFixed(0)}%` : '—'}
+                            tone="amber"
+                            caption={businessSummary.totals.generation_cost > 0 ? `Cost base ${formatBusinessCurrency(businessSummary.totals.generation_cost)}` : 'No generation cost yet'}
+                        />
+                        <BusinessMetricCard
+                            label="Refresh winners"
+                            value={String(businessSummary.refresh_winners.length)}
+                            tone="slate"
+                            caption={`Last ${businessSummary.lookback_days} days`}
+                        />
+                    </div>
+
                     {/* Chart */}
                     {analyticsData.length > 0 && (
                         <div className="mt-6 bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 p-6">
@@ -345,6 +427,199 @@ export default function AnalyticsIndex({
 
                     {/* Tables */}
                     <div className="mt-6 grid gap-6 lg:grid-cols-2">
+                        <div className="bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 p-6">
+                            <div className="flex items-start justify-between gap-4">
+                                <div>
+                                    <h3 className="font-display font-semibold text-surface-900 dark:text-white flex items-center gap-2">
+                                        <TrendingUp className="h-5 w-5 text-emerald-500" />
+                                        Business attribution
+                                    </h3>
+                                    <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
+                                        Simple value proxy from clicks, sessions and conversions over the last {businessSummary.lookback_days} days.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="mt-4 space-y-3">
+                                {businessSummary.top_articles.length === 0 ? (
+                                    <p className="text-sm text-surface-500 dark:text-surface-400">
+                                        No attributed article value yet.
+                                    </p>
+                                ) : (
+                                    businessSummary.top_articles.map((article) => (
+                                        <div key={article.article_id} className="rounded-xl border border-surface-200 dark:border-surface-800 p-4">
+                                            <div className="flex items-center justify-between gap-3">
+                                                <div>
+                                                    <p className="text-sm font-medium text-surface-900 dark:text-white">{article.title}</p>
+                                                    <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
+                                                        {article.performance_label.replace(/_/g, ' ')}
+                                                    </p>
+                                                </div>
+                                                <Link
+                                                    href={route('articles.show', { article: article.article_id })}
+                                                    className="text-sm font-medium text-primary-600 hover:underline dark:text-primary-400"
+                                                >
+                                                    Open
+                                                </Link>
+                                            </div>
+                                            <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                                                <SmallMetric label="Value" value={formatBusinessCurrency(article.traffic_value)} />
+                                                <SmallMetric label="Conversions" value={article.estimated_conversions} />
+                                                <SmallMetric
+                                                    label="ROI"
+                                                    value={article.roi !== null && article.roi !== undefined ? `${article.roi.toFixed(0)}%` : '—'}
+                                                />
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 p-6">
+                            <div className="flex items-start justify-between gap-4">
+                                <div>
+                                    <h3 className="font-display font-semibold text-surface-900 dark:text-white flex items-center gap-2">
+                                        <RefreshCw className="h-5 w-5 text-primary-500" />
+                                        Refresh winners
+                                    </h3>
+                                    <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
+                                        Articles with a recent refresh and improving value proxy.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="mt-4 space-y-3">
+                                {businessSummary.refresh_winners.length === 0 ? (
+                                    <p className="text-sm text-surface-500 dark:text-surface-400">
+                                        No refresh winners detected yet.
+                                    </p>
+                                ) : (
+                                    businessSummary.refresh_winners.map((winner) => (
+                                        <div key={winner.article_id} className="rounded-xl border border-surface-200 dark:border-surface-800 p-4">
+                                            <div className="flex items-center justify-between gap-3">
+                                                <div>
+                                                    <p className="text-sm font-medium text-surface-900 dark:text-white">{winner.title}</p>
+                                                    <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
+                                                        {winner.latest_refresh_at
+                                                            ? `Last refresh ${format(new Date(winner.latest_refresh_at), 'd MMM yyyy', { locale: fr })}`
+                                                            : 'Recent refresh'}
+                                                    </p>
+                                                </div>
+                                                <Link
+                                                    href={route('articles.show', { article: winner.article_id })}
+                                                    className="text-sm font-medium text-primary-600 hover:underline dark:text-primary-400"
+                                                >
+                                                    Open
+                                                </Link>
+                                            </div>
+                                            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                                                <SmallMetric label="Value delta" value={formatSignedCurrency(winner.traffic_value_delta)} />
+                                                <SmallMetric label="Conversion delta" value={formatSignedNumber(winner.conversion_delta)} />
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 p-6">
+                            <div className="flex items-start justify-between gap-4">
+                                <div>
+                                    <h3 className="font-display font-semibold text-surface-900 dark:text-white flex items-center gap-2">
+                                        <Radar className="h-5 w-5 text-indigo-500" />
+                                        AI Visibility
+                                    </h3>
+                                    <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
+                                        Estimated coverage across AI answer engines.
+                                    </p>
+                                </div>
+                                <div className="rounded-xl bg-indigo-50 dark:bg-indigo-500/10 px-3 py-2 text-right">
+                                    <p className="text-xs uppercase tracking-wide text-indigo-500">Average</p>
+                                    <p className="text-xl font-semibold text-indigo-700 dark:text-indigo-300">
+                                        {aiVisibility.summary.avg_visibility_score.toFixed(1)}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                                <div className="rounded-xl border border-surface-200 dark:border-surface-800 p-4">
+                                    <p className="text-xs uppercase tracking-wide text-surface-500 dark:text-surface-400">Prompts</p>
+                                    <p className="mt-2 text-2xl font-semibold text-surface-900 dark:text-white">{aiVisibility.summary.total_prompts}</p>
+                                </div>
+                                <div className="rounded-xl border border-surface-200 dark:border-surface-800 p-4">
+                                    <p className="text-xs uppercase tracking-wide text-surface-500 dark:text-surface-400">Covered</p>
+                                    <p className="mt-2 text-2xl font-semibold text-surface-900 dark:text-white">{aiVisibility.summary.covered_prompts}</p>
+                                </div>
+                                <div className="rounded-xl border border-surface-200 dark:border-surface-800 p-4">
+                                    <p className="text-xs uppercase tracking-wide text-surface-500 dark:text-surface-400">Checked</p>
+                                    <p className="mt-2 text-2xl font-semibold text-surface-900 dark:text-white">{aiVisibility.summary.checked_prompts}</p>
+                                </div>
+                            </div>
+
+                            {aiVisibility.engines.length > 0 && (
+                                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                                    {aiVisibility.engines.map((engine) => (
+                                        <div key={engine.engine} className="rounded-xl bg-surface-50/80 dark:bg-surface-800/70 p-4">
+                                            <div className="flex items-center justify-between">
+                                                <p className="text-sm font-medium capitalize text-surface-900 dark:text-white">
+                                                    {engine.engine.replace('_', ' ')}
+                                                </p>
+                                                <span className="text-sm font-semibold text-surface-700 dark:text-surface-300">
+                                                    {engine.avg_visibility_score.toFixed(1)}
+                                                </span>
+                                            </div>
+                                            <p className="mt-2 text-xs text-surface-500 dark:text-surface-400">
+                                                {engine.covered_prompts}/{engine.total_prompts} prompts surfaced
+                                            </p>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 p-6">
+                            <div className="flex items-start justify-between gap-4">
+                                <div>
+                                    <h3 className="font-display font-semibold text-surface-900 dark:text-white flex items-center gap-2">
+                                        <Sparkles className="h-5 w-5 text-amber-500" />
+                                        AI Opportunity Queue
+                                    </h3>
+                                    <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
+                                        Highest-value prompt gaps and reinforcement opportunities.
+                                    </p>
+                                </div>
+                            </div>
+
+                            {aiVisibility.recommendations.length === 0 ? (
+                                <p className="mt-4 text-sm text-surface-500 dark:text-surface-400">
+                                    No AI visibility recommendations yet. Run a sync on a selected site to populate this panel.
+                                </p>
+                            ) : (
+                                <div className="mt-4 space-y-3">
+                                    {aiVisibility.recommendations.map((recommendation, index) => (
+                                        <div key={`${recommendation.prompt_id}-${index}`} className="rounded-xl border border-surface-200 dark:border-surface-800 p-4">
+                                            <div className="flex items-center justify-between gap-3">
+                                                <p className="text-sm font-medium text-surface-900 dark:text-white">{recommendation.title}</p>
+                                                <span className="rounded-full bg-surface-100 dark:bg-surface-800 px-2.5 py-1 text-xs text-surface-600 dark:text-surface-300">
+                                                    {recommendation.type.replace('_', ' ')}
+                                                </span>
+                                            </div>
+                                            <p className="mt-2 text-sm text-surface-600 dark:text-surface-400">{recommendation.reason}</p>
+                                            {recommendation.article_id && (
+                                                <Link
+                                                    href={route('articles.show', { article: recommendation.article_id })}
+                                                    className="mt-3 inline-flex text-sm font-medium text-primary-600 hover:underline dark:text-primary-400"
+                                                >
+                                                    Open related article
+                                                </Link>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
                         {/* Top Pages */}
                         <div className="bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 overflow-hidden">
                             <div className="border-b border-surface-100 dark:border-surface-800 px-6 py-4">
@@ -454,17 +729,137 @@ export default function AnalyticsIndex({
                                         Articles nécessitant une attention
                                     </h3>
                                     <p className="text-sm text-surface-500 dark:text-surface-400 mt-0.5">
-                                        Articles dont la position a chuté de plus de 5 places
+                                        Refresh candidates detected from analytics, AI visibility, and content decay signals.
                                     </p>
                                 </div>
                             </div>
-                            <div className="px-6 py-8 text-center text-sm text-surface-500 dark:text-surface-400">
-                                Données disponibles prochainement.
-                            </div>
+                            {refreshRecommendations.length === 0 ? (
+                                <div className="px-6 py-8 text-center text-sm text-surface-500 dark:text-surface-400">
+                                    No refresh recommendations yet.
+                                </div>
+                            ) : (
+                                <div className="divide-y divide-surface-100 dark:divide-surface-800">
+                                    {refreshRecommendations.map((recommendation) => (
+                                        <div key={recommendation.id} className="px-6 py-5">
+                                            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                                                <div className="max-w-3xl">
+                                                    <div className="flex flex-wrap items-center gap-2">
+                                                        <p className="font-medium text-surface-900 dark:text-white">
+                                                            {recommendation.article_title ?? 'Untitled article'}
+                                                        </p>
+                                                        <span className={clsx(
+                                                            'rounded-full px-2.5 py-1 text-xs font-medium',
+                                                            recommendation.severity === 'high'
+                                                                ? 'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-300'
+                                                                : recommendation.severity === 'medium'
+                                                                    ? 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300'
+                                                                    : 'bg-surface-100 text-surface-700 dark:bg-surface-800 dark:text-surface-300'
+                                                        )}>
+                                                            {recommendation.severity}
+                                                        </span>
+                                                        <span className="rounded-full bg-surface-100 dark:bg-surface-800 px-2.5 py-1 text-xs text-surface-600 dark:text-surface-300">
+                                                            {recommendation.trigger_type.replace(/_/g, ' ')}
+                                                        </span>
+                                                    </div>
+                                                    <p className="mt-2 text-sm text-surface-600 dark:text-surface-400">{recommendation.reason}</p>
+                                                    {recommendation.recommended_actions.length > 0 && (
+                                                        <div className="mt-3 flex flex-wrap gap-2">
+                                                            {recommendation.recommended_actions.map((action, index) => (
+                                                                <span key={index} className="rounded-full bg-surface-50 dark:bg-surface-800 px-3 py-1 text-xs text-surface-600 dark:text-surface-300">
+                                                                    {action}
+                                                                </span>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {recommendation.status === 'open' && (
+                                                        <Button variant="secondary" size="sm" onClick={() => handleRefreshAction(recommendation.id, 'accept')}>
+                                                            Accept
+                                                        </Button>
+                                                    )}
+                                                    {recommendation.status !== 'executed' && recommendation.status !== 'dismissed' && (
+                                                        <Button size="sm" onClick={() => handleRefreshAction(recommendation.id, 'execute')}>
+                                                            Generate draft
+                                                        </Button>
+                                                    )}
+                                                    {recommendation.status !== 'dismissed' && (
+                                                        <Button variant="ghost" size="sm" onClick={() => handleRefreshAction(recommendation.id, 'dismiss')}>
+                                                            Dismiss
+                                                        </Button>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     )}
                 </>
             )}
         </AppLayout>
     );
+}
+
+function BusinessMetricCard({
+    label,
+    value,
+    delta,
+    tone,
+    caption,
+}: {
+    label: string;
+    value: string;
+    delta?: number | null;
+    tone: 'emerald' | 'indigo' | 'amber' | 'slate';
+    caption?: string;
+}) {
+    const tones = {
+        emerald: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300',
+        indigo: 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300',
+        amber: 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300',
+        slate: 'bg-surface-100 text-surface-700 dark:bg-surface-800 dark:text-surface-200',
+    } as const;
+
+    return (
+        <div className="bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 p-5">
+            <div className={clsx('inline-flex rounded-xl px-3 py-1.5 text-xs font-semibold uppercase tracking-wide', tones[tone])}>{label}</div>
+            <p className="mt-4 font-display text-3xl font-bold text-surface-900 dark:text-white">{value}</p>
+            {delta !== null && delta !== undefined && (
+                <p className={clsx('mt-2 text-xs font-medium', delta >= 0 ? 'text-emerald-600' : 'text-red-600')}>
+                    {delta >= 0 ? '+' : ''}
+                    {delta.toFixed(1)}% vs previous window
+                </p>
+            )}
+            {caption && <p className="mt-2 text-xs text-surface-500 dark:text-surface-400">{caption}</p>}
+        </div>
+    );
+}
+
+function SmallMetric({ label, value }: { label: string; value: string | number }) {
+    return (
+        <div className="rounded-xl bg-surface-50/80 dark:bg-surface-800/70 p-3">
+            <p className="text-xs uppercase tracking-wide text-surface-500 dark:text-surface-400">{label}</p>
+            <p className="mt-2 text-lg font-semibold text-surface-900 dark:text-white">{value}</p>
+        </div>
+    );
+}
+
+function formatBusinessCurrency(value: number): string {
+    return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        maximumFractionDigits: 0,
+    }).format(value || 0);
+}
+
+function formatSignedCurrency(value: number): string {
+    const sign = value > 0 ? '+' : '';
+    return `${sign}${formatBusinessCurrency(value)}`;
+}
+
+function formatSignedNumber(value: number): string {
+    const sign = value > 0 ? '+' : '';
+    return `${sign}${value.toFixed(1)}`;
 }

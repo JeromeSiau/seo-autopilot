@@ -58,8 +58,12 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
 
     // Analytics
     Route::get('sites/{site}/analytics', [AnalyticsController::class, 'dashboard'])->name('api.analytics.dashboard');
+    Route::get('sites/{site}/ai-visibility', [AnalyticsController::class, 'aiVisibility'])->name('api.analytics.ai-visibility');
+    Route::get('sites/{site}/refresh-recommendations', [AnalyticsController::class, 'refreshRecommendations'])->name('api.analytics.refresh-recommendations');
     Route::get('articles/{article}/analytics', [AnalyticsController::class, 'article'])->name('api.analytics.article');
     Route::post('sites/{site}/analytics/sync', [AnalyticsController::class, 'sync'])->name('api.analytics.sync');
+    Route::post('sites/{site}/ai-visibility/sync', [AnalyticsController::class, 'syncAiVisibility'])->name('api.analytics.ai-visibility.sync');
+    Route::post('sites/{site}/refresh-detect', [AnalyticsController::class, 'detectRefresh'])->name('api.analytics.refresh.detect');
 
     // Content Plan
     Route::get('sites/{site}/generation-status', [\App\Http\Controllers\Api\ContentPlanController::class, 'generationStatus']);

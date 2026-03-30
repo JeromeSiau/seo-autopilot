@@ -56,5 +56,10 @@ class PloiWebhookTest extends TestCase
         $this->assertSame(SiteHosting::SSL_STATUS_ACTIVE, $hosting->ssl_status);
         $this->assertSame('blog.webhook.test', $hosting->canonical_domain);
         $this->assertSame('https://blog.webhook.test/blog/launch-post', $updatedArticle->published_url);
+        $this->assertDatabaseHas('hosted_deploy_events', [
+            'site_hosting_id' => $hosting->id,
+            'type' => 'certificate_issued',
+            'status' => 'success',
+        ]);
     }
 }
