@@ -62,6 +62,7 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
     Route::get('sites/{site}/refresh-recommendations', [AnalyticsController::class, 'refreshRecommendations'])->name('api.analytics.refresh-recommendations');
     Route::get('articles/{article}/analytics', [AnalyticsController::class, 'article'])->name('api.analytics.article');
     Route::post('sites/{site}/analytics/sync', [AnalyticsController::class, 'sync'])->name('api.analytics.sync');
+    Route::patch('sites/{site}/business-model', [AnalyticsController::class, 'updateBusinessModel'])->name('api.analytics.business-model.update');
     Route::post('sites/{site}/ai-visibility/sync', [AnalyticsController::class, 'syncAiVisibility'])->name('api.analytics.ai-visibility.sync');
     Route::post('sites/{site}/refresh-detect', [AnalyticsController::class, 'detectRefresh'])->name('api.analytics.refresh.detect');
 

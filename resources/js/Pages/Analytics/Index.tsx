@@ -1,5 +1,6 @@
 import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link, router } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
 import {
     BarChart3,
     TrendingUp,
@@ -78,6 +79,10 @@ export default function AnalyticsIndex({
     businessSummary,
 }: AnalyticsIndexProps) {
     const { t } = useTranslations();
+    const [businessModel, setBusinessModel] = useState({
+        modeled_conversion_rate: businessSummary.business_model.modeled_conversion_rate?.toString() ?? '',
+        average_conversion_value: businessSummary.business_model.average_conversion_value?.toString() ?? '',
+    });
 
     const STAT_CARDS = [
         { key: 'clicks', label: t?.analytics?.totalClicks ?? 'Total Clics', icon: MousePointer, color: 'primary' },
@@ -114,6 +119,24 @@ export default function AnalyticsIndex({
 
     const handleRefreshAction = (recommendationId: number, action: 'accept' | 'dismiss' | 'execute') => {
         router.post(route(`refresh-recommendations.${action}`, { refreshRecommendation: recommendationId }), {}, { preserveScroll: true });
+    };
+
+    useEffect(() => {
+        setBusinessModel({
+            modeled_conversion_rate: businessSummary.business_model.modeled_conversion_rate?.toString() ?? '',
+            average_conversion_value: businessSummary.business_model.average_conversion_value?.toString() ?? '',
+        });
+    }, [businessSummary.business_model.average_conversion_value, businessSummary.business_model.modeled_conversion_rate, selectedSite?.id]);
+
+    const handleBusinessModelSave = () => {
+        if (!selectedSite) {
+            return;
+        }
+
+        router.patch(route('analytics.business-model.update', { site: selectedSite.id }), {
+            modeled_conversion_rate: businessModel.modeled_conversion_rate === '' ? null : Number(businessModel.modeled_conversion_rate),
+            average_conversion_value: businessModel.average_conversion_value === '' ? null : Number(businessModel.average_conversion_value),
+        }, { preserveScroll: true });
     };
 
     const isAggregatedView = !selectedSite && connectedSitesCount > 0;
@@ -316,12 +339,26 @@ export default function AnalyticsIndex({
                         })}
                     </div>
 
-                    <div className="mt-6 grid gap-4 lg:grid-cols-4">
+                    <div className="mt-6 grid gap-4 xl:grid-cols-5">
                         <BusinessMetricCard
                             label="Traffic value"
                             value={formatBusinessCurrency(businessSummary.totals.traffic_value)}
                             delta={businessSummary.deltas.traffic_value.percentage}
                             tone="emerald"
+                        />
+                        <BusinessMetricCard
+                            label="Attributed revenue"
+                            value={formatBusinessCurrency(businessSummary.totals.attributed_revenue)}
+                            delta={businessSummary.deltas.attributed_revenue.percentage}
+                            tone="rose"
+                            caption={businessSummary.totals.conversion_source === 'tracked' ? 'Conversions monetized from GA4' : 'Modeled from site assumptions'}
+                        />
+                        <BusinessMetricCard
+                            label="Total value"
+                            value={formatBusinessCurrency(businessSummary.totals.total_value)}
+                            delta={businessSummary.deltas.total_value.percentage}
+                            tone="blue"
+                            caption={businessSummary.totals.search_click_share !== null && businessSummary.totals.search_click_share !== undefined ? `${businessSummary.totals.search_click_share.toFixed(1)}% of tracked search clicks` : 'Search share not available yet'}
                         />
                         <BusinessMetricCard
                             label="Estimated conversions"
@@ -334,13 +371,7 @@ export default function AnalyticsIndex({
                             label="Blended ROI"
                             value={businessSummary.totals.roi !== null && businessSummary.totals.roi !== undefined ? `${businessSummary.totals.roi.toFixed(0)}%` : '—'}
                             tone="amber"
-                            caption={businessSummary.totals.generation_cost > 0 ? `Cost base ${formatBusinessCurrency(businessSummary.totals.generation_cost)}` : 'No generation cost yet'}
-                        />
-                        <BusinessMetricCard
-                            label="Refresh winners"
-                            value={String(businessSummary.refresh_winners.length)}
-                            tone="slate"
-                            caption={`Last ${businessSummary.lookback_days} days`}
+                            caption={businessSummary.totals.generation_cost > 0 ? `Net ${formatBusinessCurrency(businessSummary.totals.net_value)}` : 'No generation cost yet'}
                         />
                     </div>
 
@@ -435,7 +466,7 @@ export default function AnalyticsIndex({
                                         Business attribution
                                     </h3>
                                     <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
-                                        Simple value proxy from clicks, sessions and conversions over the last {businessSummary.lookback_days} days.
+                                        Traffic value plus attributed revenue over the last {businessSummary.lookback_days} days, weighted by tracked or modeled conversions.
                                     </p>
                                 </div>
                             </div>
@@ -463,8 +494,13 @@ export default function AnalyticsIndex({
                                                 </Link>
                                             </div>
                                             <div className="mt-3 grid gap-3 sm:grid-cols-3">
-                                                <SmallMetric label="Value" value={formatBusinessCurrency(article.traffic_value)} />
+                                                <SmallMetric label="Traffic value" value={formatBusinessCurrency(article.traffic_value)} />
+                                                <SmallMetric label="Revenue" value={formatBusinessCurrency(article.attributed_revenue)} />
+                                                <SmallMetric label="Total value" value={formatBusinessCurrency(article.total_value)} />
+                                            </div>
+                                            <div className="mt-3 grid gap-3 sm:grid-cols-3">
                                                 <SmallMetric label="Conversions" value={article.estimated_conversions} />
+                                                <SmallMetric label="Search share" value={article.search_click_share !== null && article.search_click_share !== undefined ? `${article.search_click_share.toFixed(1)}%` : '—'} />
                                                 <SmallMetric
                                                     label="ROI"
                                                     value={article.roi !== null && article.roi !== undefined ? `${article.roi.toFixed(0)}%` : '—'}
@@ -480,11 +516,72 @@ export default function AnalyticsIndex({
                             <div className="flex items-start justify-between gap-4">
                                 <div>
                                     <h3 className="font-display font-semibold text-surface-900 dark:text-white flex items-center gap-2">
+                                        <Target className="h-5 w-5 text-rose-500" />
+                                        Business model
+                                    </h3>
+                                    <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
+                                        Site-specific assumptions used when GA4 does not expose enough tracked conversions.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="mt-4 space-y-4">
+                                <div className="grid gap-4 sm:grid-cols-2">
+                                    <label className="block">
+                                        <span className="text-xs font-medium uppercase tracking-wide text-surface-500 dark:text-surface-400">
+                                            Modeled conversion rate
+                                        </span>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            max="100"
+                                            step="0.1"
+                                            value={businessModel.modeled_conversion_rate}
+                                            onChange={(event) => setBusinessModel((current) => ({ ...current, modeled_conversion_rate: event.target.value }))}
+                                            className="mt-2 w-full rounded-xl border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 px-3 py-2 text-sm text-surface-800 dark:text-surface-100"
+                                        />
+                                    </label>
+                                    <label className="block">
+                                        <span className="text-xs font-medium uppercase tracking-wide text-surface-500 dark:text-surface-400">
+                                            Average conversion value
+                                        </span>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            step="1"
+                                            value={businessModel.average_conversion_value}
+                                            onChange={(event) => setBusinessModel((current) => ({ ...current, average_conversion_value: event.target.value }))}
+                                            className="mt-2 w-full rounded-xl border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 px-3 py-2 text-sm text-surface-800 dark:text-surface-100"
+                                        />
+                                    </label>
+                                </div>
+                                <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-surface-200 dark:border-surface-800 px-4 py-3">
+                                    <div className="text-sm text-surface-600 dark:text-surface-300">
+                                        <p>
+                                            Source: <span className="font-medium text-surface-900 dark:text-white">{businessSummary.business_model.source}</span>
+                                        </p>
+                                        <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
+                                            Search click capture: {businessSummary.search_capture.recent_click_share !== null && businessSummary.search_capture.recent_click_share !== undefined ? `${businessSummary.search_capture.recent_click_share.toFixed(1)}%` : 'not enough site analytics yet'}
+                                        </p>
+                                    </div>
+                                    {selectedSite && (
+                                        <Button variant="secondary" size="sm" onClick={handleBusinessModelSave}>
+                                            Save assumptions
+                                        </Button>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-white dark:bg-surface-900/50 dark:backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-800 p-6">
+                            <div className="flex items-start justify-between gap-4">
+                                <div>
+                                    <h3 className="font-display font-semibold text-surface-900 dark:text-white flex items-center gap-2">
                                         <RefreshCw className="h-5 w-5 text-primary-500" />
                                         Refresh winners
                                     </h3>
                                     <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
-                                        Articles with a recent refresh and improving value proxy.
+                                        Articles with a recent refresh and improving business value.
                                     </p>
                                 </div>
                             </div>
@@ -513,9 +610,10 @@ export default function AnalyticsIndex({
                                                     Open
                                                 </Link>
                                             </div>
-                                            <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                                                <SmallMetric label="Value delta" value={formatSignedCurrency(winner.traffic_value_delta)} />
-                                                <SmallMetric label="Conversion delta" value={formatSignedNumber(winner.conversion_delta)} />
+                                            <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                                                <SmallMetric label="Traffic delta" value={formatSignedCurrency(winner.traffic_value_delta)} />
+                                                <SmallMetric label="Revenue delta" value={formatSignedCurrency(winner.attributed_revenue_delta)} />
+                                                <SmallMetric label="Total delta" value={formatSignedCurrency(winner.total_value_delta)} />
                                             </div>
                                         </div>
                                     ))
@@ -812,7 +910,7 @@ function BusinessMetricCard({
     label: string;
     value: string;
     delta?: number | null;
-    tone: 'emerald' | 'indigo' | 'amber' | 'slate';
+    tone: 'emerald' | 'indigo' | 'amber' | 'slate' | 'rose' | 'blue';
     caption?: string;
 }) {
     const tones = {
@@ -820,6 +918,8 @@ function BusinessMetricCard({
         indigo: 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300',
         amber: 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300',
         slate: 'bg-surface-100 text-surface-700 dark:bg-surface-800 dark:text-surface-200',
+        rose: 'bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-300',
+        blue: 'bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-300',
     } as const;
 
     return (

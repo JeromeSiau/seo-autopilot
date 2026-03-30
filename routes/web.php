@@ -187,6 +187,7 @@ Route::middleware(['auth', 'verified', 'has.team'])->group(function () {
     Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
     Route::get('/analytics/ai-visibility', [AnalyticsController::class, 'aiVisibility'])->name('analytics.ai-visibility.index');
     Route::post('/analytics/{site}/sync', [AnalyticsController::class, 'sync'])->name('analytics.sync');
+    Route::patch('/analytics/{site}/business-model', [AnalyticsController::class, 'updateBusinessModel'])->name('analytics.business-model.update');
     Route::post('/analytics/{site}/ai-visibility/sync', [AnalyticsController::class, 'syncAiVisibility'])->name('analytics.ai-visibility.sync');
     Route::post('/analytics/{site}/refresh-detect', [AnalyticsController::class, 'detectRefresh'])->name('analytics.refresh.detect');
     Route::post('/refresh-recommendations/{refreshRecommendation}/accept', [RefreshRecommendationController::class, 'accept'])->name('refresh-recommendations.accept');

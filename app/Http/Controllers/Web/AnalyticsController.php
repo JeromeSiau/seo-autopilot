@@ -234,6 +234,27 @@ class AnalyticsController extends Controller
         return back()->with('success', 'AI visibility sync started.');
     }
 
+    public function updateBusinessModel(Request $request, Site $site): RedirectResponse
+    {
+        $this->authorize('update', $site);
+
+        $validated = $request->validate([
+            'modeled_conversion_rate' => 'nullable|numeric|min:0|max:100',
+            'average_conversion_value' => 'nullable|numeric|min:0|max:999999.99',
+        ]);
+
+        $site->getOrCreateSettings()->update([
+            'modeled_conversion_rate' => $validated['modeled_conversion_rate'] !== null
+                ? round((float) $validated['modeled_conversion_rate'], 2)
+                : null,
+            'average_conversion_value' => $validated['average_conversion_value'] !== null
+                ? round((float) $validated['average_conversion_value'], 2)
+                : null,
+        ]);
+
+        return back()->with('success', 'Business model updated.');
+    }
+
     public function detectRefresh(Site $site): RedirectResponse
     {
         $this->authorize('update', $site);

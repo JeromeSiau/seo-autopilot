@@ -841,27 +841,48 @@ export interface RefreshRecommendationListItem {
 
 export interface BusinessSummary {
     lookback_days: number;
+    business_model: {
+        modeled_conversion_rate: number | null;
+        average_conversion_value: number | null;
+        source: 'default' | 'custom' | 'mixed' | string;
+        sites_with_custom_model?: number;
+        sites_count?: number;
+    };
     totals: {
         traffic_value: number;
+        attributed_revenue: number;
+        total_value: number;
         estimated_conversions: number;
         tracked_conversions: number;
         sessions: number;
         clicks: number;
         generation_cost: number;
         conversion_source: 'tracked' | 'modeled' | string;
+        net_value: number;
+        search_click_share?: number | null;
         roi?: number | null;
     };
     deltas: {
         traffic_value: { absolute: number; percentage?: number | null };
+        attributed_revenue: { absolute: number; percentage?: number | null };
+        total_value: { absolute: number; percentage?: number | null };
         clicks: { absolute: number; percentage?: number | null };
         sessions: { absolute: number; percentage?: number | null };
         estimated_conversions: { absolute: number; percentage?: number | null };
+    };
+    search_capture: {
+        recent_click_share?: number | null;
+        previous_click_share?: number | null;
+        tracked_site_clicks: number;
     };
     top_articles: Array<{
         article_id: number;
         title: string;
         traffic_value: number;
+        attributed_revenue: number;
+        total_value: number;
         estimated_conversions: number;
+        search_click_share?: number | null;
         roi?: number | null;
         performance_label: string;
     }>;
@@ -869,6 +890,8 @@ export interface BusinessSummary {
         article_id: number;
         title: string;
         traffic_value_delta: number;
+        attributed_revenue_delta: number;
+        total_value_delta: number;
         conversion_delta: number;
         latest_refresh_at?: string | null;
     }>;

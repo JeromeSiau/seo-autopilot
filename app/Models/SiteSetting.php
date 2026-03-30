@@ -18,6 +18,8 @@ class SiteSetting extends Model
         'publish_days',
         'auto_publish',
         'articles_allocated',
+        'modeled_conversion_rate',
+        'average_conversion_value',
     ];
 
     protected $casts = [
@@ -25,6 +27,8 @@ class SiteSetting extends Model
         'articles_per_week' => 'integer',
         'publish_days' => 'array',
         'auto_publish' => 'boolean',
+        'modeled_conversion_rate' => 'decimal:2',
+        'average_conversion_value' => 'decimal:2',
     ];
 
     public function site(): BelongsTo
