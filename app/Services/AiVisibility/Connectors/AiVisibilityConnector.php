@@ -9,5 +9,9 @@ interface AiVisibilityConnector
 {
     public function key(): string;
 
+    public function supportsEngine(string $engine): bool;
+
+    public function isAvailable(): bool;
+
     public function evaluate(Site $site, AiPrompt $prompt, string $engine, array $analysis): array;
 }

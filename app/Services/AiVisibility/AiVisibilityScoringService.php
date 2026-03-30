@@ -294,6 +294,7 @@ class AiVisibilityScoringService
             'topic' => $check->prompt?->topic,
             'intent' => $check->prompt?->intent,
             'engine' => $check->engine,
+            'provider' => $check->provider,
             'visibility_score' => (int) $check->visibility_score,
             'previous_visibility_score' => $previousScore !== null ? (int) $previousScore : null,
             'visibility_delta' => $delta,

@@ -41,13 +41,13 @@ class AiVisibilityRunner
         }
 
         $engines ??= AiVisibilityCheck::ENGINES;
-        $connector = $this->connectors->resolve($provider);
         $checks = collect();
 
         foreach ($prompts as $prompt) {
             $analysis = $this->analysePromptCoverage($site, $prompt->prompt, $prompt->topic ?: $prompt->prompt);
 
             foreach ($engines as $engine) {
+                $connector = $this->connectors->resolveForEngine($engine, $provider);
                 $evaluation = $connector->evaluate($site, $prompt, $engine, $analysis);
 
                 $check = $prompt->checks()->create([

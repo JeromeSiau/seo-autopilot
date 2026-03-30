@@ -25,6 +25,7 @@ class RunAiVisibilityChecksJob implements ShouldQueue
     public function __construct(
         public readonly Site $site,
         public readonly ?array $engines = null,
+        public readonly ?string $provider = null,
     ) {}
 
     public function handle(
@@ -36,7 +37,7 @@ class RunAiVisibilityChecksJob implements ShouldQueue
         WebhookDispatcher $webhooks,
     ): void
     {
-        $checks = $runner->runForSite($this->site, $this->engines);
+        $checks = $runner->runForSite($this->site, $this->engines, null, $this->provider);
         $site = $this->site->fresh();
         $payload = $scoring->buildDashboardPayload(collect([$site]));
         $payload['recommendations'] = $recommendations->buildRecommendations(
@@ -55,6 +56,7 @@ class RunAiVisibilityChecksJob implements ShouldQueue
             'site_id' => $site->id,
             'checks_count' => $checks->count(),
             'engines' => $checks->pluck('engine')->unique()->values()->all(),
+            'providers' => $checks->pluck('provider')->unique()->values()->all(),
             'summary' => $payload['summary'],
             'alerts' => collect($payload['alerts'] ?? [])->take(3)->values()->all(),
             'recommendations' => collect($payload['recommendations'] ?? [])->take(3)->values()->all(),

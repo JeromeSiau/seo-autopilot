@@ -226,8 +226,10 @@ class AnalyticsController extends Controller
     {
         $this->authorize('update', $site);
 
+        $provider = request()->string('provider')->toString() ?: null;
+
         GenerateAiPromptSetJob::dispatch($site);
-        RunAiVisibilityChecksJob::dispatch($site);
+        RunAiVisibilityChecksJob::dispatch($site, null, $provider);
 
         return back()->with('success', 'AI visibility sync started.');
     }

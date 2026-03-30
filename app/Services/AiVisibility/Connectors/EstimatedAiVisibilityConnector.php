@@ -25,6 +25,16 @@ class EstimatedAiVisibilityConnector implements AiVisibilityConnector
         return 'estimated';
     }
 
+    public function supportsEngine(string $engine): bool
+    {
+        return in_array($engine, AiVisibilityCheck::ENGINES, true);
+    }
+
+    public function isAvailable(): bool
+    {
+        return true;
+    }
+
     public function evaluate(Site $site, AiPrompt $prompt, string $engine, array $analysis): array
     {
         $score = (int) round(min(100, $analysis['base_score'] * (self::ENGINE_WEIGHTS[$engine] ?? 1.0)));

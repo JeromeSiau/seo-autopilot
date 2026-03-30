@@ -44,7 +44,8 @@ If AI visibility looks stale:
 
 1. Run `php artisan ai-visibility:sync-prompts {siteId}`.
 2. Run `php artisan ai-visibility:check {siteId}`.
-3. Inspect `system:health` for open high-risk alerts.
+3. Check whether `DATAFORSEO_LOGIN` and `DATAFORSEO_PASSWORD` are configured if you expect real `ai_overviews` checks.
+4. Inspect `system:health` for open high-risk alerts.
 
 ## Refresh troubleshooting
 

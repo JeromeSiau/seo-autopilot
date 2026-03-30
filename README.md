@@ -96,3 +96,4 @@ Points de contrôle:
 - Les secrets stockés ne sont jamais renvoyés au frontend
 - Le dashboard utilise un payload canonique unique pour éviter la dérive backend/frontend
 - Les articles ne passent en `approved` automatiquement que si le site peut réellement auto-publier
+- AI visibility utilise `dataforseo_ai_overview` pour `ai_overviews` quand `DATAFORSEO_*` est configuré; les autres moteurs restent sur le provider `estimated`

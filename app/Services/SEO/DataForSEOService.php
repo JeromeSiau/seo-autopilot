@@ -170,6 +170,36 @@ class DataForSEOService
     }
 
     /**
+     * Get advanced Google organic SERP data with AI Overview expansion enabled.
+     *
+     * @return array<string, mixed>
+     */
+    public function getGoogleOrganicAdvancedResult(
+        string $keyword,
+        string $language = 'en',
+        string $location = 'United States',
+        int $depth = 10,
+    ): array {
+        $locationCode = $this->getLocationCode($location);
+        $languageCode = $this->getLanguageCode($language);
+
+        $data = $this->request('POST', '/serp/google/organic/live/advanced', [
+            [
+                'keyword' => $keyword,
+                'location_code' => $locationCode,
+                'language_code' => $languageCode,
+                'depth' => $depth,
+                'device' => 'desktop',
+                'os' => 'macos',
+                'load_async_ai_overview' => true,
+                'expand_ai_overview' => true,
+            ],
+        ]);
+
+        return $data[0]['result'][0] ?? [];
+    }
+
+    /**
      * Get keyword difficulty.
      */
     public function getKeywordDifficulty(

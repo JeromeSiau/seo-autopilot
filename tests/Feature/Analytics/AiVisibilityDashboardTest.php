@@ -17,6 +17,16 @@ class AiVisibilityDashboardTest extends TestCase
     use CreatesTeams;
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        config([
+            'services.dataforseo.login' => null,
+            'services.dataforseo.password' => null,
+        ]);
+    }
+
     public function test_analytics_page_exposes_ai_visibility_payload_for_selected_site(): void
     {
         $user = $this->createUserWithTeam();
