@@ -223,6 +223,31 @@ class HostedPageManagementTest extends TestCase
                     ],
                 ],
                 [
+                    'type' => HostedPage::SECTION_CTA_BANNER,
+                    'eyebrow' => 'Ready to move',
+                    'title' => 'Launch the hosted lane',
+                    'body' => 'Ship a first-party blog in days, not quarters.',
+                    'cta_label' => 'Book a walkthrough',
+                    'cta_href' => '/contact',
+                    'secondary_cta_label' => 'See pricing',
+                    'secondary_cta_href' => '/pricing',
+                ],
+                [
+                    'type' => HostedPage::SECTION_PRICING_GRID,
+                    'title' => 'Pricing options',
+                    'body' => 'Choose the operating model that fits your team.',
+                    'items' => [
+                        [
+                            'title' => 'Core',
+                            'price' => '$990/mo',
+                            'meta' => 'For lean teams',
+                            'body' => 'Hosted blog, AI visibility and refresh workflow.',
+                            'cta_label' => 'Start with Core',
+                            'href' => '/pricing',
+                        ],
+                    ],
+                ],
+                [
                     'type' => HostedPage::SECTION_TESTIMONIAL_GRID,
                     'title' => 'Loved by teams',
                     'items' => [
@@ -246,13 +271,16 @@ class HostedPageManagementTest extends TestCase
 
         $page = $site->hostedPages()->where('slug', 'services')->firstOrFail();
 
-        $this->assertCount(5, $page->sections);
+        $this->assertCount(7, $page->sections);
         $this->assertSame(HostedPage::SECTION_HERO, $page->sections[0]['type']);
         $this->assertSame(HostedPage::SECTION_FEATURE_GRID, $page->sections[1]['type']);
         $this->assertSame('Strategy', $page->sections[1]['items'][0]['title']);
         $this->assertSame(HostedPage::SECTION_STAT_GRID, $page->sections[2]['type']);
-        $this->assertSame(HostedPage::SECTION_TESTIMONIAL_GRID, $page->sections[3]['type']);
-        $this->assertSame(HostedPage::SECTION_FAQ, $page->sections[4]['type']);
+        $this->assertSame(HostedPage::SECTION_CTA_BANNER, $page->sections[3]['type']);
+        $this->assertSame(HostedPage::SECTION_PRICING_GRID, $page->sections[4]['type']);
+        $this->assertSame('$990/mo', $page->sections[4]['items'][0]['price']);
+        $this->assertSame(HostedPage::SECTION_TESTIMONIAL_GRID, $page->sections[5]['type']);
+        $this->assertSame(HostedPage::SECTION_FAQ, $page->sections[6]['type']);
     }
 
     public function test_custom_hosted_page_slug_rejects_reserved_paths(): void

@@ -720,7 +720,7 @@ CSS;
                     }
                 }
 
-                if (($section['type'] ?? null) === HostedPage::SECTION_HERO) {
+                if (in_array(($section['type'] ?? null), [HostedPage::SECTION_HERO, HostedPage::SECTION_CTA_BANNER], true)) {
                     foreach (['cta', 'secondary_cta'] as $prefix) {
                         $hrefKey = $prefix . '_href';
                         $externalKey = $prefix . '_is_external';
@@ -732,6 +732,27 @@ CSS;
                             $section[$hrefKey] = $this->linkForPath($site, $baseUrl, $currentPath, $originalHref);
                         }
                     }
+                }
+
+                if (($section['type'] ?? null) === HostedPage::SECTION_PRICING_GRID) {
+                    $section['items'] = collect($section['items'] ?? [])
+                        ->map(function ($item) use ($site, $baseUrl, $currentPath) {
+                            if (!is_array($item)) {
+                                return null;
+                            }
+
+                            $originalHref = (string) ($item['href'] ?? '');
+                            $item['is_external'] = filled($originalHref) && !str_starts_with($originalHref, '/');
+
+                            if (filled($originalHref) && str_starts_with($originalHref, '/')) {
+                                $item['href'] = $this->linkForPath($site, $baseUrl, $currentPath, $originalHref);
+                            }
+
+                            return $item;
+                        })
+                        ->filter()
+                        ->values()
+                        ->all();
                 }
 
                 return $section;

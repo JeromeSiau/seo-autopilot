@@ -204,6 +204,31 @@ class HostedPublicPagesTest extends TestCase
                     ],
                 ],
                 [
+                    'type' => HostedPage::SECTION_CTA_BANNER,
+                    'eyebrow' => 'Start fast',
+                    'title' => 'Move your SEO operating system in-house',
+                    'body' => 'Go live with a first-party hosted setup and keep publishing velocity.',
+                    'cta_label' => 'Book a walkthrough',
+                    'cta_href' => '/contact',
+                    'secondary_cta_label' => 'Compare plans',
+                    'secondary_cta_href' => '/pricing',
+                ],
+                [
+                    'type' => HostedPage::SECTION_PRICING_GRID,
+                    'title' => 'Plans',
+                    'body' => 'Pick the level that matches your editorial ambition.',
+                    'items' => [
+                        [
+                            'title' => 'Core',
+                            'price' => '$990/mo',
+                            'meta' => 'Best for lean teams',
+                            'body' => 'Hosted blog, AI visibility and refresh automation.',
+                            'cta_label' => 'Choose Core',
+                            'href' => '/pricing',
+                        ],
+                    ],
+                ],
+                [
                     'type' => HostedPage::SECTION_FAQ,
                     'title' => 'Questions',
                     'items' => [
@@ -228,6 +253,10 @@ class HostedPublicPagesTest extends TestCase
             ->assertSee('What teams say')
             ->assertSee('Hosted mode ships faster than our old stack.')
             ->assertSee('+38%')
+            ->assertSee('Move your SEO operating system in-house')
+            ->assertSee('Compare plans')
+            ->assertSee('$990/mo')
+            ->assertSee('Choose Core')
             ->assertSee('Can I export the site?')
             ->assertSee('Yes, a ZIP export is available.');
     }

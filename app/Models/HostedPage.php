@@ -33,6 +33,8 @@ class HostedPage extends Model
     public const SECTION_HERO = 'hero';
     public const SECTION_TESTIMONIAL_GRID = 'testimonial_grid';
     public const SECTION_STAT_GRID = 'stat_grid';
+    public const SECTION_CTA_BANNER = 'cta_banner';
+    public const SECTION_PRICING_GRID = 'pricing_grid';
 
     public const SECTION_TYPES = [
         self::SECTION_RICH_TEXT,
@@ -42,6 +44,8 @@ class HostedPage extends Model
         self::SECTION_HERO,
         self::SECTION_TESTIMONIAL_GRID,
         self::SECTION_STAT_GRID,
+        self::SECTION_CTA_BANNER,
+        self::SECTION_PRICING_GRID,
     ];
 
     protected $fillable = [

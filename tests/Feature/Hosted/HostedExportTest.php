@@ -92,12 +92,29 @@ class HostedExportTest extends TestCase
         $site->hostedPages()->where('slug', 'pricing')->update([
             'sections' => [
                 [
-                    'type' => HostedPage::SECTION_CALLOUT,
-                    'eyebrow' => 'Scale safely',
-                    'title' => 'Built for hosted growth',
+                    'type' => HostedPage::SECTION_PRICING_GRID,
+                    'title' => 'Packages',
                     'body' => 'Use reusable sections to shape the hosted lane.',
-                    'cta_label' => 'Read the blog',
-                    'cta_href' => '/blog',
+                    'items' => [
+                        [
+                            'title' => 'Growth',
+                            'price' => '$1,490/mo',
+                            'meta' => 'Most popular',
+                            'body' => 'Hosted operations plus AI visibility tracking.',
+                            'cta_label' => 'Read the blog',
+                            'href' => '/blog',
+                        ],
+                    ],
+                ],
+                [
+                    'type' => HostedPage::SECTION_CTA_BANNER,
+                    'eyebrow' => 'Need more lift',
+                    'title' => 'Take the hosted lane live',
+                    'body' => 'Move from plugin sprawl to a first-party publishing surface.',
+                    'cta_label' => 'Contact sales',
+                    'cta_href' => '/contact',
+                    'secondary_cta_label' => 'Read the blog',
+                    'secondary_cta_href' => '/blog',
                 ],
             ],
         ]);
@@ -147,7 +164,9 @@ class HostedExportTest extends TestCase
         $this->assertStringContainsString('ZIP article', (string) $zip->getFromName('authors/jane-doe/index.html'));
         $this->assertStringContainsString('pricing/index.html', (string) $zip->getFromName('index.html'));
         $this->assertStringContainsString('https://github.com/acme/export-site', (string) $zip->getFromName('index.html'));
-        $this->assertStringContainsString('Built for hosted growth', (string) $zip->getFromName('pricing/index.html'));
+        $this->assertStringContainsString('Packages', (string) $zip->getFromName('pricing/index.html'));
+        $this->assertStringContainsString('$1,490/mo', (string) $zip->getFromName('pricing/index.html'));
+        $this->assertStringContainsString('Take the hosted lane live', (string) $zip->getFromName('pricing/index.html'));
         $this->assertStringContainsString('blog/index.html', (string) $zip->getFromName('pricing/index.html'));
 
         $zip->close();

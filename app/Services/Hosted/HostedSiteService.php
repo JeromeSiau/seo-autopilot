@@ -1004,6 +1004,8 @@ class HostedSiteService
             HostedPage::SECTION_HERO => $this->normalizeHeroSection($section),
             HostedPage::SECTION_TESTIMONIAL_GRID => $this->normalizeTestimonialGridSection($section),
             HostedPage::SECTION_STAT_GRID => $this->normalizeStatGridSection($section),
+            HostedPage::SECTION_CTA_BANNER => $this->normalizeCtaBannerSection($section),
+            HostedPage::SECTION_PRICING_GRID => $this->normalizePricingGridSection($section),
             default => null,
         };
     }
@@ -1200,6 +1202,71 @@ class HostedSiteService
         return [
             'type' => HostedPage::SECTION_STAT_GRID,
             'title' => $this->cleanSectionText(Arr::get($section, 'title'), 255),
+            'items' => $items,
+        ];
+    }
+
+    protected function normalizeCtaBannerSection(array $section): ?array
+    {
+        $title = $this->cleanSectionText(Arr::get($section, 'title'), 255);
+        $body = $this->cleanSectionText(Arr::get($section, 'body'), 3000);
+
+        if (blank($title) && blank($body)) {
+            return null;
+        }
+
+        return [
+            'type' => HostedPage::SECTION_CTA_BANNER,
+            'eyebrow' => $this->cleanSectionText(Arr::get($section, 'eyebrow'), 120),
+            'title' => $title,
+            'body' => $body,
+            'cta_label' => $this->cleanSectionText(Arr::get($section, 'cta_label'), 120),
+            'cta_href' => $this->normalizeSectionHref(Arr::get($section, 'cta_href')),
+            'secondary_cta_label' => $this->cleanSectionText(Arr::get($section, 'secondary_cta_label'), 120),
+            'secondary_cta_href' => $this->normalizeSectionHref(Arr::get($section, 'secondary_cta_href')),
+        ];
+    }
+
+    protected function normalizePricingGridSection(array $section): ?array
+    {
+        $items = collect(Arr::wrap(Arr::get($section, 'items')))
+            ->map(function ($item) {
+                if (!is_array($item)) {
+                    return null;
+                }
+
+                $title = $this->cleanSectionText(Arr::get($item, 'title'), 255);
+                $price = $this->cleanSectionText(Arr::get($item, 'price'), 120);
+                $body = $this->cleanSectionText(Arr::get($item, 'body'), 2000);
+                $ctaLabel = $this->cleanSectionText(Arr::get($item, 'cta_label'), 120);
+                $href = $this->normalizeSectionHref(Arr::get($item, 'href'));
+                $meta = $this->cleanSectionText(Arr::get($item, 'meta'), 160);
+
+                if (blank($title) && blank($price) && blank($body)) {
+                    return null;
+                }
+
+                return [
+                    'title' => $title,
+                    'price' => $price,
+                    'body' => $body,
+                    'cta_label' => $ctaLabel,
+                    'href' => $href,
+                    'meta' => $meta,
+                ];
+            })
+            ->filter()
+            ->values()
+            ->all();
+
+        if ($items === []) {
+            return null;
+        }
+
+        return [
+            'type' => HostedPage::SECTION_PRICING_GRID,
+            'title' => $this->cleanSectionText(Arr::get($section, 'title'), 255),
+            'body' => $this->cleanSectionText(Arr::get($section, 'body'), 3000),
             'items' => $items,
         ];
     }

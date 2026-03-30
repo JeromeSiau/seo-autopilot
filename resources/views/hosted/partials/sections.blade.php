@@ -78,6 +78,48 @@
                     </section>
                     @break
 
+                @case(\App\Models\HostedPage::SECTION_CTA_BANNER)
+                    <section class="section-shell callout-section" style="background:linear-gradient(135deg, rgba(17,24,39,.98), rgba(45,89,72,.92)); color:#f8fafc; border-color:rgba(255,255,255,.08);">
+                        @if (!empty($section['eyebrow']))
+                            <span class="eyebrow" style="color:rgba(255,255,255,.72); border-color:rgba(255,255,255,.14);">{{ $section['eyebrow'] }}</span>
+                        @endif
+                        @if (!empty($section['title']))
+                            <h2 class="page-title" style="font-size:clamp(1.9rem, 3vw, 3rem); margin:14px 0 12px; color:#fff;">{{ $section['title'] }}</h2>
+                        @endif
+                        @if (!empty($section['body']))
+                            <p style="font-size:1rem; max-width:70ch; color:rgba(255,255,255,.8);">{{ $section['body'] }}</p>
+                        @endif
+                        @if ((!empty($section['cta_label']) && !empty($section['cta_href'])) || (!empty($section['secondary_cta_label']) && !empty($section['secondary_cta_href'])))
+                            <div style="display:flex; flex-wrap:wrap; gap:12px; margin-top:20px;">
+                                @if (!empty($section['cta_label']) && !empty($section['cta_href']))
+                                    <a
+                                        href="{{ $section['cta_href'] }}"
+                                        class="section-cta"
+                                        style="background:#fff; color:#111827;"
+                                        @if (!empty($section['cta_is_external']))
+                                            target="_blank" rel="noopener noreferrer"
+                                        @endif
+                                    >
+                                        {{ $section['cta_label'] }}
+                                    </a>
+                                @endif
+                                @if (!empty($section['secondary_cta_label']) && !empty($section['secondary_cta_href']))
+                                    <a
+                                        href="{{ $section['secondary_cta_href'] }}"
+                                        class="section-cta-secondary"
+                                        style="border-color:rgba(255,255,255,.28); color:#fff;"
+                                        @if (!empty($section['secondary_cta_is_external']))
+                                            target="_blank" rel="noopener noreferrer"
+                                        @endif
+                                    >
+                                        {{ $section['secondary_cta_label'] }}
+                                    </a>
+                                @endif
+                            </div>
+                        @endif
+                    </section>
+                    @break
+
                 @case(\App\Models\HostedPage::SECTION_TESTIMONIAL_GRID)
                     <section class="section-shell">
                         @if (!empty($section['title']))
@@ -131,6 +173,49 @@
                                     @endif
                                     @if (!empty($item['body']))
                                         <p class="muted">{{ $item['body'] }}</p>
+                                    @endif
+                                </article>
+                            @endforeach
+                        </div>
+                    </section>
+                    @break
+
+                @case(\App\Models\HostedPage::SECTION_PRICING_GRID)
+                    <section class="section-shell">
+                        @if (!empty($section['title']))
+                            <h2 class="page-title" style="font-size:clamp(1.6rem, 3vw, 2.5rem); margin-bottom:10px;">{{ $section['title'] }}</h2>
+                        @endif
+                        @if (!empty($section['body']))
+                            <p class="muted" style="max-width:70ch;">{{ $section['body'] }}</p>
+                        @endif
+                        <div class="feature-grid" style="margin-top:22px;">
+                            @foreach ($section['items'] ?? [] as $item)
+                                <article class="feature-card" style="display:flex; flex-direction:column; gap:14px; min-height:100%;">
+                                    <div>
+                                        @if (!empty($item['title']))
+                                            <h3 style="margin:0; font-size:1.2rem;">{{ $item['title'] }}</h3>
+                                        @endif
+                                        @if (!empty($item['meta']))
+                                            <p class="eyebrow" style="margin-top:10px;">{{ $item['meta'] }}</p>
+                                        @endif
+                                    </div>
+                                    @if (!empty($item['price']))
+                                        <p style="margin:0; font-size:2rem; font-weight:700; line-height:1;">{{ $item['price'] }}</p>
+                                    @endif
+                                    @if (!empty($item['body']))
+                                        <p class="muted" style="flex:1;">{{ $item['body'] }}</p>
+                                    @endif
+                                    @if (!empty($item['cta_label']) && !empty($item['href']))
+                                        <a
+                                            href="{{ $item['href'] }}"
+                                            class="section-cta"
+                                            style="margin-top:auto;"
+                                            @if (!empty($item['is_external']))
+                                                target="_blank" rel="noopener noreferrer"
+                                            @endif
+                                        >
+                                            {{ $item['cta_label'] }}
+                                        </a>
                                     @endif
                                 </article>
                             @endforeach

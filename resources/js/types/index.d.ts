@@ -100,10 +100,14 @@ export interface HostedPageSectionItem {
     body?: string | null;
     question?: string | null;
     answer?: string | null;
+    price?: string | null;
+    cta_label?: string | null;
+    href?: string | null;
+    meta?: string | null;
 }
 
 export interface HostedPageSection {
-    type: 'rich_text' | 'callout' | 'feature_grid' | 'faq' | 'hero' | 'testimonial_grid' | 'stat_grid';
+    type: 'rich_text' | 'callout' | 'feature_grid' | 'faq' | 'hero' | 'testimonial_grid' | 'stat_grid' | 'cta_banner' | 'pricing_grid';
     heading?: string | null;
     eyebrow?: string | null;
     title?: string | null;

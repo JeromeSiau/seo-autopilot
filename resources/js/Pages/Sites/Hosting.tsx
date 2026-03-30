@@ -63,7 +63,9 @@ const NAVIGATION_TYPE_OPTIONS = [
 const SECTION_TYPE_OPTIONS = [
     { value: 'rich_text', label: 'Rich text' },
     { value: 'callout', label: 'Callout' },
+    { value: 'cta_banner', label: 'CTA banner' },
     { value: 'feature_grid', label: 'Feature grid' },
+    { value: 'pricing_grid', label: 'Pricing grid' },
     { value: 'faq', label: 'FAQ' },
     { value: 'hero', label: 'Hero' },
     { value: 'testimonial_grid', label: 'Testimonials' },
@@ -112,11 +114,29 @@ function createDefaultSection(type: HostedPageSection['type']): HostedPageSectio
                 cta_label: '',
                 cta_href: '',
             };
+        case 'cta_banner':
+            return {
+                type,
+                eyebrow: '',
+                title: '',
+                body: '',
+                cta_label: '',
+                cta_href: '',
+                secondary_cta_label: '',
+                secondary_cta_href: '',
+            };
         case 'feature_grid':
             return {
                 type,
                 title: '',
                 items: [{ title: '', body: '' }],
+            };
+        case 'pricing_grid':
+            return {
+                type,
+                title: '',
+                body: '',
+                items: [{ title: '', price: '', body: '', meta: '', cta_label: '', href: '' }],
             };
         case 'faq':
             return {
@@ -546,6 +566,82 @@ function HostedSectionsEditor({
                                     </>
                                 )}
 
+                                {section.type === 'cta_banner' && (
+                                    <>
+                                        <div className="grid gap-4 lg:grid-cols-2">
+                                            <div>
+                                                <label className="block text-sm font-medium text-surface-700 dark:text-surface-300">Eyebrow</label>
+                                                <input
+                                                    type="text"
+                                                    value={section.eyebrow ?? ''}
+                                                    onChange={(event) => updateSection(index, { eyebrow: event.target.value })}
+                                                    className={INPUT_CLASS}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-surface-700 dark:text-surface-300">Title</label>
+                                                <input
+                                                    type="text"
+                                                    value={section.title ?? ''}
+                                                    onChange={(event) => updateSection(index, { title: event.target.value })}
+                                                    className={INPUT_CLASS}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-surface-700 dark:text-surface-300">Body</label>
+                                            <textarea
+                                                rows={4}
+                                                value={section.body ?? ''}
+                                                onChange={(event) => updateSection(index, { body: event.target.value })}
+                                                className={TEXTAREA_CLASS}
+                                            />
+                                        </div>
+                                        <div className="grid gap-4 lg:grid-cols-2">
+                                            <div>
+                                                <label className="block text-sm font-medium text-surface-700 dark:text-surface-300">Primary CTA label</label>
+                                                <input
+                                                    type="text"
+                                                    value={section.cta_label ?? ''}
+                                                    onChange={(event) => updateSection(index, { cta_label: event.target.value })}
+                                                    className={INPUT_CLASS}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-surface-700 dark:text-surface-300">Primary CTA href</label>
+                                                <input
+                                                    type="text"
+                                                    value={section.cta_href ?? ''}
+                                                    onChange={(event) => updateSection(index, { cta_href: event.target.value })}
+                                                    placeholder="/contact or https://example.com"
+                                                    className={INPUT_CLASS}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="grid gap-4 lg:grid-cols-2">
+                                            <div>
+                                                <label className="block text-sm font-medium text-surface-700 dark:text-surface-300">Secondary CTA label</label>
+                                                <input
+                                                    type="text"
+                                                    value={section.secondary_cta_label ?? ''}
+                                                    onChange={(event) => updateSection(index, { secondary_cta_label: event.target.value })}
+                                                    className={INPUT_CLASS}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-surface-700 dark:text-surface-300">Secondary CTA href</label>
+                                                <input
+                                                    type="text"
+                                                    value={section.secondary_cta_href ?? ''}
+                                                    onChange={(event) => updateSection(index, { secondary_cta_href: event.target.value })}
+                                                    placeholder="/pricing or https://example.com"
+                                                    className={INPUT_CLASS}
+                                                />
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
+
                                 {section.type === 'feature_grid' && (
                                     <>
                                         <div>
@@ -598,6 +694,115 @@ function HostedSectionsEditor({
                                                 onClick={() => updateSectionItems(index, [...(section.items ?? []), { title: '', body: '' }])}
                                             >
                                                 Add feature
+                                            </Button>
+                                        </div>
+                                    </>
+                                )}
+
+                                {section.type === 'pricing_grid' && (
+                                    <>
+                                        <div>
+                                            <label className="block text-sm font-medium text-surface-700 dark:text-surface-300">Section title</label>
+                                            <input
+                                                type="text"
+                                                value={section.title ?? ''}
+                                                onChange={(event) => updateSection(index, { title: event.target.value })}
+                                                className={INPUT_CLASS}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-surface-700 dark:text-surface-300">Intro</label>
+                                            <textarea
+                                                rows={3}
+                                                value={section.body ?? ''}
+                                                onChange={(event) => updateSection(index, { body: event.target.value })}
+                                                className={TEXTAREA_CLASS}
+                                            />
+                                        </div>
+                                        <div className="space-y-3">
+                                            {(section.items ?? []).map((item, itemIndex) => (
+                                                <div key={itemIndex} className="rounded-xl border border-surface-200 p-4 dark:border-surface-800">
+                                                    <div className="grid gap-4 lg:grid-cols-2">
+                                                        <div>
+                                                            <label className="block text-sm font-medium text-surface-700 dark:text-surface-300">Plan name</label>
+                                                            <input
+                                                                type="text"
+                                                                value={item.title ?? ''}
+                                                                onChange={(event) => updateSectionItems(index, (section.items ?? []).map((currentItem, currentIndex) => currentIndex === itemIndex ? { ...currentItem, title: event.target.value } : currentItem))}
+                                                                className={INPUT_CLASS}
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-sm font-medium text-surface-700 dark:text-surface-300">Price</label>
+                                                            <input
+                                                                type="text"
+                                                                value={item.price ?? ''}
+                                                                onChange={(event) => updateSectionItems(index, (section.items ?? []).map((currentItem, currentIndex) => currentIndex === itemIndex ? { ...currentItem, price: event.target.value } : currentItem))}
+                                                                placeholder="$990/mo"
+                                                                className={INPUT_CLASS}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div className="mt-4 grid gap-4 lg:grid-cols-2">
+                                                        <div>
+                                                            <label className="block text-sm font-medium text-surface-700 dark:text-surface-300">Meta line</label>
+                                                            <input
+                                                                type="text"
+                                                                value={item.meta ?? ''}
+                                                                onChange={(event) => updateSectionItems(index, (section.items ?? []).map((currentItem, currentIndex) => currentIndex === itemIndex ? { ...currentItem, meta: event.target.value } : currentItem))}
+                                                                placeholder="Best for lean teams"
+                                                                className={INPUT_CLASS}
+                                                            />
+                                                        </div>
+                                                        <div className="flex items-end justify-end">
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                icon={Trash2}
+                                                                onClick={() => updateSectionItems(index, (section.items ?? []).filter((_, currentIndex) => currentIndex !== itemIndex))}
+                                                            >
+                                                                Remove plan
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                    <div className="mt-4">
+                                                        <label className="block text-sm font-medium text-surface-700 dark:text-surface-300">Description</label>
+                                                        <textarea
+                                                            rows={3}
+                                                            value={item.body ?? ''}
+                                                            onChange={(event) => updateSectionItems(index, (section.items ?? []).map((currentItem, currentIndex) => currentIndex === itemIndex ? { ...currentItem, body: event.target.value } : currentItem))}
+                                                            className={TEXTAREA_CLASS}
+                                                        />
+                                                    </div>
+                                                    <div className="mt-4 grid gap-4 lg:grid-cols-2">
+                                                        <div>
+                                                            <label className="block text-sm font-medium text-surface-700 dark:text-surface-300">CTA label</label>
+                                                            <input
+                                                                type="text"
+                                                                value={item.cta_label ?? ''}
+                                                                onChange={(event) => updateSectionItems(index, (section.items ?? []).map((currentItem, currentIndex) => currentIndex === itemIndex ? { ...currentItem, cta_label: event.target.value } : currentItem))}
+                                                                className={INPUT_CLASS}
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-sm font-medium text-surface-700 dark:text-surface-300">CTA href</label>
+                                                            <input
+                                                                type="text"
+                                                                value={item.href ?? ''}
+                                                                onChange={(event) => updateSectionItems(index, (section.items ?? []).map((currentItem, currentIndex) => currentIndex === itemIndex ? { ...currentItem, href: event.target.value } : currentItem))}
+                                                                placeholder="/contact or https://example.com"
+                                                                className={INPUT_CLASS}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                            <Button
+                                                variant="secondary"
+                                                size="sm"
+                                                onClick={() => updateSectionItems(index, [...(section.items ?? []), { title: '', price: '', body: '', meta: '', cta_label: '', href: '' }])}
+                                            >
+                                                Add pricing card
                                             </Button>
                                         </div>
                                     </>
