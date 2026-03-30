@@ -1,0 +1,65 @@
+name: Tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: tests-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  app-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, bcmath, ctype, curl, dom, fileinfo, intl, json, openssl, pdo_sqlite, sqlite3, tokenizer, xml
+          coverage: none
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Copy environment file
+        run: cp .env.example .env
+
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Prepare environment
+        run: php artisan key:generate
+
+      - name: Install Node.js dependencies
+        run: npm ci
+
+      - name: Install Python agent dependencies
+        run: uv sync --project agents-python --extra dev
+
+      - name: Run PHP test suite
+        run: php artisan test
+
+      - name: Build frontend assets
+        run: npm run build
+
+      - name: Run Python agent tests
+        run: uv run --project agents-python pytest

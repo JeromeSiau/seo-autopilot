@@ -1,0 +1,82 @@
+name: Dusk
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 2 * * *'
+
+concurrency:
+  group: dusk-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  browser-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, bcmath, ctype, curl, dom, fileinfo, intl, json, openssl, pdo_sqlite, sqlite3, tokenizer, xml
+          coverage: none
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Setup Chrome
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Copy environment files
+        run: |
+          cp .env.dusk.local .env
+          mkdir -p database
+          touch database/dusk.sqlite
+
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Install Node.js dependencies
+        run: npm ci
+
+      - name: Build frontend assets
+        run: npm run build
+
+      - name: Install matching ChromeDriver
+        run: php artisan dusk:chrome-driver --detect
+
+      - name: Start Laravel server
+        run: php artisan serve --host=127.0.0.1 --port=8000 > /tmp/laravel.log 2>&1 &
+
+      - name: Wait for application
+        run: |
+          for attempt in {1..30}; do
+            if curl --silent --fail http://127.0.0.1:8000 > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/laravel.log
+          exit 1
+
+      - name: Run Dusk suite
+        env:
+          APP_URL: http://127.0.0.1:8000
+        run: php artisan dusk --without-tty
+
+      - name: Upload Dusk artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dusk-artifacts
+          path: |
+            tests/Browser/console
+            tests/Browser/screenshots
+            storage/logs

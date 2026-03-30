@@ -53,6 +53,7 @@ php artisan test
 npm run build
 uv run --project agents-python pytest
 php artisan agents:health
+php artisan system:health
 ```
 
 ## Variables utiles
@@ -79,8 +80,10 @@ Processus à faire tourner en continu:
 Points de contrôle:
 
 - `php artisan agents:health` vérifie le heartbeat du pont Redis des agents
+- `php artisan system:health` agrège agents, webhooks, hosted et alertes AI visibility
 - `storage/indexes` ou `SITE_INDEXER_STORAGE_PATH` contient les index SQLite des sites
 - les workers queue doivent avoir un `retry_after` supérieur au plus long job
+- les runbooks d’exploitation et de release sont dans `docs/runbooks/`
 
 ## CI
 
