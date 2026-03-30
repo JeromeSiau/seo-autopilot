@@ -1,7 +1,7 @@
 # 90-Day Top-Tier Evolution Plan
 
 Last updated: 2026-03-30
-Status: In active implementation
+Status: Core roadmap implemented, remaining work is production depth and polish
 Scope: Product, backend, frontend, jobs, analytics, ops
 
 Note: This version reflects the introduction of first-party hosted blogs in addition to external CMS publishing.
@@ -10,14 +10,20 @@ Note: This version reflects the introduction of first-party hosted blogs in addi
 
 Current progress snapshot:
 
-- Phase 1 foundations: mostly implemented
+- Phase 1 foundations: implemented
 - Hosted lane: strongly advanced, including navigation, sections, SEO controls, authors, taxonomies, assets and ops telemetry
-- AI visibility: implemented as a durable product layer with alert history and prompt sets
+- AI visibility: implemented as a durable product layer with alert history, prompt sets, provider registry and DataForSEO-backed AI Overviews
 - Refresh autopilot: implemented with planner UI, business attribution, draft diffing and push-back-to-review flow
 - Editorial workflow: implemented with assignments, approvals, comments, review queue and refresh-ready scope
-- Ops and release hardening: CI workflows, health commands and runbooks added
+- Campaigns and webhooks: implemented with UI, retry metadata and actionable event payloads
+- Ops and release hardening: CI workflows, health commands, smoke coverage and runbooks added
 
-Remaining work is now mostly polish and production depth, not missing core product flows.
+Remaining work is now mostly:
+
+- deeper real-world AI visibility connectors beyond the current provider mix
+- richer business attribution inputs
+- premium hosted builder UX depth
+- broader monitoring and production observability polish
 
 ## Goal
 

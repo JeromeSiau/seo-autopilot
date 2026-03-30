@@ -3,6 +3,7 @@
 ## Before merge
 
 - `php artisan test`
+- `php artisan test --filter=CriticalFlowsSmokeTest`
 - `npm run build`
 - `uv run --project agents-python pytest`
 - `php artisan ziggy:generate resources/js/ziggy.js`
@@ -25,6 +26,7 @@
 
 ## Smoke flows
 
+- Run `php artisan test --filter=CriticalFlowsSmokeTest`
 - Generate one article
 - Approve or request approval
 - Run refresh detection
